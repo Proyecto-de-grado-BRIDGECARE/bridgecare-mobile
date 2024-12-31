@@ -12,15 +12,20 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  
+
   bool _obscurePassword = true;
   bool _isLoading = false;
 
-  OutlineInputBorder _normalBorder(Color color, double width) {
-    return OutlineInputBorder(
-      borderSide: BorderSide(color: color, width: width),
-      borderRadius: BorderRadius.circular(1),
-    );
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(
+        const AssetImage('assets/images/bridgecare_logo.png'), context);
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   Future<void> _login() async {
@@ -30,17 +35,23 @@ class _LoginPageState extends State<LoginPage> {
       setState(() => _isLoading = true);
 
       await Future.delayed(const Duration(seconds: 5)); // simulate network call
-
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomePage()),
       );
 
-      // If there was an error, do:
+      // If error occurred:
       // setState(() => _isLoading = false);
-      // and show an error message, etc.
+      // show an error, etc.
     }
+  }
+
+  OutlineInputBorder _normalBorder(Color color, double width) {
+    return OutlineInputBorder(
+      borderSide: BorderSide(color: color, width: width),
+      borderRadius: BorderRadius.circular(1),
+    );
   }
 
   @override
@@ -77,7 +88,6 @@ class _LoginPageState extends State<LoginPage> {
                 child: Form(
                   key: _formKey,
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       // Username
                       TextFormField(
@@ -97,12 +107,15 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           floatingLabelBehavior: FloatingLabelBehavior.never,
                           enabledBorder: _normalBorder(Colors.grey.shade400, 1),
-                          focusedBorder: _normalBorder(const Color(0xFF676767), 1.5),
+                          focusedBorder:
+                              _normalBorder(const Color(0xFF676767), 1.5),
                           errorBorder: _normalBorder(Colors.red, 1),
                           focusedErrorBorder: _normalBorder(Colors.red, 1.5),
-                          errorStyle: const TextStyle(fontSize: 12, color: Colors.red),
+                          errorStyle:
+                              const TextStyle(fontSize: 12, color: Colors.red),
                         ),
-                        style: const TextStyle(color: Colors.black, fontSize: 12),
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 12),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor ingrese su usuario';
@@ -137,7 +150,8 @@ class _LoginPageState extends State<LoginPage> {
                           focusedBorder: _normalBorder(Colors.black, 1.5),
                           errorBorder: _normalBorder(Colors.red, 1),
                           focusedErrorBorder: _normalBorder(Colors.red, 1.5),
-                          errorStyle: const TextStyle(fontSize: 12, color: Colors.red),
+                          errorStyle:
+                              const TextStyle(fontSize: 12, color: Colors.red),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
@@ -152,7 +166,8 @@ class _LoginPageState extends State<LoginPage> {
                             },
                           ),
                         ),
-                        style: const TextStyle(color: Colors.black, fontSize: 12),
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 12),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor ingrese su contraseña';
