@@ -18,18 +18,27 @@ class HomePage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Expanded(
-              child: GridView.count(
+          GridView.count(
+            padding: const EdgeInsets.all(20),
             crossAxisCount: 2,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
+            shrinkWrap: true,
             children: [
               Image.asset('assets/images/puente-inicio.png'),
               Image.asset('assets/images/puente-inicio.png'),
               Image.asset('assets/images/puente-inicio.png'),
               Image.asset('assets/images/puente-inicio.png'),
             ],
-          ))
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Text(
+                'Bienvenido a BridgeCare, la aplicación para el diagnostico del estado de un puente',
+                style: TextStyle(
+                    fontStyle: FontStyle.normal,
+                    color: Colors.black.withOpacity(1))),
+          )
         ],
       ),
     );
