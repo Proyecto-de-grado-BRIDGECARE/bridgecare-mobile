@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
+  static const List<String> imagenes = [
+    'assets/images/puente-inicio.png',
+    'assets/images/puente-inicio.png',
+    'assets/images/puente-inicio.png',
+    'assets/images/puente-inicio.png'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +30,11 @@ class HomePage extends StatelessWidget {
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
             shrinkWrap: true,
-            children: [
-              Image.asset('assets/images/puente-inicio.png'),
-              Image.asset('assets/images/puente-inicio.png'),
-              Image.asset('assets/images/puente-inicio.png'),
-              Image.asset('assets/images/puente-inicio.png'),
-            ],
+            children: imagenes.map((path) {
+              return ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(path, fit: BoxFit.cover));
+            }).toList(),
           ),
           Padding(
             padding: const EdgeInsets.all(10),
