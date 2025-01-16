@@ -1,4 +1,5 @@
 import 'package:bridgecare/features/auth/presentation/pages/login_page.dart';
+import 'package:bridgecare/shared/forms/form_Inventory.dart';
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {
@@ -8,9 +9,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'BridgeCare',
-      initialRoute: '/login',
+      initialRoute: '/inventarioForm',
       routes: {
-        '/login': (context) => LoginPage(),
+        //'/login': (context) => LoginPage(),
+        '/inventarioForm': (context) => FormInventory(),
         //'/home': (context) => HomePage(),
       },
     );
