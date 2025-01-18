@@ -12,6 +12,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   persistent_bottom_nav_bar: any
   google_fonts: ^5.0.0
+  image_picker: ^0.8.6+1
 
 dev_dependencies:
   flutter_test:
