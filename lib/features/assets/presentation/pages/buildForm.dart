@@ -1,32 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
-class _buildForm extends StatelessWidget {
-  const _buildForm({super.key});
+class buildForm extends StatelessWidget {
+  final String titulo;
+  final List<Widget> campos;
+
+  const buildForm({required this.campos, required this.titulo});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [],
-    );
-  }
-
-  Widget _buildSection(String title, List<Widget> children) {
     return Container(
-        margin: EdgeInsets.only(bottom: 16),
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-            ),
-            ...children
-          ],
-        ));
+      margin: EdgeInsets.all(16),
+      padding: EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            titulo,
+            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          ),
+          ...campos
+        ],
+      ),
+    );
   }
 }
