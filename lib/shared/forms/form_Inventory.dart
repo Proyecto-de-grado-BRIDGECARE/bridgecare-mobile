@@ -13,9 +13,10 @@ class FormInventory extends StatefulWidget {
 
 class _FormInventoryState extends State<FormInventory> {
   //primero
-  TextEditingController bridgeName = TextEditingController();
-  TextEditingController regionalId = TextEditingController();
-  TextEditingController roadId = TextEditingController();
+  final TextEditingController bridgeName = TextEditingController();
+  final TextEditingController regionalId = TextEditingController();
+  final TextEditingController roadId = TextEditingController();
+  final TextEditingController puenteImg = TextEditingController();
 
   //pasos
   TextEditingController tipoPaso = TextEditingController();
@@ -134,25 +135,33 @@ class _FormInventoryState extends State<FormInventory> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "Formulario de Inventario",
-            style: TextStyle(color: Colors.black, fontSize: 19),
-          ),
-          centerTitle: true,
-          backgroundColor: Color(0xFFEBEBEB),
+      backgroundColor: Color(0xFFEBEBEB),
+      appBar: AppBar(
+        title: Text(
+          "Formulario de Inventario",
+          style: TextStyle(color: Colors.black, fontSize: 19),
         ),
-        body: SingleChildScrollView());
-  }
-
-  Widget _buildTextField(String etiqueta, TextEditingController controller) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        controller: controller,
-        decoration:
-            InputDecoration(hintText: etiqueta, border: OutlineInputBorder()),
+        centerTitle: true,
+        backgroundColor: Color(0xFFEBEBEB),
       ),
+      body: buildForm(titulo: "", secciones: [
+        SectionData(
+            tituloSeccion: "informacion basica",
+            labelCampo: "nombre",
+            controller: bridgeName),
+        SectionData(
+            tituloSeccion: "identificacion regional",
+            labelCampo: "regional",
+            controller: regionalId),
+        SectionData(
+            tituloSeccion: "identificacion de carretera",
+            labelCampo: "carretera",
+            controller: roadId),
+        SectionData(
+            tituloSeccion: "imagen",
+            labelCampo: "imagen",
+            controller: puenteImg)
+      ]),
     );
   }
 }
