@@ -20,7 +20,7 @@ class _FormInventoryState extends State<FormInventory> {
 
   //pasos
   TextEditingController tipoPaso = TextEditingController();
-  TextEditingController Primero = TextEditingController();
+  TextEditingController primero = TextEditingController();
   TextEditingController supInf = TextEditingController();
   TextEditingController galiboI = TextEditingController();
   TextEditingController galiboIM = TextEditingController();
@@ -74,7 +74,7 @@ class _FormInventoryState extends State<FormInventory> {
   TextEditingController subEstructTipo = TextEditingController();
   TextEditingController subEstructMaterial = TextEditingController();
   TextEditingController tipoCimentacion = TextEditingController();
-  TextEditingController SubEstructImg = TextEditingController();
+  TextEditingController subEstructImg = TextEditingController();
 
   //Subestructura detalles
   TextEditingController tipoBaranda = TextEditingController();
@@ -126,7 +126,7 @@ class _FormInventoryState extends State<FormInventory> {
   //carga
   TextEditingController longLuzCritic = TextEditingController();
   TextEditingController factorClasificacion = TextEditingController();
-  TextEditingController FuerzaCortante = TextEditingController();
+  TextEditingController fuerzaCortante = TextEditingController();
   TextEditingController momento = TextEditingController();
   TextEditingController lineaCargaRueda = TextEditingController();
   TextEditingController observaciones = TextEditingController();
@@ -134,34 +134,29 @@ class _FormInventoryState extends State<FormInventory> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xFFEBEBEB),
-      appBar: AppBar(
-        title: Text(
-          "Formulario de Inventario",
-          style: TextStyle(color: Colors.black, fontSize: 19),
-        ),
-        centerTitle: true,
-        backgroundColor: Color(0xFFEBEBEB),
-      ),
-      body: buildForm(titulo: "", secciones: [
-        SectionData(
-            tituloSeccion: "informacion basica",
-            labelCampo: "nombre",
-            controller: bridgeName),
-        SectionData(
-            tituloSeccion: "identificacion regional",
-            labelCampo: "regional",
-            controller: regionalId),
-        SectionData(
-            tituloSeccion: "identificacion de carretera",
-            labelCampo: "carretera",
-            controller: roadId),
-        SectionData(
-            tituloSeccion: "imagen",
-            labelCampo: "imagen",
-            controller: puenteImg)
+    List<SectionData> secciones = [
+      SectionData(tituloSeccion: "informacion basica", campos: [
+        FieldData(labelCampo: "nombre", controller: bridgeName),
+        FieldData(labelCampo: "region id", controller: regionalId),
+        FieldData(labelCampo: "id del camino", controller: roadId),
       ]),
-    );
+      SectionData(tituloSeccion: "informacion basica", campos: [
+        FieldData(labelCampo: "nombre", controller: bridgeName),
+        FieldData(labelCampo: "region id", controller: regionalId),
+        FieldData(labelCampo: "id del camino", controller: roadId),
+      ])
+    ];
+
+    return Scaffold(
+        backgroundColor: Color(0xFFEBEBEB),
+        appBar: AppBar(
+          title: Text(
+            "Formulario de Inventario",
+            style: TextStyle(color: Colors.black, fontSize: 19),
+          ),
+          centerTitle: true,
+          backgroundColor: Color(0xFFEBEBEB),
+        ),
+        body: buildForm(tituloSeccion: "", secciones: secciones));
   }
 }
