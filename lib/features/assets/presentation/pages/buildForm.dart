@@ -12,23 +12,28 @@ class buildForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(16),
-      padding: EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(10)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            tituloSeccion,
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10.0),
-          ...secciones.map((section) => _buildSection(section)).toList(),
-        ],
-      ),
-    );
+    return SafeArea(
+        child: SingleChildScrollView(
+            child: Container(
+                margin: EdgeInsets.all(16),
+                padding: EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tituloSeccion,
+                      style: TextStyle(
+                          fontSize: 18.0, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10.0),
+                    ...secciones
+                        .map((section) => _buildSection(section))
+                        .toList(),
+                  ],
+                ))));
   }
 
   Widget _buildSection(SectionData section) {
