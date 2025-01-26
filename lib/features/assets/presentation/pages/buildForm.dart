@@ -1,14 +1,32 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
-class buildForm extends StatelessWidget {
+class buildForm extends StatefulWidget {
   final String tituloSeccion;
   final List<SectionData> secciones;
 
-  const buildForm(
-      {required this.tituloSeccion, required this.secciones, Key? key})
-      : super(key: key);
+  buildForm({required this.tituloSeccion, required this.secciones, super.key});
+
+  @override
+  _buildFormState createState() => _buildFormState();
+}
+
+class _buildFormState extends State<buildForm> {
+  Map<String, File?> _imagenesSecciones = {};
+
+  Future<void> _pickImage(String sectionKey) async {
+    final picker = ImagePicker();
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imagenesSecciones[sectionKey] = File(pickedFile.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +42,38 @@ class buildForm extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      tituloSeccion,
+                      widget.tituloSeccion,
                       style: TextStyle(
                           fontSize: 18.0, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10.0),
-                    ...secciones
-                        .map((section) => _buildSection(section))
-                        .toList(),
+                    ...widget.secciones
+                        .map((section) => _buildSection(section)),
+                    SizedBox(height: 10),
+                    Container(
+                        height: 150,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            color: Color(0xFF0097B2),
+                            borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(30),
+                                topLeft: Radius.circular(30))),
+                        child: Center(
+                          child: ElevatedButton(
+                              onPressed: _saveForm,
+                              child: Text(
+                                "Guardar formulario",
+                                style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xffFFFFFF)),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 20, horizontal: 20),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  backgroundColor: Color(0xFFF29E23))),
+                        ))
                   ],
                 ))));
   }
@@ -45,9 +87,38 @@ class buildForm extends StatelessWidget {
           Text(section.tituloSeccion,
               style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
           SizedBox(height: 10.0),
-          ...section.campos.map((campos) => _buildTextField(campos)).toList()
+          ...section.campos.map((campos) => _buildTextField(campos)),
+          _buildImagePicker(section.tituloSeccion)
         ],
       ),
+    );
+  }
+
+  Widget _buildImagePicker(String sectionKey) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('subir imagen: ', style: GoogleFonts.poppins()),
+        SizedBox(height: 10),
+        GestureDetector(
+          onTap: () => _pickImage(sectionKey),
+          child: Container(
+              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(10)),
+              child: _imagenesSecciones[sectionKey] == null
+                  ? Center(child: Text('toca para seleccionar una imagen'))
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.file(
+                        _imagenesSecciones[sectionKey]!,
+                        fit: BoxFit.cover,
+                      ))),
+        )
+      ],
     );
   }
 
@@ -55,11 +126,40 @@ class buildForm extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: TextField(
-        controller: field.controller,
-        decoration: InputDecoration(
-            hintText: field.labelCampo, border: OutlineInputBorder()),
-      ),
+          controller: field.controller,
+          decoration: InputDecoration(
+              hintText: field.labelCampo, border: OutlineInputBorder())),
     );
+  }
+
+  void _saveForm() {
+    bool allImagesSelected = widget.secciones.every((section) {
+      return _imagenesSecciones[section.tituloSeccion] != null;
+    });
+
+    if (!allImagesSelected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content:
+                Text("Por favor, selecciona una imagen para cada sección.")),
+      );
+      return;
+    }
+
+    for (var section in widget.secciones) {
+      for (var campo in section.campos) {
+        print("${campo.labelCampo}: ${campo.controller.text}");
+      }
+
+      final selectedImage = _imagenesSecciones[section.tituloSeccion];
+      if (selectedImage == null) {
+        print("Imagen para ${section.tituloSeccion}: ${selectedImage?.path}");
+      }
+    }
+
+    //enviar datos a servidor
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("Formulario guardado con exito")));
   }
 }
 
