@@ -9,11 +9,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'BridgeCare',
-      initialRoute: '/inspections',
+      initialRoute: '/inspecciones',
       routes: {
         // '/login': (context) => LoginPage(),
         //'/home': (context) => HomePage(),
-        '/inspections': (context) => InspectionPage(),
+        '/inspecciones': (context) => InspeccionesPage(),
       },
     );
   }

@@ -24,12 +24,12 @@ class Inspeccion {
   }
 }
 
-class InspectionPage extends StatefulWidget {
+class InspeccionesPage extends StatefulWidget {
   @override
-  State<InspectionPage> createState() => _InspectionState();
+  State<InspeccionesPage> createState() => _InspectionState();
 }
 
-class _InspectionState extends State<InspectionPage> {
+class _InspectionState extends State<InspeccionesPage> {
   List<Inspeccion> _inspecciones = [];
   List<Map<String, dynamic>> _datos = []; // Datos originales
   List<Map<String, dynamic>> _datosFiltrados = []; // Datos filtrados
