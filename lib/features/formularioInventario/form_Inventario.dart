@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:bridgecare/features/assets/presentation/pages/buildForm.dart';
+import 'package:bridgecare/features/formularioInventario/buildForm.dart';
 import 'package:image_picker/image_picker.dart';
 // import 'package:image_picker/image_picker.dart';
 
-class FormInventory extends StatefulWidget {
-  const FormInventory({super.key});
+class formInventario extends StatefulWidget {
+  const formInventario({super.key});
 
   @override
-  State<FormInventory> createState() => _FormInventoryState();
+  State<formInventario> createState() => _formInventarioState();
 }
 
-class _FormInventoryState extends State<FormInventory> {
+class _formInventarioState extends State<formInventario> {
   //primero
   final TextEditingController bridgeName = TextEditingController();
   final TextEditingController regionalId = TextEditingController();

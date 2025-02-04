@@ -1,4 +1,4 @@
-import 'package:bridgecare/shared/forms/form_Inventory.dart';
+import 'package:bridgecare/features/formularioInventario/form_Inventario.dart';
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {
@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/inventarioForm',
       routes: {
         //'/login': (context) => LoginPage(),
-        '/inventarioForm': (context) => FormInventory(),
+        '/inventarioForm': (context) => formInventario(),
         //'/home': (context) => HomePage(),
       },
     );
