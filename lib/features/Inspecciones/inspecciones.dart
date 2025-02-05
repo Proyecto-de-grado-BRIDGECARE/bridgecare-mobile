@@ -77,7 +77,7 @@ class _InspectionState extends State<InspeccionesPage> {
     return DataRow(cells: [
       DataCell(Text(elemento['id'].toString())),
       DataCell(ElevatedButton(
-        child: Text("Nueva inspeccion",
+        child: Text("ver detalle",
             style: GoogleFonts.poppins(color: Color(0xffF29E23))),
         style: ElevatedButton.styleFrom(
             shape: BeveledRectangleBorder(
@@ -85,7 +85,7 @@ class _InspectionState extends State<InspeccionesPage> {
             ),
             side: BorderSide(width: 1, color: Color(0xffF29E23))),
         onPressed: () {
-          print("nueva inspeccion");
+          print("ver detalle");
         },
       )),
       DataCell(IconButton(
