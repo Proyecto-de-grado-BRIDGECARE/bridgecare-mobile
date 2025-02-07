@@ -85,7 +85,7 @@ class _InspectionState extends State<InspeccionesPage> {
             ),
             side: BorderSide(width: 1, color: Color(0xffF29E23))),
         onPressed: () {
-          print("ver detalle");
+          _mostrarDetalles(context, elemento);
         },
       )),
       DataCell(IconButton(
@@ -103,6 +103,100 @@ class _InspectionState extends State<InspeccionesPage> {
         color: Color(0xffF29E23),
       ))
     ]);
+  }
+
+  void _mostrarDetalles(BuildContext context, Map<String, dynamic> datos) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            content: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "No. ",
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    Text(
+                      "ID Inspección",
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "No. ",
+                      style: GoogleFonts.poppins(fontSize: 16),
+                    ),
+                    Text(
+                      datos['id'] ?? "sin id",
+                      style: GoogleFonts.poppins(fontSize: 16),
+                    )
+                  ],
+                ),
+                SizedBox(height: 10),
+                Text(
+                  "Usuario encargado",
+                  style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  datos['mail'] ?? "sin mail",
+                  style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  "Fecha inspección",
+                  style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  datos['date'] ?? "sin fecha",
+                  style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton.icon(
+                      icon: Icon(Icons.edit, color: Color(0xffF29E23)),
+                      label: Text("gestionar inspeccion",
+                          style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        print("Gestionar inspección para ${datos['id']}");
+                      },
+                    ),
+                    TextButton.icon(
+                      icon: Icon(Icons.delete, color: Color(0xffF29E23)),
+                      label: Text("eliminar inspeccion",
+                          style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        print("eliminar la inspeccion de ${datos['id']}");
+                      },
+                    )
+                  ],
+                )
+              ],
+            ),
+          );
+        });
   }
 
   @override
