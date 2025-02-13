@@ -129,7 +129,7 @@ class _formInventarioState extends State<formInventario> {
         FieldData(labelCampo: "region id", controller: regionalId),
         FieldData(labelCampo: "id del camino", controller: roadId),
       ]),
-      SectionData(tituloSeccion: "pasos", campos: [
+      SectionData(tituloSeccion: "PASOS", campos: [
         FieldData(labelCampo: "Tipo paso", controller: tipoPaso),
         FieldData(labelCampo: "Primero (S/N)", controller: primero),
         FieldData(labelCampo: "Sup/Inf(S/I)", controller: supInf),
