@@ -81,8 +81,7 @@ class _buildFormState extends State<buildForm> {
   Widget _buildSection(SectionData section) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
       child: ExpansionTile(
         title: Text(section.tituloSeccion,
             style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
