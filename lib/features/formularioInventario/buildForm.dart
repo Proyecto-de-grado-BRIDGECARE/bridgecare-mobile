@@ -79,16 +79,24 @@ class _buildFormState extends State<buildForm> {
   }
 
   Widget _buildSection(SectionData section) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 2,
+      child: ExpansionTile(
+        title: Text(section.tituloSeccion,
+            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
         children: [
-          Text(section.tituloSeccion,
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10.0),
-          ...section.campos.map((campos) => _buildTextField(campos)),
-          _buildImagePicker(section.tituloSeccion)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ...section.campos.map((campo) => _buildTextField(campo)),
+                _buildImagePicker(section.tituloSeccion),
+              ],
+            ),
+          )
         ],
       ),
     );
