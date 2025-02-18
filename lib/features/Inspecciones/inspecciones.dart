@@ -76,31 +76,17 @@ class _InspectionState extends State<InspeccionesPage> {
   DataRow toElement(Map<String, dynamic> elemento) {
     return DataRow(cells: [
       DataCell(Text(elemento['id'].toString())),
+      DataCell(Text(elemento['date'].toString())),
       DataCell(ElevatedButton(
         child: Text("ver detalle",
             style: GoogleFonts.poppins(color: Color(0xffF29E23))),
         style: ElevatedButton.styleFrom(
             shape: BeveledRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
+                borderRadius: BorderRadius.all(Radius.circular(10))),
             side: BorderSide(width: 1, color: Color(0xffF29E23))),
         onPressed: () {
           _mostrarDetalles(context, elemento);
         },
-      )),
-      DataCell(IconButton(
-        icon: Icon(Icons.edit),
-        onPressed: () {
-          print("nueva inspeccion");
-        },
-        color: Color(0xffF29E23),
-      )),
-      DataCell(IconButton(
-        icon: Icon(Icons.delete),
-        onPressed: () {
-          print("eliminar inspeccion");
-        },
-        color: Color(0xffF29E23),
       ))
     ]);
   }
@@ -205,7 +191,7 @@ class _InspectionState extends State<InspeccionesPage> {
         backgroundColor: Color(0xFFEBEBEB),
         appBar: AppBar(
             title: Text(
-              "puente ${_inspecciones.isNotEmpty ? _inspecciones[0].id : "sin id"}",
+              "Ultimas inspecciones del puente",
               style: TextStyle(color: Colors.black, fontSize: 19),
             ),
             centerTitle: true,
@@ -252,12 +238,11 @@ class _InspectionState extends State<InspeccionesPage> {
                           DataColumn(
                               label: SizedBox(
                             width: 120,
-                            child: Text("Id Inspeccion",
+                            child: Text("Nombre puente",
                                 style: GoogleFonts.poppins(
                                     fontWeight: FontWeight.bold)),
                           )),
-                          DataColumn(label: Text("")),
-                          DataColumn(label: Text("")),
+                          DataColumn(label: Text("Ultima modificación")),
                           DataColumn(label: Text("")),
                         ], rows: _datosFiltrados.map(toElement).toList()),
                       )))
