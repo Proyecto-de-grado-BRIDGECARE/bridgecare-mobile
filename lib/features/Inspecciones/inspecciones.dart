@@ -74,9 +74,12 @@ class _InspectionState extends State<InspeccionesPage> {
   }
 
   DataRow toElement(Map<String, dynamic> elemento) {
+    var date = DateTime.parse(elemento['date']);
+    var fechaFormateada =
+        "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}";
     return DataRow(cells: [
       DataCell(Text(elemento['id'].toString())),
-      DataCell(Text(elemento['date'].toString())),
+      DataCell(Text(fechaFormateada)),
       DataCell(ElevatedButton(
         child: Text("ver detalle",
             style: GoogleFonts.poppins(color: Color(0xffF29E23))),
@@ -92,6 +95,9 @@ class _InspectionState extends State<InspeccionesPage> {
   }
 
   void _mostrarDetalles(BuildContext context, Map<String, dynamic> datos) {
+    var date = DateTime.parse(datos['date']);
+    var fechaFormateada =
+        "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}";
     showDialog(
         context: context,
         builder: (context) {
@@ -150,7 +156,7 @@ class _InspectionState extends State<InspeccionesPage> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  datos['date'] ?? "sin fecha",
+                  fechaFormateada ?? "sin fecha",
                   style: GoogleFonts.poppins(
                       fontWeight: FontWeight.bold, fontSize: 16),
                 ),
