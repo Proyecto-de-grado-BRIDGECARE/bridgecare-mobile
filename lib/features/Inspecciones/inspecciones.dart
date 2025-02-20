@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:bridgecare/features/assets/presentation/widgets/barraNavegacion.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -195,13 +196,51 @@ class _InspectionState extends State<InspeccionesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Color(0xFFEBEBEB),
-        appBar: AppBar(
-            title: Text(
-              "Ultimas inspecciones del puente",
-              style: TextStyle(color: Colors.black, fontSize: 19),
-            ),
-            centerTitle: true,
-            backgroundColor: Color(0xFFEBEBEB)),
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(120),
+            child: Container(
+              padding:
+                  EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
+              decoration: BoxDecoration(
+                color: Color(0xFFEBEBEB), // Mismo color de fondo
+                borderRadius:
+                    BorderRadius.vertical(bottom: Radius.circular(20)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.black,
+                            )),
+                        IconButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("notificaciones")));
+                            },
+                            icon: Icon(
+                              Icons.notifications,
+                              color: Colors.black,
+                            ))
+                      ]),
+                  Expanded(
+                    child: Text(
+                      "Últimas inspecciones del puente",
+                      style: GoogleFonts.poppins(
+                          color: Colors.black, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                ],
+              ),
+            )),
         body: Padding(
             padding: EdgeInsets.all(8.0),
             child: Column(children: [
@@ -252,6 +291,10 @@ class _InspectionState extends State<InspeccionesPage> {
                           DataColumn(label: Text("")),
                         ], rows: _datosFiltrados.map(toElement).toList()),
                       )))
-            ])));
+            ])),
+        bottomNavigationBar: barraNavegacion(
+          selectedIndex: 1,
+          onItemTapped: (int) {},
+        ));
   }
 }
