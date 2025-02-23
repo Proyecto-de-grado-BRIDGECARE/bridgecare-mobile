@@ -85,18 +85,51 @@ class _BuildFormState extends State<BuildForm> {
   }
 
   Widget _buildSection(SectionData section) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 2,
+      child: ExpansionTile(
+        title: Text(section.tituloSeccion,
+            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
         children: [
-          Text(
-            section.tituloSeccion,
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ...section.campos.map((campo) => _buildTextField(campo)),
+                _buildImagePicker(section.tituloSeccion),
+
+                // Renderizar subsecciones si existen
+                if (section.subsecciones != null)
+                  ...section.subsecciones!.map((subsection) => _buildSubsection(subsection)),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubsection(SectionData subsection) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      elevation: 1,
+      child: ExpansionTile(
+        title: Text(
+          subsection.tituloSeccion,
+          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+        ),
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: subsection.campos.map((campo) => _buildTextField(campo)).toList(),
+            ),
           ),
-          SizedBox(height: 10.0),
-          ...section.campos.map((campo) => _buildTextField(campo)),
-          _buildImagePicker(section.tituloSeccion),
         ],
       ),
     );
@@ -135,11 +168,11 @@ class _BuildFormState extends State<BuildForm> {
 
   Widget _buildTextField(FieldData field) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextField(
         controller: field.controller,
         decoration: InputDecoration(
-          hintText: field.labelCampo,
+          labelText: field.labelCampo,
           border: OutlineInputBorder(),
         ),
       ),
@@ -174,8 +207,9 @@ class _BuildFormState extends State<BuildForm> {
 class SectionData {
   final String tituloSeccion;
   final List<FieldData> campos;
+  final List<SectionData>? subsecciones;
 
-  SectionData({required this.tituloSeccion, required this.campos});
+  SectionData({required this.tituloSeccion, required this.campos, this.subsecciones});
 }
 
 class FieldData {
