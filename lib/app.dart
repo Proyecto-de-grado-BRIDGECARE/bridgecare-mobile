@@ -1,4 +1,5 @@
 import 'package:bridgecare/features/auth/presentation/pages/login_page.dart';
+import 'package:bridgecare/features/listaUsuarios/listaUsuarios.dart';
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {
@@ -8,10 +9,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'BridgeCare',
-      initialRoute: '/login',
+      initialRoute: '/usuarios',
       routes: {
-        '/login': (context) => LoginPage(),
+        // '/login': (context) => LoginPage(),
         //'/home': (context) => HomePage(),
+        '/usuarios': (context) => listaUsuarios(),
       },
     );
   }

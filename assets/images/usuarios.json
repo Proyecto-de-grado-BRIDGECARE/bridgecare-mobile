@@ -1,0 +1,31 @@
+[
+    {
+      "id": 12345,
+      "nombre": "Juan",
+      "apellidos": "Pérez",
+      "noId": "100200300",
+      "correo": "juan.perez@email.com",
+      "municipio": "Bogotá",
+      "contrasenia": "clave123",
+      "tipoUsuario": "admin"
+    },
+    {
+      "_id": "a1b2c3d4",
+      "nombre": "María",
+      "apellidos": "Gómez",
+      "correo": "maria.gomez@email.com",
+      "municipio": "Medellín",
+      "tipoUsuario": "usuario"
+    },
+    {
+      "id": "xyz789",
+      "nombre": "Carlos",
+      "apellidos": "Rodríguez",
+      "noId": "400500600",
+      "correo": "carlos.rodriguez@email.com",
+      "municipio": "Cali",
+      "contrasenia": "password123",
+      "tipoUsuario": "usuario"
+    }
+  ]
+  
