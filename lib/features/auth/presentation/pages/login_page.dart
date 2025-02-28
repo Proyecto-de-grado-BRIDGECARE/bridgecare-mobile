@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
-import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:bridgecare/core/providers/theme_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,43 +16,15 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _obscurePassword = true;
   bool _isLoading = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    precacheImage(
-        const AssetImage('assets/images/bridgecare_logo.png'), context);
-  }
+  late ThemeProvider themeProvider;
 
   @override
   void initState() {
     super.initState();
-  }
-
-  Future<void> _login() async {
-    FocusScope.of(context).unfocus();
-
-    if (_formKey.currentState?.validate() ?? false) {
-      setState(() => _isLoading = true);
-
-      await Future.delayed(const Duration(seconds: 5)); // simulate network call
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
-      );
-
-      // If error occurred:
-      // setState(() => _isLoading = false);
-      // show an error, etc.
-    }
-  }
-
-  OutlineInputBorder _normalBorder(Color color, double width) {
-    return OutlineInputBorder(
-      borderSide: BorderSide(color: color, width: width),
-      borderRadius: BorderRadius.circular(1),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+      themeProvider.setDarkMode();
+    });
   }
 
   @override
@@ -62,175 +34,201 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  Future<void> _login() async {
+    FocusScope.of(context).unfocus();
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() => _isLoading = true);
+      await Future.delayed(
+          const Duration(seconds: 3)); // Simulating network call
+      if (!mounted) return;
+      themeProvider.setLightMode();
+      Navigator.pushReplacementNamed(context, '/main');
+    }
+  }
+
+  OutlineInputBorder _normalBorder(Color color, double width) {
+    return OutlineInputBorder(
+      borderSide: BorderSide(color: color, width: width),
+      borderRadius: BorderRadius.circular(10),
+    );
+  }
+
+  String? _validateUsername(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor ingrese su usuario';
+    }
+    if (value.contains(' ')) {
+      return 'Por favor ingrese un usuario válido';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor ingrese su contraseña';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      // This makes status bar icons, navigation bar icons, etc. light
-      // so they’re visible on a dark background.
-      value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        // or any color you prefer, typically transparent for a full bleed
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark, // Especially for iOS
-        systemNavigationBarColor: Color(0xFF0E0147),
-        systemNavigationBarIconBrightness: Brightness.light,
-      ),
-      child: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Scaffold(
-          backgroundColor: const Color(0xFF0E0147),
-          body: Column(
-            children: [
-              Expanded(
-                flex: 65,
-                child: Center(
-                  child: FractionallySizedBox(
-                    widthFactor: 0.8,
-                    child: Image.asset(
-                      'assets/images/bridgecare_logo.png',
-                      fit: BoxFit.contain,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context)
+            .unfocus(); // Dismiss keyboard when tapping outside
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFF111D2C),
+        body: Stack(
+          children: [
+            // Background Image with Opacity
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.3, // 70% transparency
+                child: Image.asset(
+                  'assets/images/login_background.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+
+            // Foreground UI
+            Column(
+              children: [
+                Expanded(
+                  flex: 65,
+                  child: Center(
+                    child: FractionallySizedBox(
+                      widthFactor: 0.8,
+                      child: Image.asset(
+                        'assets/images/logo_white_1024.png',
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 35,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 45),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        // Username
-                        TextFormField(
-                          controller: _emailController,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12.0,
-                              vertical: 1.0,
+                Expanded(
+                  flex: 35,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 45),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          // Username Field
+                          TextFormField(
+                            controller: _emailController,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12.0, vertical: 1.0),
+                              filled: true,
+                              fillColor: const Color(0xFFD9D9D9),
+                              hintText: 'Usuario',
+                              hintStyle: const TextStyle(
+                                  color: Colors.black, fontSize: 12),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.never,
+                              enabledBorder:
+                                  _normalBorder(Colors.grey.shade400, 1),
+                              focusedBorder:
+                                  _normalBorder(const Color(0xFF676767), 1.5),
+                              errorBorder: _normalBorder(Colors.red, 1),
+                              focusedErrorBorder:
+                                  _normalBorder(Colors.red, 1.5),
+                              errorStyle: const TextStyle(
+                                  fontSize: 12, color: Colors.red),
                             ),
-                            filled: true,
-                            fillColor: const Color(0xFFD9D9D9),
-                            hintText: 'Usuario',
-                            hintStyle: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 12,
-                            ),
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            enabledBorder:
-                                _normalBorder(Colors.grey.shade400, 1),
-                            focusedBorder:
-                                _normalBorder(const Color(0xFF676767), 1.5),
-                            errorBorder: _normalBorder(Colors.red, 1),
-                            focusedErrorBorder: _normalBorder(Colors.red, 1.5),
-                            errorStyle: const TextStyle(
-                                fontSize: 12, color: Colors.red),
+                            style: const TextStyle(
+                                color: Colors.black, fontSize: 12),
+                            validator: _validateUsername,
                           ),
-                          style: const TextStyle(
-                              color: Colors.black, fontSize: 12),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Por favor ingrese su usuario';
-                            }
-                            if (value.contains(' ')) {
-                              return 'Por favor ingrese un usuario válido';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                        // Password
-                        TextFormField(
-                          controller: _passwordController,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          obscureText: _obscurePassword,
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 12.0,
-                              vertical: 1.0,
-                            ),
-                            filled: true,
-                            fillColor: const Color(0xFFD9D9D9),
-                            hintText: 'Contraseña',
-                            hintStyle: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 12,
-                            ),
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            enabledBorder:
-                                _normalBorder(Colors.grey.shade400, 1),
-                            focusedBorder: _normalBorder(Colors.black, 1.5),
-                            errorBorder: _normalBorder(Colors.red, 1),
-                            focusedErrorBorder: _normalBorder(Colors.red, 1.5),
-                            errorStyle: const TextStyle(
-                                fontSize: 12, color: Colors.red),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: Colors.black54,
+                          // Password Field
+                          TextFormField(
+                            controller: _passwordController,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            obscureText: _obscurePassword,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12.0, vertical: 1.0),
+                              filled: true,
+                              fillColor: const Color(0xFFD9D9D9),
+                              hintText: 'Contraseña',
+                              hintStyle: const TextStyle(
+                                  color: Colors.black, fontSize: 12),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.never,
+                              enabledBorder:
+                                  _normalBorder(Colors.grey.shade400, 1),
+                              focusedBorder: _normalBorder(Colors.black, 1.5),
+                              errorBorder: _normalBorder(Colors.red, 1),
+                              focusedErrorBorder:
+                                  _normalBorder(Colors.red, 1.5),
+                              errorStyle: const TextStyle(
+                                  fontSize: 12, color: Colors.red),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.black54,
+                                ),
+                                onPressed: () {
+                                  setState(() =>
+                                      _obscurePassword = !_obscurePassword);
+                                },
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
                             ),
+                            style: const TextStyle(
+                                color: Colors.black, fontSize: 12),
+                            validator: _validatePassword,
                           ),
-                          style: const TextStyle(
-                              color: Colors.black, fontSize: 12),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Por favor ingrese su contraseña';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 24),
+                          const SizedBox(height: 24),
 
-                        // Login Button
-                        FractionallySizedBox(
-                          widthFactor: 0.8,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFFC107),
-                              disabledBackgroundColor: const Color(0xFFFFC107),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
+                          // Login Button
+                          FractionallySizedBox(
+                            widthFactor: 0.8,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFFC107),
+                                disabledBackgroundColor:
+                                    const Color(0xFFFFC107),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              onPressed: _isLoading ? null : _login,
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          color: Colors.black,
+                                          strokeWidth: 2.0),
+                                    )
+                                  : const Text(
+                                      'Iniciar Sesión',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87),
+                                    ),
                             ),
-                            onPressed: _isLoading ? null : _login,
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.black,
-                                      strokeWidth: 2.0,
-                                    ),
-                                  )
-                                : const Text(
-                                    'Iniciar Sesión',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
+                          const SizedBox(height: 16),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ),
       ),
     );
