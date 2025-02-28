@@ -2,45 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
-
-class Usuario {
-  final String id;
-  final String nombre;
-  final String apellidos;
-  final String noId;
-  final String correo;
-  final String municipio;
-  final String contrasenia;
-  final String tipoUsuario;
-
-  Usuario(
-      {required this.id,
-      required this.nombre,
-      required this.apellidos,
-      required this.noId,
-      required this.correo,
-      required this.municipio,
-      required this.contrasenia,
-      required this.tipoUsuario});
-
-  factory Usuario.fromJson(Map<String, dynamic> json) {
-    String idKey = json.containsKey('id')
-        ? 'id'
-        : json.containsKey('_id')
-            ? '_id'
-            : 'desconocido';
-
-    return Usuario(
-        id: json[idKey].toString() ?? 'desconocido',
-        nombre: json['nombre'] ?? 'sin nombre',
-        apellidos: json['apellidos'] ?? 'sin apellidos',
-        noId: json['noId'] ?? 'sin noId',
-        correo: json['correo'] ?? 'sin correo',
-        municipio: json['municipio'] ?? 'sin municipio',
-        contrasenia: json['contrasenia'] ?? 'sin contrasenia',
-        tipoUsuario: json['tipoUsuario'] ?? 'sin tipo usuario');
-  }
-}
+import 'package:http/http.dart' as http;
+import 'package:bridgecare/features/assets/domain/models/Usuarios.dart';
 
 class listaUsuarios extends StatefulWidget {
   const listaUsuarios({super.key});
@@ -58,42 +21,75 @@ class _usuariosState extends State<listaUsuarios> {
 
   TextEditingController _searchController = TextEditingController();
   late String _idUsuario;
+  bool _isLoading = true;
+  bool _hasError = false;
 
   @override
   void initState() {
     super.initState();
-    _cargarJson();
+    obtenerDatos();
   }
 
-  void _cargarJson() async {
-    final String jsonData = await rootBundle.loadString('assets/usuarios.json');
-    final List<dynamic> data = await json.decode(jsonData);
+  Future<void> obtenerDatos() async {
+    final url = Uri.parse("https://tu-api.com/usuarios");
+    final response = await http.get(url);
 
-    setState(() {
-      // Convertir la lista de JSON en una lista de objetos Usuario
-      _usuarios = data.map((item) => Usuario.fromJson(item)).toList();
+    try {
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
 
-      //Convertir los objetos Usuario en una lista de mapas para su manejo en la UI
-      _datos = _usuarios
-          .map((u) => {
-                'id': u.id,
-                'nombre': u.nombre,
-                'correo': u.correo,
-                'tipoUsuario': u.tipoUsuario
-              })
-          .cast<Map<String, dynamic>>()
-          .toList();
+        setState(() {
+          _usuarios = data.map((item) => Usuario.fromJson(item)).toList();
 
-      _datosFiltrados = List.from(_datos);
-    });
+          _datos = _usuarios
+              .map((u) => {
+                    'id': u.id,
+                    'noId': u.noId,
+                    'nombre': u.nombre,
+                    'correo': u.correo,
+                    'tipoUsuario': u.tipoUsuario
+                  })
+              .cast<Map<String, dynamic>>()
+              .toList();
+
+          _datosFiltrados = List.from(_datos);
+          _isLoading = false;
+          _hasError = false;
+        });
+      } else {
+        throw Exception("Error en la respuesta del servidor");
+      }
+    } catch (e) {
+      print("error al cargar usuarios: $e");
+
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error al obtener datos del servidor")),
+      );
+    }
   }
 
   void _filtrarDatos() {
-    String Query = _searchController.text.toLowerCase();
+    String query = _searchController.text.toLowerCase().trim();
 
     setState(() {
+      if (query.isEmpty) {
+        _datosFiltrados = List.from(_datos);
+        return;
+      }
+
       _datosFiltrados = _datos.where((elemento) {
-        return elemento['id'].toLowerCase().contains(Query);
+        String id = elemento['id']?.toLowerCase() ?? '';
+        String nombre = elemento['nombre']?.toLowerCase() ?? '';
+        String correo = elemento['correo']?.toLowerCase() ?? '';
+
+        return id.contains(query) ||
+            nombre.contains(query) ||
+            correo.contains(query);
       }).toList();
     });
   }
@@ -114,9 +110,38 @@ class _usuariosState extends State<listaUsuarios> {
           iconSize: 40,
           color: Color(0xffF29E23),
           onPressed: () {
-            print('eliminar usuario');
+            _mostrarDialogoEliminar(elemento['id']);
           }))
     ]);
+  }
+
+  void _mostrarDialogoEliminar(String idUsuario) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Eliminar usuario"),
+          content: Text("¿Seguro que quieres eliminar este usuario?"),
+          actions: [
+            TextButton(
+              child: Text("Cancelar"),
+              onPressed: () => Navigator.pop(context),
+            ),
+            TextButton(
+              child: Text("Eliminar"),
+              onPressed: () {
+                setState(() {
+                  _usuarios.removeWhere((u) => u.id == idUsuario);
+                  _datos.removeWhere((u) => u['id'] == idUsuario);
+                  _datosFiltrados.removeWhere((u) => u['id'] == idUsuario);
+                });
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -186,58 +211,75 @@ class _usuariosState extends State<listaUsuarios> {
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.search),
+                  hintText: "Buscar usuario...",
+                  hintStyle: GoogleFonts.poppins(color: Colors.grey),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  prefixIcon: Icon(Icons.search, color: Colors.black54),
                 ),
                 onChanged: (value) {
                   _filtrarDatos();
                 },
               ),
+
               SizedBox(height: 20),
+
+              // Estado de carga o error
+              if (_isLoading) Center(child: CircularProgressIndicator()),
+              if (_hasError)
+                Center(
+                    child: Text("Error al cargar datos",
+                        style: TextStyle(color: Colors.red))),
               //tabla de usuarios
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Color(0xFFFFFFFF),
-                ),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: DataTable(columns: [
-                      DataColumn(
-                          label: SizedBox(
-                        width: 120,
-                        child: Text("No. Id",
-                            style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.bold)),
-                      )),
-                      DataColumn(
-                          label: SizedBox(
-                        width: 120,
-                        child: Text("Nombre",
-                            style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.bold)),
-                      )),
-                      DataColumn(
-                          label: SizedBox(
-                        width: 120,
-                        child: Text("editar",
-                            style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.bold)),
-                      )),
-                      DataColumn(
-                          label: SizedBox(
-                        width: 120,
-                        child: Text("visualizar",
-                            style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.bold)),
-                      )),
-                    ], rows: _datosFiltrados.map(toElement).toList()),
+
+              if (!_isLoading && !_hasError)
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Color(0xFFFFFFFF),
                   ),
-                ),
-              )
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: DataTable(columns: [
+                        DataColumn(
+                            label: SizedBox(
+                          width: 120,
+                          child: Text("No. Id",
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.bold)),
+                        )),
+                        DataColumn(
+                            label: SizedBox(
+                          width: 120,
+                          child: Text("Nombre",
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.bold)),
+                        )),
+                        DataColumn(
+                            label: SizedBox(
+                          width: 120,
+                          child: Text("editar",
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.bold)),
+                        )),
+                        DataColumn(
+                            label: SizedBox(
+                          width: 120,
+                          child: Text("visualizar",
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.bold)),
+                        )),
+                      ], rows: _datosFiltrados.map(toElement).toList()),
+                    ),
+                  ),
+                )
             ],
           )),
     );
