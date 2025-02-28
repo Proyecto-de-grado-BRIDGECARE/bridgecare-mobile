@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bridgecare/features/assets/presentation/pages/buildForm.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 // import 'package:image_picker/image_picker.dart';
 
 class FormInventory extends StatefulWidget {
