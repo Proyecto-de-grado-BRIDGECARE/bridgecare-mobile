@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginPage(),
-        //'/inventarioForm': (context) => FormInventory(),
+        '/inventarioForm': (context) => FormInventory(),
         '/inspeccionForm': (context) => FormInspection(),
         '/main': (context) => const BottomNavWrapper(),
       },
