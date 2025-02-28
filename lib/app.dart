@@ -1,5 +1,4 @@
-import 'package:bridgecare/shared/forms/form_Inventory.dart';
-import 'package:bridgecare/shared/forms/form_inspection.dart';
+import 'package:bridgecare/features/formularioInspeccion/form_inspection.dart';
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {

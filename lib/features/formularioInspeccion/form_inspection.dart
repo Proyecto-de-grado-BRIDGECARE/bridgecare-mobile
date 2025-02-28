@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bridgecare/features/assets/presentation/pages/buildForm2.dart';
+import 'package:bridgecare/features/formularioInspeccion/buildForm2.dart';
 
 class FormInspection extends StatefulWidget {
   const FormInspection({super.key});
