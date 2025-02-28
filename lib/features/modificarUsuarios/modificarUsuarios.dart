@@ -92,58 +92,61 @@ class _modificarUsuarioState extends State<modificarUsuario> {
         ),
         backgroundColor: Color(0xFFEBEBEB),
       ),
-      body: Card(
-        child: isLoading
-            ? Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                padding: EdgeInsets.all(16),
-                child: Form(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 20),
-                    _buildTextField("Nombre", nombre),
-                    _buildTextField("Apellidos", apellidos),
-                    _buildTextField("Número de Identificación", noId),
-                    _buildTextField("Tipo de Usuario", tipoUsuario),
-                    _buildTextField("Correo Electrónico", correo,
-                        isEmail: true),
-                    _buildTextField("Municipio", municipio),
-                    _buildTextField("Contraseña", consrtasenia,
-                        isPassword: true),
-                    SizedBox(height: 20),
-                    Container(
-                      height: 150,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          color: Color(0x111D2C),
-                          borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(30),
-                              topLeft: Radius.circular(30))),
-                      child: Center(
-                        child: ElevatedButton(
-                          onPressed: _enviarDatos,
-                          child: Text(
-                            "ACTUALIZAR",
-                            style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 16, horizontal: 50),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            backgroundColor:
-                                Color(0xFF111D2C), // Color del botón
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                )),
+      body: SafeArea(
+          child: Column(
+        children: [
+          Expanded(
+              child: Card(
+            margin: EdgeInsets.all(16),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            color: Colors.white,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(16),
+              child: Form(
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20),
+                  _buildTextField("Nombre", nombre),
+                  _buildTextField("Apellidos", apellidos),
+                  _buildTextField("Número de Identificación", noId),
+                  _buildTextField("Tipo de Usuario", tipoUsuario),
+                  _buildTextField("Correo Electrónico", correo, isEmail: true),
+                  _buildTextField("Municipio", municipio),
+                  _buildTextField("Contraseña", consrtasenia, isPassword: true),
+                ],
+              )),
+            ),
+          )),
+          Container(
+            height: 50,
+            padding: EdgeInsets.only(bottom: 10),
+            width: double.infinity,
+            decoration: BoxDecoration(
+                color: Color(0x111D2C),
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(30),
+                    topLeft: Radius.circular(30))),
+            child: Center(
+              child: ElevatedButton(
+                onPressed: _enviarDatos,
+                child: Text(
+                  "ACTUALIZAR",
+                  style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 50),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  backgroundColor: Color(0xFF111D2C), // Color del botón
+                ),
               ),
-      ),
+            ),
+          )
+        ],
+      )),
     );
   }
 
