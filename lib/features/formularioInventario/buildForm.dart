@@ -28,6 +28,33 @@ class _buildFormState extends State<buildForm> {
     }
   }
 
+  // Convertir String a int
+  int? toInt(String value) {
+    return int.tryParse(value); // Retorna null si no es un número válido
+  }
+
+// Convertir String a double
+  double? toDouble(String value) {
+    return double.tryParse(value); // Retorna null si no es un número válido
+  }
+
+// Convertir String a booleano (S/N, 1/0, true/false)
+  bool toBool(String value) {
+    return value.trim().toLowerCase() == "s" ||
+        value.trim() == "1" ||
+        value.trim().toLowerCase() == "true";
+  }
+
+// Convertir String a DateTime (para fechas)
+  DateTime? toDate(String value) {
+    try {
+      return DateTime.parse(
+          value); // Intenta convertir el texto en formato yyyy-MM-dd
+    } catch (e) {
+      return null; // Retorna null si la fecha es inválida
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -155,18 +182,72 @@ class _buildFormState extends State<buildForm> {
 
     for (var section in widget.secciones) {
       for (var campo in section.campos) {
-        print("${campo.labelCampo}: ${campo.controller.text}");
+        String value = campo.controller.text;
+
+        // **NÚMEROS (int o double)**
+        if ([
+          "Numero de luces",
+          "Longitud Luz menor (m)",
+          "Longitud luz mayor (m)",
+          "Longitud total (m)",
+          "Ancho del tablero (m)",
+          "Ancho del separador (m)",
+          "Ancho del anden izquierdo (m)",
+          "Ancho del anden derecho (m)",
+          "Ancho de calzada (m)",
+          "Ancho entre bordillos (m)",
+          "Ancho del acceso (m)",
+          "Altura de pilas (m)",
+          "Altura de estribos (m)",
+          "Longitud de apoyo en pilas (m)",
+          "Longitud de apoyo en estribos (m)",
+          "Long. Luz critica (m)",
+          "Latitud (N)",
+          "Longitud (O)",
+          "Longitud variante"
+        ].contains(campo.labelCampo)) {
+          double? doubleValue = toDouble(value);
+          print("${campo.labelCampo}: ${doubleValue ?? 'Valor inválido'}");
+        }
+
+        // **FECHAS**
+        else if ([
+          "Año de construcción",
+          "Año de reconstrucción",
+          "Fecha de recolección de datos"
+        ].contains(campo.labelCampo)) {
+          DateTime? dateValue = toDate(value);
+          print("${campo.labelCampo}: ${dateValue ?? 'Fecha inválida'}");
+        }
+
+        // **BOOLEANOS (BIT)**
+        else if ([
+          "Puente en terraplén (S/N)",
+          "Puente en curva / Tangente (C/T)",
+          "Primero (S/N)",
+          "Diseño tipo (S/N)",
+          "Diseño tipo 2 (S/N)",
+          "Paso por el cause (S/N)",
+          "Existe variante (S/N)"
+        ].contains(campo.labelCampo)) {
+          bool boolValue = toBool(value);
+          print("${campo.labelCampo}: ${boolValue ? 'Sí' : 'No'}");
+        }
+
+        // **OTROS VALORES (SIN CONVERSIÓN)**
+        else {
+          print("${campo.labelCampo}: $value");
+        }
       }
 
       final selectedImage = _imagenesSecciones[section.tituloSeccion];
-      if (selectedImage == null) {
-        print("Imagen para ${section.tituloSeccion}: ${selectedImage?.path}");
+      if (selectedImage != null) {
+        print("Imagen para ${section.tituloSeccion}: ${selectedImage.path}");
       }
     }
 
-    //enviar datos a servidor
     ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Formulario guardado con exito")));
+        .showSnackBar(SnackBar(content: Text("Formulario guardado con éxito")));
   }
 }
 
