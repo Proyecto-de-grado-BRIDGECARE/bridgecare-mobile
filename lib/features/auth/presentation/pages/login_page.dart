@@ -1,3 +1,5 @@
+import 'package:bridgecare/features/auth/domain/models/auth_model.dart';
+import 'package:bridgecare/features/auth/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bridgecare/core/providers/theme_provider.dart';
@@ -17,6 +19,8 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
   bool _isLoading = false;
   late ThemeProvider themeProvider;
+
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -38,11 +42,27 @@ class _LoginPageState extends State<LoginPage> {
     FocusScope.of(context).unfocus();
     if (_formKey.currentState?.validate() ?? false) {
       setState(() => _isLoading = true);
-      await Future.delayed(
-          const Duration(seconds: 3)); // Simulating network call
+
+      final request = LoginRequest(
+        username: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      final token = await _authService.login(request);
+
       if (!mounted) return;
-      themeProvider.setLightMode();
-      Navigator.pushReplacementNamed(context, '/main');
+      setState(() => _isLoading = false);
+
+      if (token != null) {
+        themeProvider.setLightMode();
+        Navigator.pushReplacementNamed(context, '/main');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Invalid credentials'),
+              backgroundColor: Colors.red),
+        );
+      }
     }
   }
 
