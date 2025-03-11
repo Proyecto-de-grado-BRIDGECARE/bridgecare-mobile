@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -118,7 +120,7 @@ class _buildFormState extends State<buildForm> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ...section.campos.map((campo) => _buildTextField(campo)),
+                ...section.campos.map((campo) => _buildField(campo)),
                 _buildImagePicker(section.tituloSeccion),
               ],
             ),
@@ -156,13 +158,147 @@ class _buildFormState extends State<buildForm> {
     );
   }
 
-  Widget _buildTextField(FieldData field) {
+  Widget _buildField(FieldData field) {
+    // Si el campo tiene opciones, usa _buildOpciones()
+    if (field.opciones != null && field.opciones!.isNotEmpty) {
+      if (field.labelCampo == "Diseño tipo (S/N)") {
+        // Manejo especial para "Diseño tipo (S/N)"
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: DropdownButtonFormField<String>(
+            value: field.controller.text.isNotEmpty
+                ? (field.controller.text == "1"
+                    ? "S"
+                    : "N") // Convierte 1 -> "S" y 0 -> "N"
+                : null,
+            decoration: InputDecoration(
+              labelText: field.labelCampo,
+              border: OutlineInputBorder(),
+            ),
+            items: ["S", "N"].map((String opcion) {
+              return DropdownMenuItem<String>(
+                value: opcion,
+                child: Text(opcion),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                field.controller.text = newValue == "S"
+                    ? "1"
+                    : "0"; // Guarda "S" como 1 y "N" como 0
+              }
+            },
+            validator: (value) {
+              if (value == null) {
+                return "Seleccione una opción";
+              }
+              return null;
+            },
+          ),
+        );
+      }
+      return _buildOpciones(field);
+    }
+
+    // Manejo especial para los campos de año
+    else if ([
+      "Año de construcción",
+      "Año de reconstrucción",
+      "Fecha de recolección de datos"
+    ].contains(field.labelCampo)) {
+      return GestureDetector(
+        onTap: () => _seleccionarAno(context, field),
+        child: AbsorbPointer(
+          child: TextFormField(
+            controller: field.controller,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: field.labelCampo,
+              border: OutlineInputBorder(),
+              suffixIcon: Icon(Icons.calendar_today), // Ícono de calendario
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Seleccione el año";
+              }
+              int? year = int.tryParse(value);
+              if (year == null || year < 1900 || year > DateTime.now().year) {
+                return "Ingrese un año válido";
+              }
+              return null;
+            },
+          ),
+        ),
+      );
+    }
+
+    // Para todos los demás campos
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
-      child: TextField(
-          controller: field.controller,
-          decoration: InputDecoration(
-              hintText: field.labelCampo, border: OutlineInputBorder())),
+      child: TextFormField(
+        controller: field.controller,
+        keyboardType:
+            field.numerico ? TextInputType.number : TextInputType.text,
+        decoration: InputDecoration(
+          hintText: field.labelCampo,
+          border: OutlineInputBorder(),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return "Por favor ingrese ${field.labelCampo}";
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Future<void> _seleccionarAno(BuildContext context, FieldData campo) async {
+    DateTime fechaActual = DateTime.now();
+    DateTime? fechaSeleccionada = await showDatePicker(
+      context: context,
+      initialDate: fechaActual,
+      firstDate: DateTime(1900),
+      lastDate: fechaActual,
+      fieldHintText: "Seleccione el año",
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Color(0xFF003366), // Color del DatePicker
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (fechaSeleccionada != null) {
+      setState(() {
+        campo.controller.text =
+            fechaSeleccionada.year.toString(); // Solo el año
+      });
+    }
+  }
+
+  Widget _buildOpciones(FieldData field) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+            labelText: field.labelCampo, border: OutlineInputBorder()),
+        value: field.valorSeleccionado,
+        items: field.opciones?.map((opcion) {
+          return DropdownMenuItem(value: opcion, child: Text(opcion));
+        }).toList(),
+        onChanged: (value) {
+          setState(() {
+            field.valorSeleccionado = value;
+          });
+        },
+      ),
     );
   }
 
@@ -234,9 +370,16 @@ class _buildFormState extends State<buildForm> {
           print("${campo.labelCampo}: ${boolValue ? 'Sí' : 'No'}");
         }
 
-        // **OTROS VALORES (SIN CONVERSIÓN)**
+        // **OTROS VALORES (SIN CONVERSIÓN)
+
+        else if (campo.opciones != null) {
+          print(
+              "${campo.labelCampo}: ${campo.valorSeleccionado ?? 'No seleccionado'}");
+        }
+
+        // **OTROS VALORES (TEXTOS)**
         else {
-          print("${campo.labelCampo}: $value");
+          print("${campo.labelCampo}: ${value ?? 'Vacío'}");
         }
       }
 
@@ -264,6 +407,14 @@ class SectionData {
 class FieldData {
   final String labelCampo;
   final TextEditingController controller;
+  final List<String>? opciones;
+  String? valorSeleccionado;
+  final bool numerico;
 
-  FieldData({required this.labelCampo, required this.controller});
+  FieldData(
+      {required this.labelCampo,
+      required this.controller,
+      this.opciones,
+      this.numerico = false,
+      this.valorSeleccionado});
 }
