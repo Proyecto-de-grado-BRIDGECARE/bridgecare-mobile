@@ -16,6 +16,8 @@ class BuildForm extends StatefulWidget {
 class _BuildFormState extends State<BuildForm> {
   Map<String, File?> _imagenesSecciones = {};
 
+
+  Map<String, bool> componentesActivos = {};
   Future<void> _pickImage(String sectionKey) async {
     final picker = ImagePicker();
     final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -89,24 +91,35 @@ class _BuildFormState extends State<BuildForm> {
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 2,
-      child: ExpansionTile(
-        title: Text(section.tituloSeccion,
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+      child: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          SwitchListTile(
+            value: componentesActivos[section.tituloSeccion] ?? true,
+            onChanged: (bool value) {
+              setState(() {
+                componentesActivos[section.tituloSeccion] = value;
+              });
+            },
+          ),
+          if (componentesActivos[section.tituloSeccion] ?? true)
+            ExpansionTile(
+              title: Text(section.tituloSeccion,
+                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
               children: [
-                ...section.campos.map((campo) => _buildTextField(campo)),
-                _buildImagePicker(section.tituloSeccion),
-
-                // Renderizar subsecciones si existen
-                if (section.subsecciones != null)
-                  ...section.subsecciones!.map((subsection) => _buildSubsection(subsection)),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ...section.campos.map((campo) => _buildField(campo)),
+                      _buildImagePicker(section.tituloSeccion),
+                      if (section.subsecciones != null)
+                        ...section.subsecciones!.map((subsection) => _buildSubsection(subsection)),
+                    ],
+                  ),
+                )
               ],
             ),
-          )
         ],
       ),
     );
@@ -165,6 +178,59 @@ class _BuildFormState extends State<BuildForm> {
       ],
     );
   }
+  Widget _buildField(FieldData field) {
+    if (field.labelCampo == "Calificación") {
+      return DropdownButtonFormField<int>(
+        decoration: InputDecoration(labelText: field.labelCampo, border: OutlineInputBorder()),
+        items: [0, 1, 3, 4, 5, 6]
+            .map((e) => DropdownMenuItem(value: e, child: Text(e.toString())))
+            .toList(),
+        onChanged: (value) {},
+      );
+    }
+    if (field.labelCampo == "Inspección Especial") {
+      return DropdownButtonFormField<String>(
+        decoration: InputDecoration(labelText: field.labelCampo, border: OutlineInputBorder()),
+        items: ["Sí", "No"].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+        onChanged: (value) {},
+      );
+    }
+    if (field.labelCampo == "No. Fotos" || field.labelCampo == "Cantidad de Reparación" || field.labelCampo == "Costo de Reparación") {
+      return TextField(
+        controller: field.controller,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(labelText: field.labelCampo, border: OutlineInputBorder()),
+      );
+    }
+    if (field.labelCampo == "Tipo de daño") {
+      List<String> damageTypes = [
+        "Daño estructural (Sobrecarga / diseño insuficiente)",
+        "Vibración excesiva",
+        "Impacto",
+        "Asentamiento / Movimiento",
+        "Erosión / socavación",
+        "Sedimentación",
+        "Corrosión de acero estructural",
+        "Daño en concreto/ Corrosión de refuerzo",
+        "Daño en concreto/ Acero Expuesto",
+        "Descomposición",
+        "Infiltración",
+        "Otro",
+        "No Aplicable",
+        "Desconocido",
+        "No Registrado"
+      ];
+      return DropdownButtonFormField<String>(
+        decoration: InputDecoration(labelText: field.labelCampo, border: OutlineInputBorder()),
+        items: damageTypes.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+        onChanged: (value) {},
+      );
+    }
+    return TextField(
+      controller: field.controller,
+      decoration: InputDecoration(labelText: field.labelCampo, border: OutlineInputBorder()),
+    );
+  }
 
   Widget _buildTextField(FieldData field) {
     return Padding(
@@ -180,18 +246,9 @@ class _BuildFormState extends State<BuildForm> {
   }
 
   void _saveForm() {
-    bool allImagesSelected = widget.secciones.every((section) {
-      return _imagenesSecciones[section.tituloSeccion] != null;
-    });
-
-    if (!allImagesSelected) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Por favor, selecciona una imagen para cada sección.")),
-      );
-      return;
-    }
-
     for (var section in widget.secciones) {
+      if (!(componentesActivos[section.tituloSeccion] ?? true)) continue; // No guardar si el componente está deshabilitado
+
       for (var campo in section.campos) {
         print("${campo.labelCampo}: ${campo.controller.text}");
       }
