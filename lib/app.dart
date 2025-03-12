@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       themeMode:
           Provider.of<ThemeProvider>(context).themeMode, // Use theme provider
-      initialRoute: '/registro',
+      initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginPage(),
         '/inventarioForm': (context) => formInventario(),
