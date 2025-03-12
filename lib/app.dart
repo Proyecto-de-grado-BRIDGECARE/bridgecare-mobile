@@ -7,6 +7,7 @@ import 'package:bridgecare/features/formularioInventario/form_Inventario.dart';
 import 'package:bridgecare/features/registroUsuario/registroUsuario.dart';
 import 'package:bridgecare/features/modificarUsuarios/modificarUsuarios.dart';
 import 'package:bridgecare/features/listaUsuarios/listaUsuarios.dart';
+import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
