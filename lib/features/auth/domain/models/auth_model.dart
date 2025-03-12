@@ -6,8 +6,8 @@ class LoginRequest {
 
   Map<String, String> toJson() {
     return {
-      "username": username,
-      "password": password,
+      "correo": username,
+      "contrasenia": password,
     };
   }
 }
