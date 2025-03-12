@@ -5,6 +5,7 @@ import 'package:bridgecare/features/formularioInspeccion/form_inspection.dart';
 
 import 'package:bridgecare/features/registroUsuario/registroUsuario.dart';
 import 'package:bridgecare/shared/forms/form_inventory.dart';
+import 'package:bridgecare/features/modificarUsuarios/modificarUsuarios.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         '/inspeccionForm': (context) => FormInspection(),
         '/main': (context) => const BottomNavWrapper(),
         '/registro': (context) => registroUsuario(),
+        '/modificarUsuario': (context) => modificarUsuario(),
       },
     );
   }
