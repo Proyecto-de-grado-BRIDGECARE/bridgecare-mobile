@@ -2,9 +2,9 @@ import 'package:bridgecare/core/providers/theme_provider.dart';
 import 'package:bridgecare/core/widgets/navbar.dart';
 import 'package:bridgecare/features/auth/presentation/pages/login_page.dart';
 import 'package:bridgecare/features/formularioInspeccion/form_inspection.dart';
-import 'package:bridgecare/shared/forms/form_inventory.dart';
 
 import 'package:bridgecare/features/registroUsuario/registroUsuario.dart';
+import 'package:bridgecare/shared/forms/form_inventory.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;

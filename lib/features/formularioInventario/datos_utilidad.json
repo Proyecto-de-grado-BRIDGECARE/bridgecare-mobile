@@ -1,0 +1,138 @@
+{
+    "tipo_barandas": {
+      "10": "Mampostería",
+      "20": "Concreto sólido",
+      "21": "Concreto sólido con pasamanos metálicas",
+      "30": "Pasamanos de concreto sobre pilastras de concreto",
+      "40": "Pasamanos metálicas sobre pilastras de concreto",
+      "41": "Pasamanos metálicas sobre pilastras metálicas",
+      "50": "Construcción metálica ligera",
+      "60": "Parte integral de la superestructura"
+    },
+    "tipo_superficie_puente": {
+      "10": "Asfalto",
+      "20": "Concreto",
+      "30": "Acero (con disp. de fricción)",
+      "40": "Afirmado"
+    },
+    "tipo_juntas_expansion": {
+      "10": "Placa de acero",
+      "11": "Placa de acero cubierto de asfalto",
+      "12": "Placas verticales/ángulos de acero",
+      "13": "Junta dentada",
+      "20": "Acero con sello fijo de neopreno",
+      "21": "Acero con neopreno comprimido",
+      "30": "Bloque de neopreno",
+      "40": "Junta de goma asfáltica",
+      "50": "No dispositivo de junta",
+      "51": "Junta de cartón asfaltado",
+      "52": "Junta de cartón asfaltado con sello"
+    },
+    "tipo_estructuracion_transversal": {
+      "10": "Losa",
+      "11": "Losa/viga, 1 viga",
+      "12": "Losa/viga, 2 vigas",
+      "13": "Losa/viga, 3 vigas",
+      "14": "Losa/viga, 4 o más vigas",
+      "30": "Trabe cajón, 1 cajón",
+      "31": "Trabe cajón, 2 ó más cajones",
+      "40": "Armadura de paso inferior",
+      "41": "Armadura de paso superior",
+      "42": "Armadura de paso a través",
+      "50": "Arco superior",
+      "51": "Arco inferior, tipo abierto",
+      "52": "Arco inferior, tipo cerrado",
+      "80": "Provisional, tipo Bailey",
+      "81": "Provisional, tipo Callender Hamilton"
+    },
+    "tipo_estructuracion_longitudinal": {
+      "10": "Simplemente apoyado, sección transversal constante",
+      "11": "Simplemente apoyado, sección transversal variable",
+      "20": "Viga continua, sección transversal constante",
+      "21": "Viga continua, sección transversal variable",
+      "30": "Viga Gerber, sección transversal constante",
+      "31": "Viga Gerber, sección transversal variable",
+      "40": "Pórtico, sección transversal constante",
+      "41": "Pórtico, sección transversal variable",
+      "42": "Cajones (box culvert)",
+      "50": "Puente colgante",
+      "60": "Puente atirantado"
+    },
+    "material_superestructura": {
+      "10": "Concreto ciclópeo",
+      "11": "Concreto sin refuerzo",
+      "20": "Concreto reforzado, in situ",
+      "21": "Concreto reforzado, prefabricado & in situ",
+      "30": "Concreto presforzado, in situ",
+      "31": "Concreto presforzado, prefabricado",
+      "32": "Concreto presforzado, prefabricado & in situ",
+      "50": "Acero",
+      "51": "Acero y concreto",
+      "60": "Piedra o roca",
+      "70": "Ladrillo"
+    },
+    "tipo_estribos": {
+      "10": "Con aletas integradas",
+      "11": "Con aletas separadas",
+      "20": "Enterrado, sólido",
+      "21": "Enterrado, columnas/pilotes con viga cabezal"
+    },
+    "tipo_pilas": {
+      "10": "Pila sólida",
+      "20": "Columna sola",
+      "21": "2 o más columnas sin viga cabezal",
+      "30": "Columna sola con viga cabezal",
+      "31": "2 ó más columnas con vigas cabezales separadas",
+      "32": "2 ó más columnas con viga cabezal común",
+      "33": "Columnas con viga cabezal y diafragma",
+      "40": "Pilotes con viga cabezal",
+      "41": "Pilotes con viga cabezal y diafragma",
+      "50": "Mástil (pilón)",
+      "60": "Torre metálica"
+    },
+    "material_estribos": {
+      "10": "Mampostería",
+      "20": "Concreto ciclópeo",
+      "21": "Concreto reforzado",
+      "30": "Acero",
+      "40": "Acero y concreto",
+      "50": "Tierra armada",
+      "60": "Ladrillo"
+    },
+    "tipo_cimentacion_estribos": {
+      "10": "Cimentación superficial",
+      "20": "Pilotes de concreto",
+      "21": "Pilotes de acero",
+      "22": "Pilotes de madera",
+      "30": "Caisson de concreto",
+      "40": "Cajón autofundante"
+    },
+    "material_pilas": {
+      "10": "Mampostería",
+      "20": "Concreto ciclópeo",
+      "21": "Concreto reforzado",
+      "30": "Acero",
+      "40": "Acero y concreto",
+      "50": "Tierra armada",
+      "60": "Ladrillo"
+    },
+    "tipo_cimentacion_pilas": {
+      "10": "Cimentación superficial",
+      "20": "Pilotes de concreto",
+      "21": "Pilotes de acero",
+      "22": "Pilotes de madera",
+      "30": "Caisson de concreto",
+      "40": "Cajón autofundante"
+    },
+    "tipo_apoyos": {
+      "10": "Junta de construcción (acaso con una capa de cartón asfaltado o de plomo)",
+      "20": "Balancín de concreto",
+      "30": "Placas de neopreno",
+      "40": "Apoyo fijo de acero",
+      "41": "Apoyo de deslizamiento (acero)",
+      "42": "Balancín de acero",
+      "43": "Apoyos de rodillos (acero)",
+      "50": "Basculante"
+    }
+  }
+  
