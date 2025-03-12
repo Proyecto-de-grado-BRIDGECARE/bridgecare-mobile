@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:bridgecare/features/formularioInventario/buildForm.dart';
-import 'package:image_picker/image_picker.dart';
 // import 'package:image_picker/image_picker.dart';
 
 class formInventario extends StatefulWidget {
