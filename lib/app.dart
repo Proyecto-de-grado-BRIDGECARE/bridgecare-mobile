@@ -1,4 +1,6 @@
 import 'package:bridgecare/features/formularioInspeccion/form_inspection.dart';
+import 'package:bridgecare/features/listaPuente/lista_puente.dart';
+
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {
@@ -8,11 +10,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'BridgeCare',
-      initialRoute: '/inspeccionForm',
+      initialRoute: '/listaPuentes',
       routes: {
         //'/login': (context) => LoginPage(),
         //'/inventarioForm': (context) => FormInventory(),
-        '/inspeccionForm': (context) => FormInspection(),
+        //'/inspeccionForm': (context) => FormInspection(),
+        '/listaPuentes': (context) => BridgeListScreen(),
         //'/home': (context) => HomePage(),
       },
     );
