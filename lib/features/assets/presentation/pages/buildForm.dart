@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,7 +19,7 @@ class _buildFormState extends State<buildForm> {
   Future<void> _pickImage(String sectionKey) async {
     final picker = ImagePicker();
     final XFile? pickedFile =
-    await picker.pickImage(source: ImageSource.gallery);
+        await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _imagenesSecciones[sectionKey] = File(pickedFile.path);
@@ -112,11 +111,11 @@ class _buildFormState extends State<buildForm> {
               child: _imagenesSecciones[sectionKey] == null
                   ? Center(child: Text('toca para seleccionar una imagen'))
                   : ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.file(
-                    _imagenesSecciones[sectionKey]!,
-                    fit: BoxFit.cover,
-                  ))),
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.file(
+                        _imagenesSecciones[sectionKey]!,
+                        fit: BoxFit.cover,
+                      ))),
         )
       ],
     );
@@ -141,7 +140,7 @@ class _buildFormState extends State<buildForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content:
-            Text("Por favor, selecciona una imagen para cada sección.")),
+                Text("Por favor, selecciona una imagen para cada sección.")),
       );
       return;
     }
