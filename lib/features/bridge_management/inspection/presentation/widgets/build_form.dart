@@ -7,20 +7,25 @@ class BuildForm extends StatefulWidget {
   final String tituloSeccion;
   final List<SectionData> secciones;
 
-  BuildForm({required this.tituloSeccion, required this.secciones, super.key});
+  const BuildForm({
+    required this.tituloSeccion,
+    required this.secciones,
+    super.key,
+  });
 
   @override
-  _BuildFormState createState() => _BuildFormState();
+  BuildFormState createState() => BuildFormState();
 }
 
-class _BuildFormState extends State<BuildForm> {
-  Map<String, File?> _imagenesSecciones = {};
-
+class BuildFormState extends State<BuildForm> {
+  final Map<String, File?> _imagenesSecciones = {};
 
   Map<String, bool> componentesActivos = {};
   Future<void> _pickImage(String sectionKey) async {
     final picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
     if (pickedFile != null) {
       setState(() {
         _imagenesSecciones[sectionKey] = File(pickedFile.path);
@@ -62,6 +67,16 @@ class _BuildFormState extends State<BuildForm> {
                 child: Center(
                   child: ElevatedButton(
                     onPressed: _saveForm,
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 20,
+                        horizontal: 20,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: Color(0xFFF29E23),
+                    ),
                     child: Text(
                       "Guardar formulario",
                       style: GoogleFonts.poppins(
@@ -69,16 +84,9 @@ class _BuildFormState extends State<BuildForm> {
                         color: Color(0xffFFFFFF),
                       ),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      backgroundColor: Color(0xFFF29E23),
-                    ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -103,8 +111,10 @@ class _BuildFormState extends State<BuildForm> {
           ),
           if (componentesActivos[section.tituloSeccion] ?? true)
             ExpansionTile(
-              title: Text(section.tituloSeccion,
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+              title: Text(
+                section.tituloSeccion,
+                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              ),
               children: [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -114,10 +124,12 @@ class _BuildFormState extends State<BuildForm> {
                       ...section.campos.map((campo) => _buildField(campo)),
                       _buildImagePicker(section.tituloSeccion),
                       if (section.subsecciones != null)
-                        ...section.subsecciones!.map((subsection) => _buildSubsection(subsection)),
+                        ...section.subsecciones!.map(
+                          (subsection) => _buildSubsection(subsection),
+                        ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
         ],
@@ -140,7 +152,9 @@ class _BuildFormState extends State<BuildForm> {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: subsection.campos.map((campo) => _buildTextField(campo)).toList(),
+              children: subsection.campos
+                  .map((campo) => _buildTextField(campo))
+                  .toList(),
             ),
           ),
         ],
@@ -167,39 +181,56 @@ class _BuildFormState extends State<BuildForm> {
             child: _imagenesSecciones[sectionKey] == null
                 ? Center(child: Text('Toca para seleccionar una imagen'))
                 : ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.file(
-                _imagenesSecciones[sectionKey]!,
-                fit: BoxFit.cover,
-              ),
-            ),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(
+                      _imagenesSecciones[sectionKey]!,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
           ),
         ),
       ],
     );
   }
+
   Widget _buildField(FieldData field) {
     if (field.labelCampo == "Calificación") {
       return DropdownButtonFormField<int>(
-        decoration: InputDecoration(labelText: field.labelCampo, border: OutlineInputBorder()),
+        decoration: InputDecoration(
+          labelText: field.labelCampo,
+          border: OutlineInputBorder(),
+        ),
         items: [0, 1, 3, 4, 5, 6]
-            .map((e) => DropdownMenuItem(value: e, child: Text(e.toString())))
+            .map(
+              (e) => DropdownMenuItem(value: e, child: Text(e.toString())),
+            )
             .toList(),
         onChanged: (value) {},
       );
     }
     if (field.labelCampo == "Inspección Especial") {
       return DropdownButtonFormField<String>(
-        decoration: InputDecoration(labelText: field.labelCampo, border: OutlineInputBorder()),
-        items: ["Sí", "No"].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+        decoration: InputDecoration(
+          labelText: field.labelCampo,
+          border: OutlineInputBorder(),
+        ),
+        items: [
+          "Sí",
+          "No",
+        ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
         onChanged: (value) {},
       );
     }
-    if (field.labelCampo == "No. Fotos" || field.labelCampo == "Cantidad de Reparación" || field.labelCampo == "Costo de Reparación") {
+    if (field.labelCampo == "No. Fotos" ||
+        field.labelCampo == "Cantidad de Reparación" ||
+        field.labelCampo == "Costo de Reparación") {
       return TextField(
         controller: field.controller,
         keyboardType: TextInputType.number,
-        decoration: InputDecoration(labelText: field.labelCampo, border: OutlineInputBorder()),
+        decoration: InputDecoration(
+          labelText: field.labelCampo,
+          border: OutlineInputBorder(),
+        ),
       );
     }
     if (field.labelCampo == "Tipo de daño") {
@@ -218,17 +249,25 @@ class _BuildFormState extends State<BuildForm> {
         "Otro",
         "No Aplicable",
         "Desconocido",
-        "No Registrado"
+        "No Registrado",
       ];
       return DropdownButtonFormField<String>(
-        decoration: InputDecoration(labelText: field.labelCampo, border: OutlineInputBorder()),
-        items: damageTypes.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+        decoration: InputDecoration(
+          labelText: field.labelCampo,
+          border: OutlineInputBorder(),
+        ),
+        items: damageTypes
+            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+            .toList(),
         onChanged: (value) {},
       );
     }
     return TextField(
       controller: field.controller,
-      decoration: InputDecoration(labelText: field.labelCampo, border: OutlineInputBorder()),
+      decoration: InputDecoration(
+        labelText: field.labelCampo,
+        border: OutlineInputBorder(),
+      ),
     );
   }
 
@@ -247,17 +286,21 @@ class _BuildFormState extends State<BuildForm> {
 
   void _saveForm() {
     for (var section in widget.secciones) {
-      if (!(componentesActivos[section.tituloSeccion] ?? true)) continue; // No guardar si el componente está deshabilitado
+      if (!(componentesActivos[section.tituloSeccion] ?? true)) {
+        continue; // No guardar si el componente está deshabilitado
+      }
 
       for (var campo in section.campos) {
-        print("${campo.labelCampo}: ${campo.controller.text}");
+        debugPrint("${campo.labelCampo}: ${campo.controller.text}");
       }
-      print("Imagen para ${section.tituloSeccion}: ${_imagenesSecciones[section.tituloSeccion]?.path}");
+      debugPrint(
+        "Imagen para ${section.tituloSeccion}: ${_imagenesSecciones[section.tituloSeccion]?.path}",
+      );
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Formulario guardado con éxito")),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text("Formulario guardado con éxito")));
   }
 }
 
@@ -266,7 +309,11 @@ class SectionData {
   final List<FieldData> campos;
   final List<SectionData>? subsecciones;
 
-  SectionData({required this.tituloSeccion, required this.campos, this.subsecciones});
+  SectionData({
+    required this.tituloSeccion,
+    required this.campos,
+    this.subsecciones,
+  });
 }
 
 class FieldData {

@@ -5,10 +5,7 @@ class LoginRequest {
   LoginRequest({required this.username, required this.password});
 
   Map<String, String> toJson() {
-    return {
-      "correo": username,
-      "contrasenia": password,
-    };
+    return {"correo": username, "contrasenia": password};
   }
 }
 

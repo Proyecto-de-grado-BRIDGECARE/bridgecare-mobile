@@ -1,5 +1,5 @@
 import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
-import 'package:bridgecare/features/search_bridge/presentation/search_bridge.dart';
+import 'package:bridgecare/features/search_bridge/presentation/pages/search_bridge.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -44,7 +44,7 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
         settingsButtonKey: keyNavBarSettings,
         onTutorialStateChanged: _updateTutorialState,
       ),
-      const SearchBridgeScreen(),
+      BridgeListScreen(),
       const AddScreen(),
       const SettingsScreen(),
       const ProfileScreen(),
@@ -72,15 +72,21 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(CupertinoIcons.doc_text,
-            key: keyNavBarHistory, size: iconSize),
+        icon: Icon(
+          CupertinoIcons.doc_text,
+          key: keyNavBarHistory,
+          size: iconSize,
+        ),
         title: "History",
         activeColorPrimary: Colors.blue,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
-        icon: Icon(CupertinoIcons.settings,
-            key: keyNavBarSettings, size: iconSize),
+        icon: Icon(
+          CupertinoIcons.settings,
+          key: keyNavBarSettings,
+          size: iconSize,
+        ),
         title: "Settings",
         activeColorPrimary: Colors.blue,
         inactiveColorPrimary: Colors.grey,

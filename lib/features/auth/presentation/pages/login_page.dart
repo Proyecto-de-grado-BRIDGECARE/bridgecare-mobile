@@ -59,8 +59,9 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('Invalid credentials'),
-              backgroundColor: Colors.red),
+            content: Text('Invalid credentials'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -94,8 +95,9 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        FocusScope.of(context)
-            .unfocus(); // Dismiss keyboard when tapping outside
+        FocusScope.of(
+          context,
+        ).unfocus(); // Dismiss keyboard when tapping outside
       },
       child: Scaffold(
         backgroundColor: const Color(0xFF111D2C),
@@ -142,26 +144,40 @@ class _LoginPageState extends State<LoginPage> {
                                 AutovalidateMode.onUserInteraction,
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12.0, vertical: 1.0),
+                                horizontal: 12.0,
+                                vertical: 1.0,
+                              ),
                               filled: true,
                               fillColor: const Color(0xFFD9D9D9),
                               hintText: 'Usuario',
                               hintStyle: const TextStyle(
-                                  color: Colors.black, fontSize: 12),
+                                color: Colors.black,
+                                fontSize: 12,
+                              ),
                               floatingLabelBehavior:
                                   FloatingLabelBehavior.never,
-                              enabledBorder:
-                                  _normalBorder(Colors.grey.shade400, 1),
-                              focusedBorder:
-                                  _normalBorder(const Color(0xFF676767), 1.5),
+                              enabledBorder: _normalBorder(
+                                Colors.grey.shade400,
+                                1,
+                              ),
+                              focusedBorder: _normalBorder(
+                                const Color(0xFF676767),
+                                1.5,
+                              ),
                               errorBorder: _normalBorder(Colors.red, 1),
-                              focusedErrorBorder:
-                                  _normalBorder(Colors.red, 1.5),
+                              focusedErrorBorder: _normalBorder(
+                                Colors.red,
+                                1.5,
+                              ),
                               errorStyle: const TextStyle(
-                                  fontSize: 12, color: Colors.red),
+                                fontSize: 12,
+                                color: Colors.red,
+                              ),
                             ),
                             style: const TextStyle(
-                                color: Colors.black, fontSize: 12),
+                              color: Colors.black,
+                              fontSize: 12,
+                            ),
                             validator: _validateUsername,
                           ),
                           const SizedBox(height: 16),
@@ -174,22 +190,32 @@ class _LoginPageState extends State<LoginPage> {
                             obscureText: _obscurePassword,
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12.0, vertical: 1.0),
+                                horizontal: 12.0,
+                                vertical: 1.0,
+                              ),
                               filled: true,
                               fillColor: const Color(0xFFD9D9D9),
                               hintText: 'Contraseña',
                               hintStyle: const TextStyle(
-                                  color: Colors.black, fontSize: 12),
+                                color: Colors.black,
+                                fontSize: 12,
+                              ),
                               floatingLabelBehavior:
                                   FloatingLabelBehavior.never,
-                              enabledBorder:
-                                  _normalBorder(Colors.grey.shade400, 1),
+                              enabledBorder: _normalBorder(
+                                Colors.grey.shade400,
+                                1,
+                              ),
                               focusedBorder: _normalBorder(Colors.black, 1.5),
                               errorBorder: _normalBorder(Colors.red, 1),
-                              focusedErrorBorder:
-                                  _normalBorder(Colors.red, 1.5),
+                              focusedErrorBorder: _normalBorder(
+                                Colors.red,
+                                1.5,
+                              ),
                               errorStyle: const TextStyle(
-                                  fontSize: 12, color: Colors.red),
+                                fontSize: 12,
+                                color: Colors.red,
+                              ),
                               suffixIcon: IconButton(
                                 icon: Icon(
                                   _obscurePassword
@@ -198,13 +224,16 @@ class _LoginPageState extends State<LoginPage> {
                                   color: Colors.black54,
                                 ),
                                 onPressed: () {
-                                  setState(() =>
-                                      _obscurePassword = !_obscurePassword);
+                                  setState(
+                                    () => _obscurePassword = !_obscurePassword,
+                                  );
                                 },
                               ),
                             ),
                             style: const TextStyle(
-                                color: Colors.black, fontSize: 12),
+                              color: Colors.black,
+                              fontSize: 12,
+                            ),
                             validator: _validatePassword,
                           ),
                           const SizedBox(height: 24),
@@ -215,12 +244,15 @@ class _LoginPageState extends State<LoginPage> {
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFFFC107),
-                                disabledBackgroundColor:
-                                    const Color(0xFFFFC107),
+                                disabledBackgroundColor: const Color(
+                                  0xFFFFC107,
+                                ),
                                 shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30)),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                               ),
                               onPressed: _isLoading ? null : _login,
                               child: _isLoading
@@ -228,15 +260,17 @@ class _LoginPageState extends State<LoginPage> {
                                       width: 20,
                                       height: 20,
                                       child: CircularProgressIndicator(
-                                          color: Colors.black,
-                                          strokeWidth: 2.0),
+                                        color: Colors.black,
+                                        strokeWidth: 2.0,
+                                      ),
                                     )
                                   : const Text(
                                       'Iniciar Sesión',
                                       style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
                                     ),
                             ),
                           ),

@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
     'assets/images/puente-inicio.jpeg',
     'assets/images/puente-inicio.jpeg',
     'assets/images/puente-inicio.jpeg',
-    'assets/images/puente-inicio.jpeg'
+    'assets/images/puente-inicio.jpeg',
   ];
 
   @override
@@ -81,23 +81,41 @@ class _HomePageState extends State<HomePage> {
 
   List<TargetFocus> _buildTutorialTargets() {
     return [
-      _buildTarget("HomeButton", widget.navBarKey,
-          "This is the Home button! Tap here to go back to the main page."),
-      _buildTarget("SearchButton", widget.searchButtonKey,
-          "This is the Search button! Use it to find bridges."),
-      _buildTarget("AddButton", widget.addButtonKey,
-          "This is the Add button! Use it to add new content."),
-      _buildTarget("HistoryButton", widget.historyButtonKey,
-          "This is the History button! Use it to view past activities."),
-      _buildTarget("SettingsButton", widget.settingsButtonKey,
-          "This is the Settings button! Use it to customize the app.",
-          isLast: true),
+      _buildTarget(
+        "HomeButton",
+        widget.navBarKey,
+        "This is the Home button! Tap here to go back to the main page.",
+      ),
+      _buildTarget(
+        "SearchButton",
+        widget.searchButtonKey,
+        "This is the Search button! Use it to find bridges.",
+      ),
+      _buildTarget(
+        "AddButton",
+        widget.addButtonKey,
+        "This is the Add button! Use it to add new content.",
+      ),
+      _buildTarget(
+        "HistoryButton",
+        widget.historyButtonKey,
+        "This is the History button! Use it to view past activities.",
+      ),
+      _buildTarget(
+        "SettingsButton",
+        widget.settingsButtonKey,
+        "This is the Settings button! Use it to customize the app.",
+        isLast: true,
+      ),
     ];
   }
 
   TargetFocus _buildTarget(
-      String identify, GlobalKey keyTarget, String description,
-      {bool isLast = false}) {
+    String identify,
+    GlobalKey keyTarget,
+    String description, {
+    bool isLast = false,
+  }) {
     return TargetFocus(
       identify: identify,
       keyTarget: keyTarget,
@@ -108,8 +126,10 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(description,
-                  style: const TextStyle(fontSize: 18, color: Colors.white)),
+              Text(
+                description,
+                style: const TextStyle(fontSize: 18, color: Colors.white),
+              ),
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
@@ -132,46 +152,53 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Image.asset('assets/images/bridgecare_logo.png',
-            fit: BoxFit.contain, height: 150),
+        title: Image.asset(
+          'assets/images/bridgecare_logo.png',
+          fit: BoxFit.contain,
+          height: 150,
+        ),
         centerTitle: true,
         backgroundColor: const Color(0xFF0F0147),
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+        ),
         toolbarHeight: 150,
       ),
       body: SingleChildScrollView(
-          child: Column(
-        children: [
-          GridView.count(
-            padding: const EdgeInsets.all(20),
-            crossAxisCount: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            shrinkWrap: true,
-            children: imagenes.map((path) {
-              return ClipRRect(
+        child: Column(
+          children: [
+            GridView.count(
+              padding: const EdgeInsets.all(20),
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              shrinkWrap: true,
+              children: imagenes.map((path) {
+                return ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: SizedBox(
                     width: 50,
                     height: 50,
                     child: Image.asset(path, fit: BoxFit.cover),
-                  ));
-            }).toList(),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Text(
-              'Bienvenido a BridgeCare, la aplicación para el diagnostico del estado de un puente',
-              style: TextStyle(
+                  ),
+                );
+              }).toList(),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Text(
+                'Bienvenido a BridgeCare, la aplicación para el diagnostico del estado de un puente',
+                style: TextStyle(
                   fontStyle: FontStyle.normal,
                   color: Colors.black,
-                  fontSize: 17),
-              textAlign: TextAlign.center,
+                  fontSize: 17,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
-          )
-        ],
-      )),
+          ],
+        ),
+      ),
     );
   }
 }
