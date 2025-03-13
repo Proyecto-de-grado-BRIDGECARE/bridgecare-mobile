@@ -1,4 +1,5 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
-    "cmake.sourceDirectory": "C:/Users/Santiago Vides/Documents/universidad/tesis/movil/bridgecare-mobile/linux"
+    "cmake.sourceDirectory": "C:/Users/Santiago Vides/Documents/universidad/tesis/movil/bridgecare-mobile/linux",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
