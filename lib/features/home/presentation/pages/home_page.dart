@@ -36,8 +36,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    _checkIfTutorialSeen();
     super.initState();
+    _checkIfTutorialSeen();
   }
 
   Future<void> _checkIfTutorialSeen() async {
@@ -59,7 +59,10 @@ class _HomePageState extends State<HomePage> {
         tutorialCoachMark = TutorialCoachMark(
           targets: _buildTutorialTargets(),
           hideSkip: true,
-          onFinish: () {
+          onFinish: () async {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('hasSeenTutorial', true);
+
             setState(() {
               widget.onTutorialStateChanged(false);
             });
@@ -84,27 +87,27 @@ class _HomePageState extends State<HomePage> {
       _buildTarget(
         "HomeButton",
         widget.navBarKey,
-        "This is the Home button! Tap here to go back to the main page.",
+        "Este es el botón de inicio. Pulsa aquí para volver a la página principal.",
       ),
       _buildTarget(
         "SearchButton",
         widget.searchButtonKey,
-        "This is the Search button! Use it to find bridges.",
+        "Este es el botón de búsqueda. Úsalo para encontrar puentes.",
       ),
       _buildTarget(
         "AddButton",
         widget.addButtonKey,
-        "This is the Add button! Use it to add new content.",
+        "Este es el botón \"Añadir\". Úsalo para añadir un inventario o inspección nuevos.",
       ),
       _buildTarget(
         "HistoryButton",
         widget.historyButtonKey,
-        "This is the History button! Use it to view past activities.",
+        "Este es el botón Historial. Úsalo para ver actividades de creación de inventario/inspección de otros usuarios.",
       ),
       _buildTarget(
         "SettingsButton",
         widget.settingsButtonKey,
-        "This is the Settings button! Use it to customize the app.",
+        "Este es el botón de Configuración. Úsalo para personalizar tu usuario y crear, borrar, o actualizar nuevos usuarios.",
         isLast: true,
       ),
     ];
@@ -139,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                     tutorialCoachMark?.next();
                   }
                 },
-                child: const Text("Got it"),
+                child: const Text("Entendido"),
               ),
             ],
           ),
