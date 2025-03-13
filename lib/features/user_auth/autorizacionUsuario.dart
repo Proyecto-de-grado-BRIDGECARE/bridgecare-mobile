@@ -1,4 +1,4 @@
-import 'package:bridgecare/features/autorizacionUsuario/detallesUsuario.dart';
+import 'package:bridgecare/features/user_auth/user_details.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
