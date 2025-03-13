@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Invalid credentials'),
+            content: Text('Credenciales inválidas.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -74,12 +74,14 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  String? _validateUsername(String? value) {
+  String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Por favor ingrese su usuario';
+      return 'Por favor ingrese su correo electrónico';
     }
-    if (value.contains(' ')) {
-      return 'Por favor ingrese un usuario válido';
+    // Basic email validation pattern
+    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Por favor ingrese un correo electrónico válido';
     }
     return null;
   }
@@ -149,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               filled: true,
                               fillColor: const Color(0xFFD9D9D9),
-                              hintText: 'Usuario',
+                              hintText: 'Correo electrónico',
                               hintStyle: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 12,
@@ -178,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                               color: Colors.black,
                               fontSize: 12,
                             ),
-                            validator: _validateUsername,
+                            validator: _validateEmail,
                           ),
                           const SizedBox(height: 16),
 
