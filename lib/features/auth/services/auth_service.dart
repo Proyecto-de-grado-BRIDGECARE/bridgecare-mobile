@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String baseUrl =
-      "http://192.168.1.6:8080"; // Temporary backend URL
+      "http://192.168.10.14:8080"; // Temporary backend URL
 
   Future<String?> login(LoginRequest request) async {
     final url = Uri.parse("$baseUrl/login");
