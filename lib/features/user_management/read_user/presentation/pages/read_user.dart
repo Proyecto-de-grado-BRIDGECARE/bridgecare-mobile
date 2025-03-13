@@ -43,8 +43,8 @@ class _UsuariosState extends State<ListaUsuarios> {
               .map(
                 (u) => {
                   'id': u.id,
-                  'noId': u.noId,
-                  'nombre': u.nombre,
+                  'noId': u.identificacion,
+                  'nombre': u.nombres,
                   'correo': u.correo,
                   'tipoUsuario': u.tipoUsuario,
                 },

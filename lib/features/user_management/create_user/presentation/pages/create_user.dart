@@ -14,25 +14,25 @@ class RegistroUsuario extends StatefulWidget {
 class _RegistroUsuarioState extends State<RegistroUsuario> {
   // final _formKey = GlobalKey<FormState>();
 
-  TextEditingController nombre = TextEditingController();
+  TextEditingController nombres = TextEditingController();
   TextEditingController apellidos = TextEditingController();
-  TextEditingController noId = TextEditingController();
+  TextEditingController identificacion = TextEditingController();
   TextEditingController tipoUsuario = TextEditingController();
   TextEditingController correo = TextEditingController();
   TextEditingController municipio = TextEditingController();
-  TextEditingController consrtasenia = TextEditingController();
+  TextEditingController contrasenia = TextEditingController();
 
   Future<void> _enviarDatos() async {
     final url = Uri.parse("https://tu-api.com/usuarios");
 
     final Map<String, dynamic> usuarioData = {
-      "nombre": nombre.text,
+      "nombres": nombres.text,
       "apellidos": apellidos.text,
-      "identificacion": noId.text,
+      "identificacion": identificacion.text,
       "tipoUsuario": tipoUsuario.text,
       "correo": correo.text,
       "municipio": municipio.text,
-      "contrasena": consrtasenia.text,
+      "contrasena": contrasenia.text,
     };
 
     final response = await http.post(
@@ -86,9 +86,10 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 20),
-                        _buildTextField("Nombre", nombre),
+                        _buildTextField("Nombres", nombres),
                         _buildTextField("Apellidos", apellidos),
-                        _buildTextField("Número de Identificación", noId),
+                        _buildTextField(
+                            "Número de Identificación", identificacion),
                         _buildTextField("Tipo de Usuario", tipoUsuario),
                         _buildTextField(
                           "Correo Electrónico",
@@ -98,7 +99,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                         _buildTextField("Municipio", municipio),
                         _buildTextField(
                           "Contraseña",
-                          consrtasenia,
+                          contrasenia,
                           isPassword: true,
                         ),
                       ],
