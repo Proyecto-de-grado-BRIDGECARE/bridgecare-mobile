@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       themeMode:
           Provider.of<ThemeProvider>(context).themeMode, // Use theme provider
-      initialRoute: '/autorizaciónUsuario',
+      initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginPage(),
         '/inventarioForm': (context) => FormInventario(),
@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
         '/usuarios': (context) => ListaUsuarios(),
         '/inspecciones': (context) => InspeccionesPage(),
         '/autorizaciónUsuario': (context) => autorizacionUsuario(),
+        '/historialInspecciones': (context) => InspeccionesPage()
       },
     );
   }

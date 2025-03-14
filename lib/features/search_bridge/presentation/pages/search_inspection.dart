@@ -2,28 +2,7 @@ import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-class Inspeccion {
-  final String id;
-  final String mail;
-  final DateTime date;
-
-  Inspeccion({required this.id, required this.mail, required this.date});
-
-  factory Inspeccion.fromJson(Map<String, dynamic> json) {
-    // Buscamos la primera clave que no sea 'mail' ni 'date' (asumimos que es el id)
-    String idKey = json.keys.firstWhere(
-      (key) => key != 'mail' && key != 'date',
-      orElse: () => 'desconocido',
-    ); // Evita errores si el id no existe
-
-    return Inspeccion(
-      id: json[idKey] ?? 'Sin ID',
-      mail: json['mail'] ?? 'Sin correo',
-      date: json['date'] ?? 'Sin fecha',
-    );
-  }
-}
+import 'package:bridgecare/shared/entities/inspection.dart';
 
 class InspeccionesPage extends StatefulWidget {
   const InspeccionesPage({super.key});
@@ -34,8 +13,8 @@ class InspeccionesPage extends StatefulWidget {
 
 class _InspectionState extends State<InspeccionesPage> {
   List<Inspeccion> _inspecciones = [];
-  List<Map<String, dynamic>> _datos = []; // Datos originales
-  List<Map<String, dynamic>> _datosFiltrados = []; // Datos filtrados
+  List<Map<String, dynamic>> _datos = [];
+  List<Map<String, dynamic>> _datosFiltrados = [];
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -51,24 +30,22 @@ class _InspectionState extends State<InspeccionesPage> {
     final List<dynamic> data = await json.decode(jsonData);
 
     setState(() {
-      _inspecciones =
-          data.skip(1).map((item) => Inspeccion.fromJson(item)).toList();
-
-      //convertir Inspeccion a map<Strig, dynamic>
+      _inspecciones = data.map((item) => Inspeccion.fromJson(item)).toList();
       _datos = _inspecciones
           .map(
-            (e) => {'id': e.id, 'mail': e.mail, 'date': e.date.toString()},
+            (e) => {
+              'id': e.id.toString(),
+              'inspector': e.inspector,
+              'fecha_inspeccion': e.fechaInspeccion.toIso8601String(),
+            },
           )
-          .cast<Map<String, dynamic>>()
           .toList();
-
       _datosFiltrados = List.from(_datos);
     });
   }
 
   void _filtrarDatos() {
     String query = _searchController.text.toLowerCase();
-
     setState(() {
       _datosFiltrados = _datos.where((elemento) {
         return elemento['id'].toLowerCase().contains(query);
@@ -77,12 +54,13 @@ class _InspectionState extends State<InspeccionesPage> {
   }
 
   DataRow toElement(Map<String, dynamic> elemento) {
-    var date = DateTime.parse(elemento['date']);
+    var date = DateTime.parse(elemento['fecha_inspeccion']);
     var fechaFormateada =
         "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}";
     return DataRow(
       cells: [
         DataCell(Text(elemento['id'].toString())),
+        DataCell(Text(elemento['inspector'].toString())),
         DataCell(Text(fechaFormateada)),
         DataCell(
           ElevatedButton(
@@ -96,7 +74,7 @@ class _InspectionState extends State<InspeccionesPage> {
               _mostrarDetalles(context, elemento);
             },
             child: Text(
-              "ver detalle",
+              "Ver detalle",
               style: GoogleFonts.poppins(color: Color(0xffF29E23)),
             ),
           ),
@@ -106,7 +84,7 @@ class _InspectionState extends State<InspeccionesPage> {
   }
 
   void _mostrarDetalles(BuildContext context, Map<String, dynamic> datos) {
-    var date = DateTime.parse(datos['date']);
+    var date = DateTime.parse(datos['fecha_inspeccion']);
     var fechaFormateada =
         "${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}";
     showDialog(
@@ -117,81 +95,33 @@ class _InspectionState extends State<InspeccionesPage> {
             borderRadius: BorderRadius.circular(10),
           ),
           content: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "No. ",
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  Text(
-                    "ID Inspección",
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("No. ", style: GoogleFonts.poppins(fontSize: 16)),
-                  Text(
-                    datos['id'] ?? "sin id",
-                    style: GoogleFonts.poppins(fontSize: 16),
-                  ),
-                ],
+              Text(
+                "ID Inspección: ${datos['id']}",
+                style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold, fontSize: 16),
               ),
               SizedBox(height: 10),
               Text(
-                "Usuario encargado",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+                "Inspector: ${datos['inspector']}",
+                style: GoogleFonts.poppins(fontSize: 16),
               ),
               SizedBox(height: 10),
               Text(
-                datos['mail'] ?? "sin mail",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+                "Fecha Inspección: $fechaFormateada",
+                style: GoogleFonts.poppins(fontSize: 16),
               ),
-              SizedBox(height: 10),
-              Text(
-                "Fecha inspección",
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                fechaFormateada,
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
+              SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton.icon(
                     icon: Icon(Icons.edit, color: Color(0xffF29E23)),
                     label: Text(
-                      "gestionar inspeccion",
+                      "Gestionar",
                       style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                          fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     onPressed: () {
                       Navigator.of(context).pop();
@@ -201,15 +131,13 @@ class _InspectionState extends State<InspeccionesPage> {
                   TextButton.icon(
                     icon: Icon(Icons.delete, color: Color(0xffF29E23)),
                     label: Text(
-                      "eliminar inspeccion",
+                      "Eliminar",
                       style: GoogleFonts.poppins(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                          fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     onPressed: () {
                       Navigator.of(context).pop();
-                      debugPrint("eliminar la inspeccion de ${datos['id']}");
+                      debugPrint("Eliminar la inspección de ${datos['id']}");
                     },
                   ),
                 ],
