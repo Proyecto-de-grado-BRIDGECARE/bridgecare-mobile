@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:bridgecare/shared/entities/inspection.dart';
+import 'package:bridgecare/features/user_management/models/inspection.dart';
 
 class InspeccionesPage extends StatefulWidget {
   const InspeccionesPage({super.key});
