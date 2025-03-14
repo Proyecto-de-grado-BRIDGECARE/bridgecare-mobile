@@ -301,6 +301,7 @@ class BuildFormState extends State<BuildForm> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text("Formulario guardado con éxito")));
+    Navigator.pushReplacementNamed(context, '/main');
   }
 }
 

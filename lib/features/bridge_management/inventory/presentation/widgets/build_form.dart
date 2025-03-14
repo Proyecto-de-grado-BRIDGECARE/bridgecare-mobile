@@ -323,24 +323,11 @@ class BuildFormState extends State<BuildForm> {
   }
 
   void _saveForm() {
-    bool allImagesSelected = widget.secciones.every((section) {
-      return _imagenesSecciones[section.tituloSeccion] != null;
-    });
-
-    if (!allImagesSelected) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Por favor, selecciona una imagen para cada sección."),
-        ),
-      );
-      return;
-    }
-
     for (var section in widget.secciones) {
       for (var campo in section.campos) {
         String value = campo.controller.text;
 
-        // **NÚMEROS (int o double)**
+        // *NÚMEROS (int o double)*
         if ([
           "Numero de luces",
           "Longitud Luz menor (m)",
@@ -365,7 +352,7 @@ class BuildFormState extends State<BuildForm> {
           double? doubleValue = toDouble(value);
           debugPrint("${campo.labelCampo}: ${doubleValue ?? 'Valor inválido'}");
         }
-        // **FECHAS**
+        // *FECHAS*
         else if ([
           "Año de construcción",
           "Año de reconstrucción",
@@ -374,7 +361,7 @@ class BuildFormState extends State<BuildForm> {
           DateTime? dateValue = toDate(value);
           debugPrint("${campo.labelCampo}: ${dateValue ?? 'Fecha inválida'}");
         }
-        // **BOOLEANOS (BIT)**
+        // *BOOLEANOS (BIT)*
         else if ([
           "Puente en terraplén (S/N)",
           "Puente en curva / Tangente (C/T)",
@@ -387,18 +374,19 @@ class BuildFormState extends State<BuildForm> {
           bool boolValue = toBool(value);
           debugPrint("${campo.labelCampo}: ${boolValue ? 'Sí' : 'No'}");
         }
-        // **OTROS VALORES (SIN CONVERSIÓN)
+        // *SELECCIÓN ÚNICA (Dropdown o RadioListTile)*
         else if (campo.opciones != null) {
           debugPrint(
             "${campo.labelCampo}: ${campo.valorSeleccionado ?? 'No seleccionado'}",
           );
         }
-        // **OTROS VALORES (TEXTOS)**
+        // *OTROS VALORES (TEXTOS)*
         else {
           debugPrint("${campo.labelCampo}: $value");
         }
       }
 
+      // Si el usuario subió una imagen, se guarda; si no, se ignora
       final selectedImage = _imagenesSecciones[section.tituloSeccion];
       if (selectedImage != null) {
         debugPrint(
@@ -410,7 +398,9 @@ class BuildFormState extends State<BuildForm> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text("Formulario guardado con éxito")));
+    Navigator.pushReplacementNamed(context, '/inspeccionForm');
   }
+
 }
 
 class SectionData {

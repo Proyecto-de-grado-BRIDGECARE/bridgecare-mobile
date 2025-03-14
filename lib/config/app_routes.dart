@@ -15,10 +15,13 @@ class AppRoutes {
     '/inventarioForm': (context) => FormInventario(),
     '/inspeccionForm': (context) => FormInspection(),
     '/main': (context) => const BottomNavWrapper(),
-    '/registro': (context) => RegistroUsuario(),
+    //'/registro': (context) => RegistroUsuario(),
     '/modificarUsuario': (context) => ModificarUsuario(),
     '/usuarios': (context) => ListaUsuarios(),
     '/inspecciones': (context) => InspeccionesPage(),
     '/autorizaciónUsuario': (context) => autorizacionUsuario(),
+    '/updateUser': (context) => ModificarUsuario(),
+    '/readUser': (context) => ListaUsuarios(),
+    '/createUser': (context) => RegistroUsuario(),
   };
 }
