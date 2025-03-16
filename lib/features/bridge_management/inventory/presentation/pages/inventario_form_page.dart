@@ -2,7 +2,7 @@ import 'package:bridgecare/features/bridge_management/inventory/models/detalle.d
 import 'package:bridgecare/features/bridge_management/inventory/models/estribo.dart';
 import 'package:bridgecare/features/bridge_management/inventory/models/pila.dart';
 import 'package:bridgecare/features/bridge_management/inventory/models/senial.dart';
-import 'package:bridgecare/features/bridge_management/inventory/presentation/widgets/dynamic_form.dart';
+import 'package:bridgecare/shared/widgets/dynamic_form.dart';
 import 'package:bridgecare/features/bridge_management/inventory/models/apoyo.dart';
 import 'package:bridgecare/features/bridge_management/inventory/models/carga.dart';
 import 'package:bridgecare/features/bridge_management/inventory/models/datos_administrativos.dart';
