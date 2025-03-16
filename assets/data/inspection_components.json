@@ -1,0 +1,19 @@
+[
+    {"title": "Superficie del Puente", "key": "superficie_puente"},
+    {"title": "Juntas de Expansión", "key": "juntas_expansion"},
+    {"title": "Andenes/Bordillos", "key": "anden_bordillos"},
+    {"title": "Barandas", "key": "barandas"},
+    {"title": "Conos/Taludes", "key": "conos_taludes"},
+    {"title": "Alertas", "key": "alertas"},
+    {"title": "Estribos", "key": "estribos"},
+    {"title": "Pilas", "key": "pilas"},
+    {"title": "Apoyos", "key": "apoyos"},
+    {"title": "Losa", "key": "losa"},
+    {"title": "Vigas/Largueros/Diafragmas", "key": "vigas_largueros_diafragmas"},
+    {"title": "Elementos de Arco", "key": "elementos_arco"},
+    {"title": "Cables/Pendolones/Torres/Macizos", "key": "cables_pendolones_torres_macizos"},
+    {"title": "Elementos de Armadura", "key": "elementos_armadura"},
+    {"title": "Cauce", "key": "cauce"},
+    {"title": "Otros Elementos", "key": "otros_elementos"},
+    {"title": "Puente en General", "key": "puente_general"}
+]
