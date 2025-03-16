@@ -1,6 +1,7 @@
+import 'package:bridgecare/features/bridge_management/inventory/presentation/pages/inventario_form_page.dart';
 import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
 import 'package:bridgecare/features/search_bridge/presentation/pages/search_bridge.dart';
-import 'package:bridgecare/features/bridge_management/inventory/presentation/pages/form_inventario.dart';
+import 'package:bridgecare/features/search_bridge/presentation/pages/search_inspection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -47,8 +48,11 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
         onTutorialStateChanged: _updateTutorialState,
       ),
       BridgeListScreen(),
-      FormInventario(),
-      const SettingsScreen(),
+      // TODO use actual userId
+      InventoryFormScreen(
+        usuarioId: 1,
+      ),
+      InspeccionesPage(),
       ListaUsuarios(),
     ];
   }
@@ -154,30 +158,6 @@ class AddScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("Add Screen")),
       body: const Center(child: Text("Add Screen Content")),
-    );
-  }
-}
-
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("History Screen")),
-      body: const Center(child: Text("History Screen Content")),
-    );
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Settings Screen")),
-      body: const Center(child: Text("Settings Screen Content")),
     );
   }
 }
