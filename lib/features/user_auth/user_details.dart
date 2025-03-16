@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class detallesUsuario extends StatelessWidget {
+class DetallesUsuario extends StatelessWidget {
   final Map<String, String> user;
 
-  detallesUsuario({required this.user});
+  const DetallesUsuario({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class detallesUsuario extends StatelessWidget {
                     );
                   }).toList(),
                   onChanged: (value) {
-                    print("Rol seleccionado: $value");
+                    debugPrint("Rol seleccionado: $value");
                   },
                 ),
                 SizedBox(height: 30), // Más espacio antes de los botones

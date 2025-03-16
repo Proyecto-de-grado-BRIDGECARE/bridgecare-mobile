@@ -1,16 +1,15 @@
 import 'package:bridgecare/features/user_auth/user_details.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter/services.dart';
 
-class autorizacionUsuario extends StatefulWidget {
-  const autorizacionUsuario({super.key});
+class AutorizacionUsuario extends StatefulWidget {
+  const AutorizacionUsuario({super.key});
 
   @override
-  State<autorizacionUsuario> createState() => _autorizacionPage();
+  State<AutorizacionUsuario> createState() => AutorizacionPage();
 }
 
-class _autorizacionPage extends State<autorizacionUsuario> {
+class AutorizacionPage extends State<AutorizacionUsuario> {
   List<Map<String, String>> usuariosPendientes = [
     {
       "name": "Carlos Mendoza",
@@ -93,7 +92,7 @@ class _autorizacionPage extends State<autorizacionUsuario> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => detallesUsuario(user: user),
+                      builder: (context) => DetallesUsuario(user: user),
                     ),
                   );
                 },

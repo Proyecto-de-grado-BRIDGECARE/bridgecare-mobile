@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:bridgecare/features/user_management/models/usuario.dart';
-import 'package:provider/provider.dart';
 
 class ListaUsuarios extends StatefulWidget {
   const ListaUsuarios({super.key});
@@ -110,7 +109,6 @@ class _UsuariosState extends State<ListaUsuarios> {
               debugPrint('editar usuario');
               Navigator.pushReplacementNamed(context, '/updateUser');
             },
-
           ),
         ),
         DataCell(
