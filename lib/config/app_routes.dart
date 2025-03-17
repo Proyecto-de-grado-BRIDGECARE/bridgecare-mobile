@@ -17,7 +17,6 @@ class AppRoutes {
     '/inspecciones': (context) => InspeccionesPage(),
     '/autorizaciónUsuario': (context) => AutorizacionUsuario(),
     '/updateUser': (context) => ModificarUsuario(),
-    '/readUser': (context) => ListaUsuarios(),
     '/createUser': (context) => RegistroUsuario(),
   };
 }

@@ -89,7 +89,7 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
       ),
       PersistentBottomNavBarItem(
         icon: Icon(
-          CupertinoIcons.settings,
+          CupertinoIcons.person,
           key: keyNavBarSettings,
           size: iconSize,
         ),
@@ -146,18 +146,6 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
           ],
         );
       },
-    );
-  }
-}
-
-class AddScreen extends StatelessWidget {
-  const AddScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Add Screen")),
-      body: const Center(child: Text("Add Screen Content")),
     );
   }
 }
