@@ -56,9 +56,7 @@ class _ModificarUsuarioState extends State<ModificarUsuario> {
           context,
         ).showSnackBar(
             SnackBar(content: Text("Usuario actualizado con éxito")));
-
       }
-
     } else {
       if (mounted) {
         ScaffoldMessenger.of(
@@ -67,7 +65,9 @@ class _ModificarUsuarioState extends State<ModificarUsuario> {
             SnackBar(content: Text("Error al actualizar el usuario")));
       }
     }
-    Navigator.pushReplacementNamed(context, '/updateUser');
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/updateUser');
+    }
   }
 
   Future<void> _obtenerDatos() async {
@@ -165,7 +165,6 @@ class _ModificarUsuarioState extends State<ModificarUsuario> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     backgroundColor: Color(0xFF111D2C), // Color del botón
-
                   ),
                   child: Text(
                     "ACTUALIZAR",
