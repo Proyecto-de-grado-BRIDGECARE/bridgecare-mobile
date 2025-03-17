@@ -168,14 +168,35 @@ class _HomePageState extends State<HomePage> {
         toolbarHeight: 150,
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Text(
+              'Bienvenido a BridgeCare',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'BridgeCare es una aplicación diseñada para facilitar la inspección y gestión de puentes, '
+              'permitiendo a ingenieros y responsables de mantenimiento registrar y analizar información '
+              'de manera eficiente.',
+              style: TextStyle(fontSize: 16, color: Colors.black54),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
             GridView.count(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(10),
               crossAxisCount: 2,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
               shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
               children: imagenes.map((path) {
                 return ClipRRect(
                   borderRadius: BorderRadius.circular(10),
@@ -187,20 +208,58 @@ class _HomePageState extends State<HomePage> {
                 );
               }).toList(),
             ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Text(
-                'Bienvenido a BridgeCare, la aplicación para el diagnostico del estado de un puente',
-                style: TextStyle(
-                  fontStyle: FontStyle.normal,
-                  color: Colors.black,
-                  fontSize: 17,
-                ),
-                textAlign: TextAlign.center,
+            const SizedBox(height: 20),
+            Text(
+              'Características clave:',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
               ),
+              textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 10),
+            _buildFeatureItem(Icons.assignment, 'Inspección de Puentes',
+                'Registra y documenta información estructural de manera detallada.'),
+            _buildFeatureItem(Icons.cloud_upload, 'Sincronización Inteligente',
+                'Guarda datos sin conexión y sincronízalos automáticamente cuando haya conexión.'),
+            _buildFeatureItem(Icons.security, 'Seguridad',
+                'Autenticación y control de acceso para proteger la información.'),
+            _buildFeatureItem(Icons.analytics, 'Análisis de Datos',
+                'Consulta reportes y toma decisiones basadas en datos en tiempo real.'),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureItem(IconData icon, String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, color: Color(0xFF0F0147), size: 30),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                Text(
+                  description,
+                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
