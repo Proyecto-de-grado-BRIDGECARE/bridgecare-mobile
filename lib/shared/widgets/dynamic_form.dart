@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class DynamicForm extends StatefulWidget {
   final Map<String, dynamic> fields;
@@ -70,6 +72,7 @@ class DynamicFormState extends State<DynamicForm>
 
   Widget _buildField(String fieldName, Map<String, dynamic> fieldInfo) {
     final initialValue = widget.initialData?[fieldName];
+    _controllers[fieldName] ??= TextEditingController();
     Widget field;
 
     switch (fieldInfo['type']) {
@@ -115,7 +118,7 @@ class DynamicFormState extends State<DynamicForm>
             setState(() {
               if (value != null) {
                 _formData[fieldName] = value;
-                widget.onSave(_formData); // Update parent form data
+                widget.onSave(_formData);
               }
             });
           },
@@ -130,7 +133,7 @@ class DynamicFormState extends State<DynamicForm>
               onChanged: (value) {
                 setState(() {
                   _formData[fieldName] = value;
-                  widget.onSave(_formData); // Update parent form data
+                  widget.onSave(_formData);
                 });
               },
             ),
@@ -141,7 +144,23 @@ class DynamicFormState extends State<DynamicForm>
         );
         break;
       case 'date':
-        field = GestureDetector(
+        if (_formData[fieldName] != null &&
+            _controllers[fieldName]!.text.isEmpty) {
+          _controllers[fieldName]!.text = (_formData[fieldName] as DateTime)
+              .toIso8601String()
+              .split('T')[0];
+        } else if (initialValue != null &&
+            _controllers[fieldName]!.text.isEmpty) {
+          _controllers[fieldName]!.text =
+              (initialValue as DateTime).toIso8601String().split('T')[0];
+        }
+        field = TextFormField(
+          controller: _controllers[fieldName],
+          decoration: _getInputDecoration(fieldInfo['label']).copyWith(
+            prefixIcon: Icon(Icons.calendar_today,
+                color: Colors.blueGrey[700], size: 20.0),
+          ),
+          readOnly: true,
           onTap: () async {
             final date = await showDatePicker(
               context: context,
@@ -152,30 +171,109 @@ class DynamicFormState extends State<DynamicForm>
             if (date != null) {
               setState(() {
                 _formData[fieldName] = date;
-                widget.onSave(_formData); // Update parent form data
+                _controllers[fieldName]!.text =
+                    date.toIso8601String().split('T')[0];
+                widget.onSave(_formData);
               });
             }
           },
-          child: Container(
-            padding: const EdgeInsets.all(12.0),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[400]!),
-              borderRadius: BorderRadius.circular(12.0),
+          onSaved: (value) => _formData[fieldName] = _formData[fieldName],
+        );
+        break;
+      case 'image':
+        // Initialize as empty list if not set
+        _formData[fieldName] ??=
+            initialValue ?? <XFile>[]; // Start with XFiles, later URLs
+        final maxImages = fieldInfo['maxImages'] as int? ?? 5;
+        final List<XFile> images = _formData[fieldName] as List<XFile>;
+
+        field = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(fieldInfo['label'],
+                style: TextStyle(color: Colors.blueGrey[700])),
+            const SizedBox(height: 8.0),
+            Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              children: images.map((image) {
+                return Stack(
+                  children: [
+                    FutureBuilder<Uint8List>(
+                      future: image.readAsBytes(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return GestureDetector(
+                            onTap: () {
+                              // Show larger image in a dialog
+                              showDialog(
+                                context: context,
+                                builder: (context) => Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  child: GestureDetector(
+                                    onTap: () =>
+                                        Navigator.pop(context), // Close on tap
+                                    child: Image.memory(
+                                      snapshot.data!,
+                                      fit: BoxFit
+                                          .contain, // Fit within screen bounds
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image.memory(
+                              snapshot.data!,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        }
+                        return Container(
+                          width: 100,
+                          height: 100,
+                          color: Colors.grey[300],
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      },
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: IconButton(
+                        icon: Icon(Icons.remove_circle, color: Colors.red),
+                        onPressed: () {
+                          setState(() {
+                            images.remove(image);
+                            widget.onSave(_formData);
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
             ),
-            child: Row(
-              children: [
-                Icon(Icons.calendar_today,
-                    size: 20.0, color: Colors.blueGrey[700]),
-                const SizedBox(width: 8.0),
-                Text(
-                  _formData[fieldName]?.toString() ??
-                      initialValue?.toString() ??
-                      fieldInfo['label'],
-                  style: TextStyle(color: Colors.blueGrey[700]),
-                ),
-              ],
-            ),
-          ),
+            if (images.length < maxImages)
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final picker = ImagePicker();
+                  final pickedFile = await picker.pickImage(
+                    source: ImageSource.camera,
+                    preferredCameraDevice: CameraDevice.rear,
+                  );
+                  if (pickedFile != null) {
+                    setState(() {
+                      images.add(pickedFile);
+                      widget.onSave(_formData);
+                    });
+                  }
+                },
+                icon: Icon(Icons.add_a_photo),
+                label: Text('Tomar Foto (${images.length}/$maxImages)'),
+              ),
+          ],
         );
         break;
       default:
@@ -183,7 +281,8 @@ class DynamicFormState extends State<DynamicForm>
     }
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding:
+          const EdgeInsets.only(bottom: 8.0), // Should be 'bottom' or similar
       child: field,
     );
   }

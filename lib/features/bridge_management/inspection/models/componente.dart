@@ -8,6 +8,7 @@ class Componente {
   final int tipoDanio;
   final String danio;
   final int inspeccionId;
+  final List<String>? imagenUrls;
 
   Componente({
     this.id,
@@ -19,6 +20,7 @@ class Componente {
     required this.tipoDanio,
     required this.danio,
     required this.inspeccionId,
+    this.imagenUrls,
   });
 
   static const Map<String, dynamic> formFields = {
@@ -26,11 +28,13 @@ class Componente {
       'type': 'dropdown',
       'label': 'Calificación',
       'options': [
-        '1 - Excelente',
-        '2 - Bueno',
-        '3 - Regular',
-        '4 - Malo',
-        '5 - Crítico'
+        '0 - Sin daño o daño insignificante',
+        '1 - Daño pequeño pero no es necesaria reparación (excepto mantenimiento menor)',
+        '2 - Algún daño, reparación necesaria cuando se presente la ocasión. El componente funciona como se diseñó',
+        '3 - Daño significativo, reparación necesaria muy pronto',
+        '4 - Daño grave, reparación necesaria inmediatamente',
+        '5 - Daño extremo, falla total o riesgo de falla total del componente',
+        '? - Desconocido',
       ],
     },
     'mantenimiento': {'type': 'text', 'label': 'Mantenimiento'},
@@ -54,5 +58,10 @@ class Componente {
       ],
     },
     'danio': {'type': 'text', 'label': 'Daño'},
+    'imagen': {
+      'type': 'image',
+      'label': 'Imágenes (0-5)',
+      'maxImages': 5,
+    },
   };
 }

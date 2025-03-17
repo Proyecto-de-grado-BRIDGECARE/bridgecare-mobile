@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:bridgecare/features/bridge_management/inspection/models/componente.dart';
 import 'package:bridgecare/features/bridge_management/inspection/models/inspeccion.dart';
 import 'package:bridgecare/features/bridge_management/inspection/models/reparacion.dart';
@@ -7,7 +8,7 @@ import 'package:bridgecare/shared/widgets/form_template.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:image_picker/image_picker.dart';
 
 class InspectionFormScreen extends StatefulWidget {
   final int usuarioId;
@@ -36,7 +37,7 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
 
   Future<void> _loadComponents() async {
     final String response =
-        await rootBundle.loadString('assets/data/components.json');
+        await rootBundle.loadString('assets/data/inspection_components.json');
     final List<dynamic> data = jsonDecode(response);
     setState(() {
       componentList =
@@ -88,6 +89,12 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
         // Post Inspeccion
         _formData['inspeccion']!['puenteId'] = widget.puenteId;
         _formData['inspeccion']!['usuarioId'] = widget.usuarioId;
+        if (_formData['inspeccion']!['fecha'] != null) {
+          _formData['inspeccion']!['fecha'] =
+              (_formData['inspeccion']!['fecha'] as DateTime)
+                  .toIso8601String()
+                  .split('T')[0];
+        }
         final inspeccionResponse = await http.post(
           Uri.parse('https://your-api.com/inspecciones'),
           headers: {'Content-Type': 'application/json'},
@@ -112,6 +119,35 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
           componenteData['tipoDanio'] =
               _parseDropdownValue(componenteData['tipoDanio']?.toString());
           componenteData['inspeccionId'] = inspeccionId;
+
+          if (componenteData['imagenUrls'] != null &&
+              (componenteData['imagenUrls'] as List).isNotEmpty) {
+            final List<XFile> images =
+                componenteData['imagenUrls'] as List<XFile>;
+            final List<String> uploadedUrls = [];
+            for (var image in images) {
+              var request = http.MultipartRequest(
+                'POST',
+                Uri.parse(
+                    'https://your-api.com/upload-image'), // Backend endpoint
+              );
+              request.files
+                  .add(await http.MultipartFile.fromPath('image', image.path));
+              final response = await request.send();
+              if (response.statusCode == 200) {
+                final responseData = await response.stream.bytesToString();
+                final url = jsonDecode(responseData)['url'] as String;
+                uploadedUrls.add(url);
+              } else {
+                throw Exception(
+                    'Failed to upload image: ${response.reasonPhrase}');
+              }
+            }
+            componenteData['imagenUrls'] =
+                uploadedUrls; // Replace XFiles with URLs
+          } else {
+            componenteData['imagenUrls'] = null;
+          }
 
           final componenteResponse = await http.post(
             Uri.parse('https://your-api.com/componentes'),
@@ -140,14 +176,17 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
             }
           }
         }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Inspección enviada con éxito')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Inspección enviada con éxito')),
+          );
+        }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')),
+          );
+        }
       }
     }
   }
