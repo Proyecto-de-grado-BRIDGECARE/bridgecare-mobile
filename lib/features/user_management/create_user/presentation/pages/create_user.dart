@@ -33,7 +33,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
 
     try {
       final response = await http.post(
-        Uri.parse("https://tu-api.com/usuarios"), // URL real de la API
+        Uri.parse("https://tu-api.com/usuarios"),
         headers: {"Content-Type": "application/json"},
         body: json.encode(_formData),
       );
@@ -137,7 +137,6 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
     );
   }
 
-  /// 🔹 Función para construir un campo de texto dinámico
   Widget _buildTextField(
     String label,
     String key, {
