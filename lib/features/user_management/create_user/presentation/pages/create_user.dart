@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:bridgecare/features/user_management/models/usuario.dart';
 
 class RegistroUsuario extends StatefulWidget {
   const RegistroUsuario({super.key});
@@ -14,7 +13,6 @@ class RegistroUsuario extends StatefulWidget {
 class _RegistroUsuarioState extends State<RegistroUsuario> {
   final _formKey = GlobalKey<FormState>();
 
-  // Mapa basado en el modelo Usuario
   Map<String, dynamic> _formData = {
     "id": 0, // Se genera en la API
     "nombres": "",
