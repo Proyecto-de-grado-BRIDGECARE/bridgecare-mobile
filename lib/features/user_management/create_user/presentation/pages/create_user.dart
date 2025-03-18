@@ -1,8 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:bridgecare/features/user_management/models/usuario.dart';
 
 class RegistroUsuario extends StatefulWidget {
   const RegistroUsuario({super.key});
@@ -12,96 +12,87 @@ class RegistroUsuario extends StatefulWidget {
 }
 
 class _RegistroUsuarioState extends State<RegistroUsuario> {
-  // final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
-  TextEditingController nombres = TextEditingController();
-  TextEditingController apellidos = TextEditingController();
-  TextEditingController identificacion = TextEditingController();
-  TextEditingController tipoUsuario = TextEditingController();
-  TextEditingController correo = TextEditingController();
-  TextEditingController municipio = TextEditingController();
-  TextEditingController contrasenia = TextEditingController();
+  // Mapa basado en el modelo Usuario
+  Map<String, dynamic> _formData = {
+    "id": 0, // Se genera en la API
+    "nombres": "",
+    "apellidos": "",
+    "identificacion": "",
+    "tipoUsuario": 2, // Tipo de usuario fijo (Ej: 2 = Usuario)
+    "correo": "",
+    "municipio": "",
+    "contrasenia": "",
+  };
 
   Future<void> _enviarDatos() async {
-    final url = Uri.parse("https://tu-api.com/usuarios");
+    if (!_formKey.currentState!.validate()) return;
 
-    final Map<String, dynamic> usuarioData = {
-      "nombres": nombres.text,
-      "apellidos": apellidos.text,
-      "identificacion": identificacion.text,
-      "tipoUsuario": tipoUsuario.text,
-      "correo": correo.text,
-      "municipio": municipio.text,
-      "contrasena": contrasenia.text,
-    };
+    _formKey.currentState!.save(); // Guarda los valores en _formData
 
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: json.encode(usuarioData),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse("https://tu-api.com/usuarios"), // URL real de la API
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(_formData),
+      );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Usuario registrado con éxito")));
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Usuario registrado con éxito")),
+        );
+        Navigator.pop(context); // Regresa a la pantalla anterior
+      } else {
+        throw Exception('Error al registrar usuario: ${response.body}');
       }
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(
-            SnackBar(content: Text("Error al registrar el usuario")));
-      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFEBEBEB),
+      backgroundColor: const Color(0xFFEBEBEB),
       appBar: AppBar(
         title: Text(
-          "Registro de usuarios",
+          "Registro de Usuario",
           style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
-        backgroundColor: Color(0xFFEBEBEB),
+        backgroundColor: const Color(0xFFEBEBEB),
       ),
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: Card(
-                margin: EdgeInsets.all(16),
+                margin: const EdgeInsets.all(16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 color: Colors.white,
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Form(
+                    key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 20),
-                        _buildTextField("Nombres", nombres),
-                        _buildTextField("Apellidos", apellidos),
+                        const SizedBox(height: 20),
+                        _buildTextField("Nombres", "nombres"),
+                        _buildTextField("Apellidos", "apellidos"),
                         _buildTextField(
-                            "Número de Identificación", identificacion),
-                        _buildTextField("Tipo de Usuario", tipoUsuario),
-                        _buildTextField(
-                          "Correo Electrónico",
-                          correo,
-                          isEmail: true,
-                        ),
-                        _buildTextField("Municipio", municipio),
-                        _buildTextField(
-                          "Contraseña",
-                          contrasenia,
-                          isPassword: true,
-                        ),
+                            "Número de Identificación", "identificacion",
+                            isNumeric: true),
+                        _buildTextField("Correo Electrónico", "correo",
+                            isEmail: true),
+                        _buildTextField("Municipio", "municipio"),
+                        _buildTextField("Contraseña", "contrasenia",
+                            isPassword: true),
                       ],
                     ),
                   ),
@@ -110,9 +101,9 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
             ),
             Container(
               height: 50,
-              padding: EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: 10),
               width: double.infinity,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0x00111d2c),
                 borderRadius: BorderRadius.only(
                   topRight: Radius.circular(30),
@@ -123,14 +114,15 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                 child: ElevatedButton(
                   onPressed: _enviarDatos,
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 50),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    backgroundColor: Color(0xFF111D2C), // Color del botón
+                    backgroundColor: const Color(0xFF111D2C),
                   ),
                   child: Text(
-                    "ACTUALIZAR",
+                    "REGISTRAR",
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -145,21 +137,26 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
     );
   }
 
+  /// 🔹 Función para construir un campo de texto dinámico
   Widget _buildTextField(
     String label,
-    TextEditingController controller, {
+    String key, {
     bool isPassword = false,
     bool isEmail = false,
+    bool isNumeric = false,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
-        controller: controller,
         obscureText: isPassword,
-        keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
+        keyboardType: isEmail
+            ? TextInputType.emailAddress
+            : isNumeric
+                ? TextInputType.number
+                : TextInputType.text,
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -168,7 +165,17 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
           if (isEmail && !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
             return "Ingrese un correo válido";
           }
+          if (isNumeric && int.tryParse(value) == null) {
+            return "Ingrese un número válido";
+          }
           return null;
+        },
+        onSaved: (value) {
+          if (isNumeric) {
+            _formData[key] = int.tryParse(value!) ?? 0;
+          } else {
+            _formData[key] = value;
+          }
         },
       ),
     );

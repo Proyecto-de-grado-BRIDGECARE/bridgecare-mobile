@@ -30,47 +30,46 @@ class _UsuariosState extends State<ListaUsuarios> {
 
   Future<void> obtenerDatos() async {
     final url = Uri.parse("https://tu-api.com/usuarios");
-    final response = await http.get(url);
 
     try {
+      final response = await http.get(url);
+
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
 
         setState(() {
           _usuarios = data.map((item) => Usuario.fromJson(item)).toList();
-
           _datos = _usuarios
-              .map(
-                (u) => {
-                  'id': u.id,
-                  'noId': u.identificacion,
-                  'nombre': u.nombres,
-                  'correo': u.correo,
-                  'tipoUsuario': u.tipoUsuario,
-                },
-              )
+              .map((u) => {
+                    'id': u.id,
+                    'noId': u.identificacion,
+                    'nombre': u.nombres,
+                    'correo': u.correo,
+                    'tipoUsuario': u.tipoUsuario,
+                  })
               .cast<Map<String, dynamic>>()
               .toList();
-
           _datosFiltrados = List.from(_datos);
           _isLoading = false;
           _hasError = false;
         });
       } else {
-        throw Exception("Error en la respuesta del servidor");
+        throw Exception(
+            "Error en la respuesta del servidor: ${response.statusCode}");
       }
     } catch (e) {
-      debugPrint("error al cargar usuarios: $e");
+      debugPrint("Error al cargar usuarios: $e");
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error al obtener datos del servidor: $e")),
+        );
+      }
 
       setState(() {
         _isLoading = false;
         _hasError = true;
       });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error al obtener datos del servidor")),
-        );
-      }
     }
   }
 

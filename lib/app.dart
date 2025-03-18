@@ -3,6 +3,7 @@
 import 'package:bridgecare/config/app_routes.dart';
 import 'package:bridgecare/core/providers/theme_provider.dart';
 import 'package:bridgecare/features/bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
+import 'package:bridgecare/features/user_management/create_user/presentation/pages/create_user.dart';
 import 'package:bridgecare/shared/widgets/splash_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,8 +19,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       themeMode:
           Provider.of<ThemeProvider>(context).themeMode, // Use theme provider
-      home: InspectionFormScreen(
-          usuarioId: 1, puenteId: 1), //const SplashToLoginTransition(),
+      home: RegistroUsuario(), //const SplashToLoginTransition(),
       // home: FormInventario(),
       routes: AppRoutes.routes,
     );
