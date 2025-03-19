@@ -7,8 +7,8 @@ class Componente {
   final int numeroFotos;
   final int tipoDanio;
   final String danio;
-  final int inspeccionId;
   final List<String>? imagenUrls;
+  final int inspeccionId;
 
   Componente({
     this.id,

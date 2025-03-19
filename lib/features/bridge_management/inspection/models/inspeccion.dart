@@ -16,9 +16,9 @@ class Inspeccion {
     required this.administrador,
     required this.anioProximaInspeccion,
     required this.observacionesGenerales,
+    required this.fecha,
     required this.puenteId,
     required this.usuarioId,
-    required this.fecha,
   });
 
   static const Map<String, dynamic> formFields = {

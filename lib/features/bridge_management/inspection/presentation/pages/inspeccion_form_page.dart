@@ -231,8 +231,7 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                         setState(() => _formData['puente']!.addAll(data)),
                   ),
                   DynamicForm(
-                    fields: Inspeccion
-                        .formFields, // Now without observacionesGenerales
+                    fields: Inspeccion.formFields,
                     initialData: _formData['inspeccion'],
                     onSave: (data) =>
                         setState(() => _formData['inspeccion']!.addAll(data)),
