@@ -14,7 +14,16 @@ class Estribo {
   });
 
   static const Map<String, dynamic> formFields = {
-    'tipo': {'type': 'number', 'label': 'Tipo'},
+    'tipo': {
+      'type': 'dropdown',
+      'label': 'Tipo',
+      'options': [
+        '10 - Con aletas integradas',
+        '11 - Con aletas separadas',
+        '20 - Enterrado, sólido',
+        '21 - Enterrado, columnas/pilotes con viga cabezal'
+      ]
+    },
     'material': {
       'type': 'dropdown',
       'label': 'Material',

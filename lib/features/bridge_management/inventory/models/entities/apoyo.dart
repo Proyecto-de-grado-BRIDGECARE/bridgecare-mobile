@@ -7,7 +7,7 @@ class Apoyo {
   final int fijoEnViga;
   final int movilEnViga;
   final int vehiculoDiseno;
-  final String claseDistribucionCarga;
+  final int claseDistribucionCarga;
   final int inventarioId;
 
   Apoyo({
@@ -137,9 +137,9 @@ class Apoyo {
       'type': 'dropdown',
       'label': 'Clase Distribución Carga',
       'options': [
-        'Distribución en dos direcciones',
-        'Distribución en una dirección',
-        'No distribución',
+        '1 - Distribución en dos direcciones',
+        '2 - Distribución en una dirección',
+        '3 - No distribución',
       ],
     },
   };
