@@ -48,10 +48,7 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
         onTutorialStateChanged: _updateTutorialState,
       ),
       BridgeListScreen(),
-      // TODO use actual userId
-      InventoryFormScreen(
-        usuarioId: 1,
-      ),
+      InventoryFormScreen(),
       InspeccionesPage(),
       ListaUsuarios(),
     ];
