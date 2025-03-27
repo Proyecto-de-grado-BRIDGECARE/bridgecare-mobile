@@ -9,11 +9,9 @@ class AuthService {
   static const String baseUrl =
       "http://192.168.1.6:8080/api/auth"; // Temporary backend URL
 
-  /// Logs in the user and stores the JWT token locally
   Future<String?> login(LoginRequest request) async {
     final url = Uri.parse("$baseUrl/login");
 
-    // Create Basic Auth header: "Authorization: Basic <base64(correo:contrasenia)>"
     String credentials = "${request.username}:${request.password}";
     String basicAuth = "Basic ${base64Encode(utf8.encode(credentials))}";
 
@@ -73,6 +71,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        debugPrint(response.body);
         return Usuario.fromJson(data);
       } else {
         debugPrint("Failed to fetch user: ${response.body}");
@@ -89,14 +88,14 @@ class AuthService {
     final token = prefs.getString("token");
 
     if (token == null) return false;
-
     try {
       final response = await http.get(
         Uri.parse("$baseUrl/me"),
         headers: {"Authorization": "Bearer $token"},
-      );
+      ).timeout(Duration(seconds: 5), onTimeout: () {
+        return http.Response("Timeout", 408);
+      });
 
-      // Return true only if the token is valid and user exists (200 OK)
       return response.statusCode == 200;
     } catch (e) {
       debugPrint("Token validation error: $e");
