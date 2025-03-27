@@ -7,16 +7,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String baseUrl =
-      "http://localhost:8080/api/auth"; // Temporary backend URL
+      "http://192.168.1.6:8080/api/auth"; // Temporary backend URL
 
   /// Logs in the user and stores the JWT token locally
   Future<String?> login(LoginRequest request) async {
     final url = Uri.parse("$baseUrl/login");
 
+    // Create Basic Auth header: "Authorization: Basic <base64(correo:contrasenia)>"
+    String credentials = "${request.username}:${request.password}";
+    String basicAuth = "Basic ${base64Encode(utf8.encode(credentials))}";
+
     try {
       final response = await http.post(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": basicAuth,
+        },
         body: jsonEncode(request.toJson()),
       );
 
@@ -30,7 +37,7 @@ class AuthService {
 
         return loginResponse.token;
       } else {
-        debugPrint("Login failed: ${response.body}");
+        debugPrint("Login failed: ${response.statusCode} - ${response.body}");
         return null;
       }
     } catch (e) {
@@ -60,7 +67,7 @@ class AuthService {
 
     try {
       final response = await http.get(
-        Uri.parse("$baseUrl/getUser"),
+        Uri.parse("$baseUrl/me"),
         headers: {"Authorization": "Bearer $token"},
       );
 
@@ -74,6 +81,26 @@ class AuthService {
     } catch (e) {
       debugPrint("Error fetching user: $e");
       return null;
+    }
+  }
+
+  Future<bool> validateToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+
+    if (token == null) return false;
+
+    try {
+      final response = await http.get(
+        Uri.parse("$baseUrl/me"),
+        headers: {"Authorization": "Bearer $token"},
+      );
+
+      // Return true only if the token is valid and user exists (200 OK)
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("Token validation error: $e");
+      return false;
     }
   }
 }
