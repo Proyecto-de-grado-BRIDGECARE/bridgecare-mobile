@@ -22,10 +22,47 @@ class SplashToLoginTransitionState extends State<SplashToLoginTransition> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-      _startTransition();
+      _checkTokenAndTransition();
     });
   }
 
+  Future<void> _checkTokenAndTransition() async {
+    // Start fade-in immediately
+    setState(() {
+      _opacity = 1.0;
+    });
+
+    bool isValidToken = await AuthService().validateToken();
+
+    if (isValidToken) {
+      themeProvider.setLightMode();
+      // Navigate to main screen with fade transition
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                BottomNavWrapper(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 1000),
+          ),
+        );
+      }
+    } else {
+      // Show login page after fade-in completes
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // ignore: unused_element
   void _startTransition() {
     // Check login status before transitioning
     AuthService().isLoggedIn().then((loggedIn) {
@@ -42,7 +79,7 @@ class SplashToLoginTransitionState extends State<SplashToLoginTransition> {
                 context,
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      BottomNavWrapper(), // Replace with your main screen widget
+                      BottomNavWrapper(),
                   transitionsBuilder:
                       (context, animation, secondaryAnimation, child) {
                     return FadeTransition(
