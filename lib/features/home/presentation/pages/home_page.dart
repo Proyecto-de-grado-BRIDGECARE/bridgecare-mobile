@@ -1,266 +1,203 @@
+import 'package:bridgecare/features/home/presentation/pages/utils/constans.dart';
 import 'package:flutter/material.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:bridgecare/features/bridge_management/inventory/presentation/pages/inventario_form_page.dart';
+import 'package:bridgecare/features/search_bridge/presentation/pages/search_bridge.dart';
 class HomePage extends StatefulWidget {
-  final GlobalKey navBarKey;
-  final GlobalKey searchButtonKey;
-  final GlobalKey addButtonKey;
-  final GlobalKey historyButtonKey;
-  final GlobalKey settingsButtonKey;
-  final Function(bool) onTutorialStateChanged;
-
-  const HomePage({
-    super.key,
-    required this.navBarKey,
-    required this.searchButtonKey,
-    required this.addButtonKey,
-    required this.historyButtonKey,
-    required this.settingsButtonKey,
-    required this.onTutorialStateChanged,
-  });
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  TutorialCoachMark? tutorialCoachMark;
+  int page = 1;
 
-  static const List<String> imagenes = [
-    'assets/images/puente-inicio.jpeg',
-    'assets/images/puente-inicio.jpeg',
-    'assets/images/puente-inicio.jpeg',
-    'assets/images/puente-inicio.jpeg',
+  final List<String> titles = [
+    "Bienvenido a BridgeCare",
+    "",
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _checkIfTutorialSeen();
-  }
+  final List<String> subtitles = [
+    "Si tiene alguna duda sobre el funcionamiento de la aplicación, consulte uno de los siguientes manuales: /n Si no tiene dudas presione siguiente ",
+    "Usted desea: ",
+  ];
 
-  Future<void> _checkIfTutorialSeen() async {
-    final prefs = await SharedPreferences.getInstance();
-    bool hasSeenTutorial = prefs.getBool('hasSeenTutorial') ?? false;
-
-    if (!hasSeenTutorial) {
-      Future.delayed(Duration.zero, startTutorial);
-    }
-  }
-
-  void startTutorial() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_areKeysAttached()) {
-        setState(() {
-          widget.onTutorialStateChanged(true);
-        });
-
-        tutorialCoachMark = TutorialCoachMark(
-          targets: _buildTutorialTargets(),
-          hideSkip: true,
-          onFinish: () async {
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setBool('hasSeenTutorial', true);
-
-            setState(() {
-              widget.onTutorialStateChanged(false);
-            });
-          },
-        )..show(context: context);
-      } else {
-        debugPrint("One or more keys are not attached to a widget.");
-      }
-    });
-  }
-
-  bool _areKeysAttached() {
-    return widget.navBarKey.currentContext != null &&
-        widget.searchButtonKey.currentContext != null &&
-        widget.addButtonKey.currentContext != null &&
-        widget.historyButtonKey.currentContext != null &&
-        widget.settingsButtonKey.currentContext != null;
-  }
-
-  List<TargetFocus> _buildTutorialTargets() {
-    return [
-      _buildTarget(
-        "HomeButton",
-        widget.navBarKey,
-        "Este es el botón de inicio. Pulsa aquí para volver a la página principal.",
-      ),
-      _buildTarget(
-        "SearchButton",
-        widget.searchButtonKey,
-        "Este es el botón de búsqueda. Úsalo para encontrar puentes.",
-      ),
-      _buildTarget(
-        "AddButton",
-        widget.addButtonKey,
-        "Este es el botón \"Añadir\". Úsalo para añadir un inventario o inspección nuevos.",
-      ),
-      _buildTarget(
-        "HistoryButton",
-        widget.historyButtonKey,
-        "Este es el botón Historial. Úsalo para ver actividades de creación de inventario/inspección de otros usuarios.",
-      ),
-      _buildTarget(
-        "SettingsButton",
-        widget.settingsButtonKey,
-        "Este es el botón de Configuración. Úsalo para personalizar tu usuario y crear, borrar, o actualizar nuevos usuarios.",
-        isLast: true,
-      ),
-    ];
-  }
-
-  TargetFocus _buildTarget(
-    String identify,
-    GlobalKey keyTarget,
-    String description, {
-    bool isLast = false,
-  }) {
-    return TargetFocus(
-      identify: identify,
-      keyTarget: keyTarget,
-      alignSkip: Alignment.topRight,
-      contents: [
-        TargetContent(
-          align: ContentAlign.top,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                description,
-                style: const TextStyle(fontSize: 18, color: Colors.white),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  if (isLast) {
-                    tutorialCoachMark?.finish();
-                  } else {
-                    tutorialCoachMark?.next();
-                  }
-                },
-                child: const Text("Entendido"),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  final List<Color> colors = [pageBlue, pageYellow];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Image.asset(
-          'assets/images/bridgecare_logo.png',
-          fit: BoxFit.contain,
-          height: 150,
-        ),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF0F0147),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-        ),
-        toolbarHeight: 150,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Bienvenido a BridgeCare',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'BridgeCare es una aplicación diseñada para facilitar la inspección y gestión de puentes, '
-              'permitiendo a ingenieros y responsables de mantenimiento registrar y analizar información '
-              'de manera eficiente.',
-              style: TextStyle(fontSize: 16, color: Colors.black54),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            GridView.count(
-              padding: const EdgeInsets.all(10),
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              children: imagenes.map((path) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: Image.asset(path, fit: BoxFit.cover),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Características clave:',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            _buildFeatureItem(Icons.assignment, 'Inspección de Puentes',
-                'Registra y documenta información estructural de manera detallada.'),
-            _buildFeatureItem(Icons.cloud_upload, 'Sincronización Inteligente',
-                'Guarda datos sin conexión y sincronízalos automáticamente cuando haya conexión.'),
-            _buildFeatureItem(Icons.security, 'Seguridad',
-                'Autenticación y control de acceso para proteger la información.'),
-            _buildFeatureItem(Icons.analytics, 'Análisis de Datos',
-                'Consulta reportes y toma decisiones basadas en datos en tiempo real.'),
-          ],
-        ),
-      ),
-    );
-  }
+    final size = MediaQuery.of(context).size;
+    final safePadding = MediaQuery.of(context).padding;
 
-  Widget _buildFeatureItem(IconData icon, String title, String description) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
+    return Scaffold(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Color(0xFF0F0147), size: 30),
-          const SizedBox(width: 10),
-          Expanded(
+          Container(
+            width: size.width,
+            height: size.height * 0.4,
+            decoration: BoxDecoration(
+              color: colors[page - 1],
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(125.0),
+                bottomRight: Radius.circular(125.0),
+              ),
+            ),
+          ),
+          separator40V,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
+                  titles[page - 1],
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 22.0,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
                   ),
                 ),
-                Text(
-                  description,
-                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                separator20V,
+                if (page == 1) ...[
+                  Text(
+                    "Si tiene alguna duda sobre el funcionamiento de la aplicación, consulte uno de los siguientes manuales:",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 18.0),
+                  ),
+                  separator20V,
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      // Aquí abres o descargas el PDF
+                      // Si está en assets: Navigator.push(...) a vista con PDF Viewer
+                    },
+                    icon: const Icon(Icons.picture_as_pdf),
+                    label: const Text("Ver manual PDF"),
+                  ),
+                  separator20V,
+                  const Text(
+                    "Si no tiene dudas, presione siguiente",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                ] else if (page == 2) ...[
+                  Text(
+                    subtitles[page - 1],
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 18.0),
+                  ),
+                  separator20V,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => InventoryFormScreen(usuarioId: 1),
+                            ),
+                          );
+                        },
+                        child: const Text("Nuevo"),
+                      ),
+
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BridgeListScreen(),
+                            ),
+                          );
+                        },
+                        child: const Text("Buscar"),
+                      ),
+
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+          const Spacer(),
+          Padding(
+            padding: EdgeInsets.only(
+              left: 24.0,
+              right: 24.0,
+              bottom: safePadding.bottom > 0 ? safePadding.bottom : 16.0,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Dots
+                Row(
+                  children: List.generate(
+                    3,
+                        (index) => Row(
+                      children: [
+                        _DotsIndicator(
+                          size: page == index + 1 ? 10.0 : 5.0,
+                          color: page == index + 1
+                              ? colors[page - 1]
+                              : Colors.grey,
+                        ),
+                        if (index != 2) separator10H,
+                      ],
+                    ),
+                  ),
                 ),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: 56.0 * 1.3,
+                      height: 56.0 * 1.3,
+                      child: CircularProgressIndicator(
+                        valueColor:
+                        AlwaysStoppedAnimation(colors[page - 1]),
+                        strokeWidth: 2.0,
+                        value: (1.0 / 2) * page,
+                        backgroundColor: Colors.grey.shade300,
+                      ),
+                    ),
+                    FilledButton(
+                      onPressed: () {
+                        setState(() {
+                          page = page < 2 ? page + 1 : 1;
+                        });
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colors[page - 1],
+                        minimumSize: const Size(56.0, 56.0),
+                        shape: const CircleBorder(),
+                      ),
+                      child: const Icon(Icons.chevron_right),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Dot widget definido dentro del mismo archivo porque solo se usa aquí
+class _DotsIndicator extends StatelessWidget {
+  final double size;
+  final Color color;
+  const _DotsIndicator({required this.size, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: size,
+      width: size,
+      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
     );
   }
 }

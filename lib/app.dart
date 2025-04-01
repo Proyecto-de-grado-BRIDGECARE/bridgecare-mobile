@@ -15,13 +15,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'BridgeCare',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      theme: ThemeData(
+        brightness: Brightness.light,
+        fontFamily: 'JosefinSans',
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+      ),
+
       themeMode:
-          Provider.of<ThemeProvider>(context).themeMode, // Use theme provider
+      Provider.of<ThemeProvider>(context).themeMode, // Use theme provider
       // home: InspectionFormScreen(
       //     usuarioId: 1, puenteId: 1), //const SplashToLoginTransition(),
-      home: BottomNavWrapper(),
+      initialRoute: '/home',
       routes: AppRoutes.routes,
     );
   }
