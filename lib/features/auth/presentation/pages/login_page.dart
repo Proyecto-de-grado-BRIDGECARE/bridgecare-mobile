@@ -132,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 Expanded(
-                  flex: 35,
+                  flex: 50,
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 45),
                     child: Form(
@@ -277,6 +277,32 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "¿No tienes una cuenta?",
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/createUser');
+                                },
+                                child: const Text(
+                                  "Regístrate aquí",
+                                  style: TextStyle(
+                                    color: Color(0xFFFFC107),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
                         ],
                       ),
                     ),

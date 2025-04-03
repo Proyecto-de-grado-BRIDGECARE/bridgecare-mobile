@@ -34,11 +34,11 @@ class _InspectionState extends State<InspeccionesPage> {
       _datos = _inspecciones
           .map(
             (e) => {
-              'id': e.id.toString(),
-              'inspector': e.inspector,
-              'fecha_inspeccion': e.fechaInspeccion.toIso8601String(),
-            },
-          )
+          'id': e.id.toString(),
+          'inspector': e.inspector,
+          'fecha_inspeccion': e.fechaInspeccion.toIso8601String(),
+        },
+      )
           .toList();
       _datosFiltrados = List.from(_datos);
     });
@@ -148,6 +148,7 @@ class _InspectionState extends State<InspeccionesPage> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

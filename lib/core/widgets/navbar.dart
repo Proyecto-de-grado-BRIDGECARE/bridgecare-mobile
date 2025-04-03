@@ -4,8 +4,8 @@ import 'package:bridgecare/features/search_bridge/presentation/pages/search_brid
 import 'package:bridgecare/features/search_bridge/presentation/pages/search_inspection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:bridgecare/features/user_management/read_user/presentation/pages/read_user.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 class BottomNavWrapper extends StatefulWidget {
   const BottomNavWrapper({super.key});
@@ -22,7 +22,7 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
   final GlobalKey keyNavBarHistory = GlobalKey();
   final GlobalKey keyNavBarSettings = GlobalKey();
 
-  bool _tutorialStarted = false;
+  //bool _tutorialStarted = false;
   double _navBarHeight = 0;
 
   @override
@@ -31,22 +31,15 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
     _controller = PersistentTabController(initialIndex: 0);
   }
 
-  void _updateTutorialState(bool isRunning) {
+  /*void _updateTutorialState(bool isRunning) {
     setState(() {
       _tutorialStarted = isRunning;
     });
-  }
+  }*/
 
   List<Widget> _buildScreens() {
     return [
-      HomePage(
-        navBarKey: keyNavBarHome,
-        searchButtonKey: keyNavBarSearch,
-        addButtonKey: keyNavBarAdd,
-        historyButtonKey: keyNavBarHistory,
-        settingsButtonKey: keyNavBarSettings,
-        onTutorialStateChanged: _updateTutorialState,
-      ),
+      HomePage(),
       BridgeListScreen(),
       // TODO use actual userId
       InventoryFormScreen(
@@ -130,7 +123,7 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
               ),
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
-            if (_tutorialStarted)
+            /*if (_tutorialStarted)
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -142,7 +135,7 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
                     color: Colors.transparent,
                   ),
                 ),
-              ),
+              ),*/
           ],
         );
       },

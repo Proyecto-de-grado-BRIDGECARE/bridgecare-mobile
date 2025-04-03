@@ -21,11 +21,17 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        fontFamily: 'JosefinSans',
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blueGrey,
+          brightness: Brightness.dark, // 👈 Este valor es obligatorio
+        ),
+      ),
 
-      themeMode:
-      Provider.of<ThemeProvider>(context).themeMode, // Use theme provider
-      // home: InspectionFormScreen(
-      //     usuarioId: 1, puenteId: 1), //const SplashToLoginTransition(),
+      themeMode: Provider.of<ThemeProvider>(context).themeMode,
       initialRoute: '/home',
       routes: AppRoutes.routes,
     );

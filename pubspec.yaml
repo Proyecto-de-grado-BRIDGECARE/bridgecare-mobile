@@ -20,6 +20,9 @@ dependencies:
   flutter_launcher_icons: ^0.14.3
   flutter_native_splash: ^2.4.4
   path_provider: ^2.1.5
+  flutter_pdfview: ^1.3.1
+  lottie: ^3.3.1
+
 
 dev_dependencies:
   flutter_test:
@@ -48,10 +51,28 @@ flutter_native_splash:
 
 flutter:
   uses-material-design: true
+
   assets:
     - assets/images/
+    - assets/animations/puente.json
+    - assets/pdf/
     - assets/data/
-    - assets/
+    - assets/fonts/
+
+  fonts:
+    - family: JosefinSans
+      fonts:
+        - asset: assets/fonts/JosefinSans-Regular.ttf
+        - asset: assets/fonts/JosefinSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/JosefinSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/JosefinSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/JosefinSans-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/JosefinSans-LightItalic.ttf
+          style: italic
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
