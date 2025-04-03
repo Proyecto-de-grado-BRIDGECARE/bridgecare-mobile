@@ -111,7 +111,7 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  top: 15,
+                  top: 20,
                   right: 5,
                   child: IconButton(
                     icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
