@@ -314,7 +314,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
   @override
   Widget build(BuildContext context) {
     return FormTemplate(
-      title: 'Formulario de Inventario',
+      title: 'Creación de Inventario',
       formKey: _formKey,
       onSave: _saveForm,
       sections: [
@@ -546,6 +546,39 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
             initialData: {'observaciones': _formData['observaciones']},
             onSave: (data) => setState(
                 () => _formData['observaciones'] = data['observaciones'] ?? ''),
+          ),
+        ),
+        FormSection(
+          title: '',
+          isCollapsible: false,
+          content: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0),
+            child: Center(
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  child: ElevatedButton(
+                    onPressed: _saveForm,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF003366),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'GUARDAR',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ],

@@ -1,265 +1,188 @@
 import 'package:flutter/material.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bridgecare/features/search_bridge/presentation/pages/search_bridge.dart';
+import 'package:lottie/lottie.dart';
 
-class HomePage extends StatefulWidget {
-  final GlobalKey navBarKey;
-  final GlobalKey searchButtonKey;
-  final GlobalKey addButtonKey;
-  final GlobalKey historyButtonKey;
-  final GlobalKey settingsButtonKey;
-  final Function(bool) onTutorialStateChanged;
+import '../../../bridge_management/inventory/presentation/pages/inventario_form_page.dart';
+class CustomButton extends StatefulWidget {
+  final String text;
+  final VoidCallback onTap;
+  final Color defaultColor;
+  final Color pressedColor;
+  final Color textColor;
 
-  const HomePage({
+  const CustomButton({
     super.key,
-    required this.navBarKey,
-    required this.searchButtonKey,
-    required this.addButtonKey,
-    required this.historyButtonKey,
-    required this.settingsButtonKey,
-    required this.onTutorialStateChanged,
+    required this.text,
+    required this.onTap,
+    required this.defaultColor,
+    required this.pressedColor,
+    required this.textColor,
   });
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<CustomButton> createState() => _CustomButtonState();
 }
 
-class _HomePageState extends State<HomePage> {
-  TutorialCoachMark? tutorialCoachMark;
+class _CustomButtonState extends State<CustomButton> {
+  bool _isPressed = false;
 
-  static const List<String> imagenes = [
-    'assets/images/puente-inicio.jpeg',
-    'assets/images/puente-inicio.jpeg',
-    'assets/images/puente-inicio.jpeg',
-    'assets/images/puente-inicio.jpeg',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _checkIfTutorialSeen();
-  }
-
-  Future<void> _checkIfTutorialSeen() async {
-    final prefs = await SharedPreferences.getInstance();
-    bool hasSeenTutorial = prefs.getBool('hasSeenTutorial') ?? false;
-
-    if (!hasSeenTutorial) {
-      Future.delayed(Duration.zero, startTutorial);
-    }
-  }
-
-  void startTutorial() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_areKeysAttached()) {
-        setState(() {
-          widget.onTutorialStateChanged(true);
-        });
-
-        tutorialCoachMark = TutorialCoachMark(
-          targets: _buildTutorialTargets(),
-          hideSkip: true,
-          onFinish: () async {
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setBool('hasSeenTutorial', true);
-
-            setState(() {
-              widget.onTutorialStateChanged(false);
-            });
-          },
-        )..show(context: context);
-      } else {
-        debugPrint("One or more keys are not attached to a widget.");
-      }
+  void _onTapDown(TapDownDetails details) {
+    setState(() {
+      _isPressed = true;
     });
   }
 
-  bool _areKeysAttached() {
-    return widget.navBarKey.currentContext != null &&
-        widget.searchButtonKey.currentContext != null &&
-        widget.addButtonKey.currentContext != null &&
-        widget.historyButtonKey.currentContext != null &&
-        widget.settingsButtonKey.currentContext != null;
+  void _onTapUp(TapUpDetails details) {
+    setState(() {
+      _isPressed = false;
+    });
+    widget.onTap();
   }
 
-  List<TargetFocus> _buildTutorialTargets() {
-    return [
-      _buildTarget(
-        "HomeButton",
-        widget.navBarKey,
-        "Este es el botón de inicio. Pulsa aquí para volver a la página principal.",
-      ),
-      _buildTarget(
-        "SearchButton",
-        widget.searchButtonKey,
-        "Este es el botón de búsqueda. Úsalo para encontrar puentes.",
-      ),
-      _buildTarget(
-        "AddButton",
-        widget.addButtonKey,
-        "Este es el botón \"Añadir\". Úsalo para añadir un inventario o inspección nuevos.",
-      ),
-      _buildTarget(
-        "HistoryButton",
-        widget.historyButtonKey,
-        "Este es el botón Historial. Úsalo para ver actividades de creación de inventario/inspección de otros usuarios.",
-      ),
-      _buildTarget(
-        "SettingsButton",
-        widget.settingsButtonKey,
-        "Este es el botón de Configuración. Úsalo para personalizar tu usuario y crear, borrar, o actualizar nuevos usuarios.",
-        isLast: true,
-      ),
-    ];
-  }
-
-  TargetFocus _buildTarget(
-    String identify,
-    GlobalKey keyTarget,
-    String description, {
-    bool isLast = false,
-  }) {
-    return TargetFocus(
-      identify: identify,
-      keyTarget: keyTarget,
-      alignSkip: Alignment.topRight,
-      contents: [
-        TargetContent(
-          align: ContentAlign.top,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                description,
-                style: const TextStyle(fontSize: 18, color: Colors.white),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  if (isLast) {
-                    tutorialCoachMark?.finish();
-                  } else {
-                    tutorialCoachMark?.next();
-                  }
-                },
-                child: const Text("Entendido"),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+  void _onTapCancel() {
+    setState(() {
+      _isPressed = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Image.asset(
-          'assets/images/bridgecare_logo.png',
-          fit: BoxFit.contain,
-          height: 150,
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: Container(
+        height: 70,
+        width: 300,
+        decoration: BoxDecoration(
+          color: _isPressed ? widget.pressedColor : widget.defaultColor,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: Colors.white),
         ),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF0F0147),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-        ),
-        toolbarHeight: 150,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Bienvenido a BridgeCare',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-              textAlign: TextAlign.center,
+        child: Center(
+          child: Text(
+            widget.text,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: widget.textColor,
             ),
-            const SizedBox(height: 10),
-            Text(
-              'BridgeCare es una aplicación diseñada para facilitar la inspección y gestión de puentes, '
-              'permitiendo a ingenieros y responsables de mantenimiento registrar y analizar información '
-              'de manera eficiente.',
-              style: TextStyle(fontSize: 16, color: Colors.black54),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            GridView.count(
-              padding: const EdgeInsets.all(10),
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              children: imagenes.map((path) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: Image.asset(path, fit: BoxFit.cover),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Características clave:',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 10),
-            _buildFeatureItem(Icons.assignment, 'Inspección de Puentes',
-                'Registra y documenta información estructural de manera detallada.'),
-            _buildFeatureItem(Icons.cloud_upload, 'Sincronización Inteligente',
-                'Guarda datos sin conexión y sincronízalos automáticamente cuando haya conexión.'),
-            _buildFeatureItem(Icons.security, 'Seguridad',
-                'Autenticación y control de acceso para proteger la información.'),
-            _buildFeatureItem(Icons.analytics, 'Análisis de Datos',
-                'Consulta reportes y toma decisiones basadas en datos en tiempo real.'),
-          ],
+          ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildFeatureItem(IconData icon, String title, String description) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Icon(icon, color: Color(0xFF0F0147), size: 30),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xff3ab4fb),
+              Color(0xff281537),
+            ],
+          ),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 0),
+            // Animación del puente
+            Stack(
+              alignment: Alignment.center,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                Container(
+                  height: 280,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(100.0),
+                      bottomRight: Radius.circular(100.0),
+                    ),
                   ),
                 ),
-                Text(
-                  description,
-                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                Positioned(
+                  top: 20,
+                  right: 5,
+                  child: IconButton(
+                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
+                    onPressed: () {
+                      // Aquí puedes abrir un menú o hacer lo que necesites
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: 250,
+                  child: Lottie.asset(
+                    'assets/animations/puente.json',
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+
+            const Text(
+              'Usted desea:',
+              style: TextStyle(fontSize: 30, color: Colors.white),
+            ),
+
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CustomButton(
+                      text: 'Crear nuevo puente',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => InventoryFormScreen(usuarioId: 1,)),
+                        );
+                      },
+                      defaultColor: Color(0xccffffff),
+                      pressedColor: Colors.white.withOpacity(0.2),
+                      textColor: Colors.black,
+                    ),
+                    const SizedBox(height: 30),
+                    CustomButton(
+                      text: 'Buscar un puente',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => BridgeListScreen()),
+                        );
+                      },
+                      defaultColor: Color(0xccffffff),
+                      pressedColor: Colors.white.withOpacity(0.2),
+                      textColor: Colors.black,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.menu_book, color: Colors.white, size: 25),
+                SizedBox(width: 7),
+                Text(
+                  'Manual',
+                  style: TextStyle(fontSize: 17, color: Colors.white),
+                ),
+              ],
+            ),
+            const SizedBox(height: 42),
+          ],
+        ),
       ),
     );
   }
