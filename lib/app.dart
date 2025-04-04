@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       ),
 
       themeMode: Provider.of<ThemeProvider>(context).themeMode,
-      initialRoute: '/Auth',
+      initialRoute: '/homeAdmin',
       routes: AppRoutes.routes,
     );
   }
