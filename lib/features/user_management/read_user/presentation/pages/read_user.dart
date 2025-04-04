@@ -8,13 +8,11 @@ class ListaUsuarios extends StatefulWidget {
   const ListaUsuarios({super.key});
 
   @override
-  State<StatefulWidget> createState() => _UsuariosState();
+  State<ListaUsuarios> createState() => _ListaUsuariosState();
 }
 
-class _UsuariosState extends State<ListaUsuarios> {
+class _ListaUsuariosState extends State<ListaUsuarios> {
   List<Usuario> _usuarios = [];
-
-  //datos para la barra de busqueda
   List<Map<String, dynamic>> _datos = [];
   List<Map<String, dynamic>> _datosFiltrados = [];
 
@@ -33,10 +31,8 @@ class _UsuariosState extends State<ListaUsuarios> {
 
     try {
       final response = await http.get(url);
-
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-
         setState(() {
           _usuarios = data.map((item) => Usuario.fromJson(item)).toList();
           _datos = _usuarios
@@ -47,76 +43,50 @@ class _UsuariosState extends State<ListaUsuarios> {
                     'correo': u.correo,
                     'tipoUsuario': u.tipoUsuario,
                   })
-              .cast<Map<String, dynamic>>()
               .toList();
           _datosFiltrados = List.from(_datos);
           _isLoading = false;
-          _hasError = false;
         });
       } else {
-        throw Exception(
-            "Error en la respuesta del servidor: ${response.statusCode}");
+        throw Exception("Error ${response.statusCode}");
       }
     } catch (e) {
-      debugPrint("Error al cargar usuarios: $e");
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error al obtener datos del servidor: $e")),
-        );
-      }
-
+      debugPrint("Error al obtener datos: $e");
       setState(() {
-        _isLoading = false;
         _hasError = true;
+        _isLoading = false;
       });
     }
   }
 
   void _filtrarDatos() {
-    String query = _searchController.text.toLowerCase().trim();
-
+    String query = _searchController.text.toLowerCase();
     setState(() {
-      if (query.isEmpty) {
-        _datosFiltrados = List.from(_datos);
-        return;
-      }
-
       _datosFiltrados = _datos.where((elemento) {
-        String id = elemento['id']?.toLowerCase() ?? '';
-        String nombre = elemento['nombre']?.toLowerCase() ?? '';
-        String correo = elemento['correo']?.toLowerCase() ?? '';
-
-        return id.contains(query) ||
-            nombre.contains(query) ||
-            correo.contains(query);
+        return (elemento['nombre'] ?? '').toLowerCase().contains(query) ||
+            (elemento['correo'] ?? '').toLowerCase().contains(query);
       }).toList();
     });
   }
 
-  DataRow toElement(Map<String, dynamic> elemento) {
+  DataRow toElement(Map<String, dynamic> usuario) {
     return DataRow(
       cells: [
-        DataCell(Text(elemento['noId'].toString())),
-        DataCell(Text(elemento['nombre'].toString())),
+        DataCell(Text(usuario['noId'])),
+        DataCell(Text(usuario['nombre'])),
         DataCell(
           IconButton(
-            icon: Icon(Icons.edit),
-            iconSize: 40,
-            color: Color(0xffF29E23),
+            icon: const Icon(Icons.edit, color: Colors.orange),
             onPressed: () {
-              debugPrint('editar usuario');
-              Navigator.pushReplacementNamed(context, '/updateUser');
+              Navigator.pushNamed(context, '/updateUser');
             },
           ),
         ),
         DataCell(
           IconButton(
-            icon: Icon(Icons.delete),
-            iconSize: 40,
-            color: Color(0xffF29E23),
+            icon: const Icon(Icons.delete, color: Colors.red),
             onPressed: () {
-              _mostrarDialogoEliminar(elemento['id']);
+              _mostrarDialogoEliminar(usuario['id']);
             },
           ),
         ),
@@ -127,197 +97,154 @@ class _UsuariosState extends State<ListaUsuarios> {
   void _mostrarDialogoEliminar(String idUsuario) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Eliminar usuario"),
-          content: Text("¿Seguro que quieres eliminar este usuario?"),
-          actions: [
-            TextButton(
-              child: Text("Cancelar"),
-              onPressed: () => Navigator.pop(context),
-            ),
-            TextButton(
-              child: Text("Eliminar"),
-              onPressed: () {
-                setState(() {
-                  _usuarios.removeWhere((u) => u.id == int.parse(idUsuario));
-                  _datos.removeWhere((u) => u['id'] == idUsuario);
-                  _datosFiltrados.removeWhere((u) => u['id'] == idUsuario);
-                });
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
+      builder: (_) => AlertDialog(
+        title: const Text("Eliminar usuario"),
+        content:
+            const Text("¿Estás seguro de que deseas eliminar este usuario?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancelar"),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _usuarios.removeWhere((u) => u.id == idUsuario);
+                _datos.removeWhere((u) => u['id'] == idUsuario);
+                _datosFiltrados.removeWhere((u) => u['id'] == idUsuario);
+              });
+              Navigator.pop(context);
+            },
+            child: const Text("Eliminar", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFEBEBEB),
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(120),
-        child: Container(
-          padding: EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
-          decoration: BoxDecoration(
-            color: Color(0xFFEBEBEB), // Mismo color de fondo
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xff281537), Color(0xff1780cc)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
+        ),
+        child: SafeArea(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(Icons.arrow_back, color: Colors.black),
+              // Header
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+                decoration: const BoxDecoration(
+                  color: Color(0xccffffff),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text("notificaciones")));
-                    },
-                    icon: Icon(Icons.notifications, color: Colors.black),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: Text(
-                  "Lista de usuarios",
-                  style: GoogleFonts.poppins(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
                 ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back,
+                          color: Color(0xff01579a)),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      "Lista de usuarios",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.notifications_none,
+                          color: Colors.black),
+                      onPressed: () {},
+                    )
+                  ],
+                ),
+              ),
+
+              // Botón y campo de búsqueda
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () =>
+                          Navigator.pushNamed(context, '/createUser'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text("Nuevo usuario",
+                          style: TextStyle(color: Color(0xffF29E23))),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _searchController,
+                      onChanged: (_) => _filtrarDatos(),
+                      style: const TextStyle(color: Colors.black),
+                      decoration: InputDecoration(
+                        hintText: "Buscar por nombre o correo",
+                        fillColor: Colors.white,
+                        filled: true,
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Lista o estados
+              Expanded(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _hasError
+                        ? const Center(
+                            child: Text("Error al cargar usuarios",
+                                style: TextStyle(color: Colors.red)))
+                        : Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xccffffff),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: SingleChildScrollView(
+                                  child: DataTable(
+                                    columnSpacing: 30,
+                                    columns: const [
+                                      DataColumn(label: Text("ID")),
+                                      DataColumn(label: Text("Nombre")),
+                                      DataColumn(label: Text("Editar")),
+                                      DataColumn(label: Text("Eliminar")),
+                                    ],
+                                    rows:
+                                        _datosFiltrados.map(toElement).toList(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
               ),
             ],
           ),
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(8),
-        child: Column(
-          children: [
-            //nuevo usuario
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: BeveledRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-              ),
-              onPressed: () {
-                debugPrint("buscar usuario");
-                Navigator.pushReplacementNamed(context, '/createUser');
-              },
-              child: Text(
-                "Nuevo usuario",
-                style: GoogleFonts.poppins(color: Color(0xffF29E23)),
-              ),
-            ),
-            const SizedBox(height: 20),
-            //barra de busqueda
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: "Buscar usuario...",
-                hintStyle: GoogleFonts.poppins(color: Colors.grey),
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
-                prefixIcon: Icon(Icons.search, color: Colors.black54),
-              ),
-              onChanged: (value) {
-                _filtrarDatos();
-              },
-            ),
-
-            SizedBox(height: 20),
-
-            // Estado de carga o error
-            if (_isLoading) Center(child: CircularProgressIndicator()),
-            if (_hasError)
-              Center(
-                child: Text(
-                  "Error al cargar datos",
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-
-            //tabla de usuarios
-            if (!_isLoading && !_hasError)
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Color(0xFFFFFFFF),
-                ),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: DataTable(
-                      columns: [
-                        DataColumn(
-                          label: SizedBox(
-                            width: 120,
-                            child: Text(
-                              "No. Id",
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: SizedBox(
-                            width: 120,
-                            child: Text(
-                              "Nombre",
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: SizedBox(
-                            width: 120,
-                            child: Text(
-                              "editar",
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: SizedBox(
-                            width: 120,
-                            child: Text(
-                              "visualizar",
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                      rows: _datosFiltrados.map(toElement).toList(),
-                    ),
-                  ),
-                ),
-              ),
-          ],
         ),
       ),
     );
