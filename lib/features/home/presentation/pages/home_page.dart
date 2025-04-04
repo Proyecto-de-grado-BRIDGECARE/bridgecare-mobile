@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bridgecare/features/search_bridge/presentation/pages/search_bridge.dart';
 import 'package:lottie/lottie.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 import '../../../bridge_management/inventory/presentation/pages/inventario_form_page.dart';
 
@@ -76,7 +77,7 @@ class _CustomButtonState extends State<CustomButton> {
 }
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -110,17 +111,6 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                 ),
-                Positioned(
-                  top: 20,
-                  right: 5,
-                  child: IconButton(
-                    icon: const Icon(Icons.more_vert,
-                        color: Color(0xff01579a), size: 50),
-                    onPressed: () {
-                      // Aquí puedes abrir un menú o hacer lo que necesites
-                    },
-                  ),
-                ),
                 SizedBox(
                   height: 250,
                   child: Lottie.asset(
@@ -144,27 +134,28 @@ class HomePage extends StatelessWidget {
                     CustomButton(
                       text: 'Crear nuevo puente',
                       onTap: () {
-                        Navigator.push(
+                        PersistentNavBarNavigator.pushNewScreen(
                           context,
-                          MaterialPageRoute(
-                              builder: (_) => InventoryFormScreen()),
+                          screen: InventoryFormScreen(),
+                          withNavBar: false,
                         );
                       },
                       defaultColor: Color(0xccffffff),
-                      pressedColor: Colors.white.withOpacity(0.2),
+                      pressedColor: const Color.fromRGBO(255, 255, 255, 0.2),
                       textColor: Colors.black,
                     ),
                     const SizedBox(height: 30),
                     CustomButton(
                       text: 'Buscar un puente',
                       onTap: () {
-                        Navigator.push(
+                        PersistentNavBarNavigator.pushNewScreen(
                           context,
-                          MaterialPageRoute(builder: (_) => BridgeListScreen()),
+                          screen: BridgeListScreen(),
+                          withNavBar: false,
                         );
                       },
                       defaultColor: Color(0xccffffff),
-                      pressedColor: Colors.white.withOpacity(0.2),
+                      pressedColor: const Color.fromRGBO(255, 255, 255, 0.2),
                       textColor: Colors.black,
                     ),
                   ],
@@ -181,6 +172,9 @@ class HomePage extends StatelessWidget {
                   style: TextStyle(fontSize: 17, color: Colors.white),
                 ),
               ],
+            ),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 32.0),
             ),
             const SizedBox(height: 42),
           ],
