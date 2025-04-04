@@ -1,4 +1,5 @@
 import 'package:bridgecare/features/auth/services/auth_service.dart';
+import 'package:bridgecare/features/bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
 import 'package:bridgecare/features/bridge_management/inventory/models/entities/detalle.dart';
 import 'package:bridgecare/features/bridge_management/inventory/models/entities/estribo.dart';
 import 'package:bridgecare/features/bridge_management/inventory/models/entities/pila.dart';
@@ -92,16 +93,6 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         debugPrint('Error: No token found');
         return;
       }
-      // token ??= 'asdf';
-      // if (token == null) {
-      //   debugPrint('Error: No token found in SharedPreferences');
-      // return;
-      // }
-      // _formData['usuario']['id'] = _extractUserIdFromToken(
-      //   token,
-      // ); // Optional, if needed
-
-      // _formData.remove('usuario');
 
       // Clean up _formData
       final cleanedData = _cleanFormData(_formData);
@@ -113,8 +104,6 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
       });
       final jsonString = jsonEncoder.convert(cleanedData);
 
-      debugPrint(jsonString);
-
       // Send to backend
       final url = Uri.parse('http://192.168.1.6:8082/api/inventario/add');
       final response = await http.post(
@@ -125,22 +114,53 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         },
         body: jsonString,
       );
-      debugPrint(
-        response.statusCode == 200
-            ? 'Success: ${response.body}'
-            : 'Failed: ${response.statusCode} - ${response.body}',
-      );
+
+      // Check response and show popup
+      // Check response and show popup
+      if (response.statusCode == 200 && mounted) {
+        // Parse the inventarioId from the response
+        final inventarioId =
+            int.parse(response.body); // Assuming it's returned as a string
+
+        showDialog(
+          context: context, // Pass the context
+          builder: (ctx) => AlertDialog(
+            title: const Text('Inventario creado exitosamente!'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    // Pass the inventarioId to the InspectionFormScreen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            InspectionFormScreen(puenteId: inventarioId),
+                      ),
+                    );
+                  },
+                  child: const Text('Crear Inspección'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(
+                        context); // Return to the previous screen (homepage)
+                  },
+                  child: const Text('Volver al menú principal'),
+                ),
+              ],
+            ),
+          ),
+        );
+      } else {
+        debugPrint(
+          'Failed: ${response.statusCode} - ${response.body}',
+        );
+      }
     }
   }
-
-  // Placeholder for token extraction (adjust based on your JWT structure)
-  // int _extractUserIdFromToken(String token) {
-  // Example: Decode JWT (requires jwt_decoder package)
-  // import 'package:jwt_decoder/jwt_decoder.dart';
-  // final decoded = JwtDecoder.decode(token);
-  // return int.parse(decoded['sub'] ?? '1');
-  //   return 1; // Replace with actual logic
-  // }
 
   Map<String, dynamic> _cleanFormData(Map<String, dynamic> data) {
     final cleaned = Map<String, dynamic>.from(data);
