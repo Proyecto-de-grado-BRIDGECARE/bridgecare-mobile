@@ -1,6 +1,4 @@
-import 'package:bridgecare/features/bridge_management/inventory/presentation/pages/inventario_form_page.dart';
 import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
-import 'package:bridgecare/features/search_bridge/presentation/pages/search_bridge.dart';
 import 'package:bridgecare/features/search_bridge/presentation/pages/search_inspection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +15,6 @@ class BottomNavWrapper extends StatefulWidget {
 class _BottomNavWrapperState extends State<BottomNavWrapper> {
   late PersistentTabController _controller;
   final GlobalKey keyNavBarHome = GlobalKey();
-  final GlobalKey keyNavBarSearch = GlobalKey();
-  final GlobalKey keyNavBarAdd = GlobalKey();
   final GlobalKey keyNavBarHistory = GlobalKey();
   final GlobalKey keyNavBarSettings = GlobalKey();
 
@@ -40,8 +36,6 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
   List<Widget> _buildScreens() {
     return [
       HomePage(),
-      BridgeListScreen(),
-      InventoryFormScreen(),
       InspeccionesPage(),
       ListaUsuarios(),
     ];
@@ -52,18 +46,6 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
       PersistentBottomNavBarItem(
         icon: Icon(CupertinoIcons.home, key: keyNavBarHome, size: iconSize),
         title: "Home",
-        activeColorPrimary: Colors.blue,
-        inactiveColorPrimary: Colors.grey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Icon(CupertinoIcons.search, key: keyNavBarSearch, size: iconSize),
-        title: "Search",
-        activeColorPrimary: Colors.blue,
-        inactiveColorPrimary: Colors.grey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Icon(CupertinoIcons.add, key: keyNavBarAdd, size: iconSize),
-        title: "Add",
         activeColorPrimary: Colors.blue,
         inactiveColorPrimary: Colors.grey,
       ),
