@@ -11,11 +11,9 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 class InspectionFormScreen extends StatefulWidget {
-  final int usuarioId;
   final int puenteId;
 
-  const InspectionFormScreen(
-      {required this.usuarioId, required this.puenteId, super.key});
+  const InspectionFormScreen({required this.puenteId, super.key});
 
   @override
   InspectionFormScreenState createState() => InspectionFormScreenState();
@@ -71,6 +69,7 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
     });
   }
 
+  // ignore: unused_element
   Future<String> _fetchInspectorName(int usuarioId) async {
     // final response =
     //     await http.get(Uri.parse('https://your-api.com/usuarios/$usuarioId'));
@@ -88,7 +87,7 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
       try {
         // Post Inspeccion
         _formData['inspeccion']!['puenteId'] = widget.puenteId;
-        _formData['inspeccion']!['usuarioId'] = widget.usuarioId;
+        // _formData['inspeccion']!['usuarioId'] = widget.usuarioId;
         if (_formData['inspeccion']!['fecha'] != null) {
           _formData['inspeccion']!['fecha'] =
               (_formData['inspeccion']!['fecha'] as DateTime)
@@ -196,7 +195,7 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
     return FutureBuilder<Map<String, dynamic>>(
       future: Future.wait([
         _fetchPuenteData(widget.puenteId),
-        _fetchInspectorName(widget.usuarioId),
+        // _fetchInspectorName(widget.usuarioId),
       ]).then((results) => {'puente': results[0], 'inspector': results[1]}),
       builder: (context, snapshot) {
         if (!snapshot.hasData || componentList.isEmpty) {
