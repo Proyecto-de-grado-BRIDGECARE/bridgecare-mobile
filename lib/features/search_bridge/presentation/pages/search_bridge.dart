@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
-import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
 
 class BridgeListScreen extends StatefulWidget {
-  BridgeListScreen({super.key});
+  const BridgeListScreen({super.key});
 
   @override
   State<BridgeListScreen> createState() => _BridgeListState();
@@ -20,7 +19,11 @@ class _BridgeListState extends State<BridgeListScreen> {
     {'nombre': 'Charles', 'fecha': '15/07/2016'},
   ];
   final List<String> municipios = [
-    'San Bernardo', 'Faca', 'Arbelaez', 'Venecia', 'Pasca'
+    'San Bernardo',
+    'Faca',
+    'Arbelaez',
+    'Venecia',
+    'Pasca'
   ];
 
   @override
@@ -56,11 +59,8 @@ class _BridgeListState extends State<BridgeListScreen> {
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => const HomePage()),
-                              (Route<dynamic> route) => false,
-                        );
+                        Navigator.pop(
+                            context); // Go back to the previous screen
                       },
                     ),
                     const SizedBox(width: 8),
@@ -92,7 +92,9 @@ class _BridgeListState extends State<BridgeListScreen> {
                           children: [
                             Checkbox(
                               value: isFirstChecked,
-                              side: const BorderSide(color: Colors.white, width: 2), // Color del borde
+                              side: const BorderSide(
+                                  color: Colors.white,
+                                  width: 2), // Color del borde
                               onChanged: (bool? value) {
                                 setState(() {
                                   if (!isSecondChecked || !value!) {
@@ -102,14 +104,18 @@ class _BridgeListState extends State<BridgeListScreen> {
                                 });
                               },
                             ),
-                            Text("Puente", style: TextStyle(color: Colors.white, fontSize: 18)),
+                            Text("Puente",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18)),
                           ],
                         ),
                         Row(
                           children: [
                             Checkbox(
                               value: isSecondChecked,
-                              side: const BorderSide(color: Colors.white, width: 2), // Color del borde
+                              side: const BorderSide(
+                                  color: Colors.white,
+                                  width: 2), // Color del borde
                               onChanged: (bool? value) {
                                 setState(() {
                                   if (!isFirstChecked || !value!) {
@@ -119,7 +125,9 @@ class _BridgeListState extends State<BridgeListScreen> {
                                 });
                               },
                             ),
-                            Text("Municipio", style: TextStyle(color: Colors.white, fontSize: 18)),
+                            Text("Municipio",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18)),
                           ],
                         ),
                       ],
@@ -139,33 +147,38 @@ class _BridgeListState extends State<BridgeListScreen> {
                                   filled: true,
                                   fillColor: Color(0xccffffff),
                                   hintText: 'Escribe el nombre del puente',
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                                  contentPadding:
+                                      EdgeInsets.symmetric(horizontal: 16),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide(color: Colors.white, width: 2),
+                                    borderSide: BorderSide(
+                                        color: Colors.white, width: 2),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide(color: Colors.white, width: 2),
+                                    borderSide: BorderSide(
+                                        color: Colors.white, width: 2),
                                   ),
                                 ),
                                 onChanged: (value) {
-                                  print("Filtrar por puente: $value");
+                                  debugPrint("Filtrar por puente: $value");
                                 },
                               ),
                             ),
                             SizedBox(width: 10),
                             GestureDetector(
                               onTap: () {
-                                print("Buscar puente");
+                                debugPrint("Buscar puente");
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color:
+                                      const Color.fromRGBO(255, 255, 255, 0.3),
                                   shape: BoxShape.circle,
                                 ),
                                 padding: EdgeInsets.all(6),
-                                child: Icon(Icons.search, color: Colors.white, size: 28),
+                                child: Icon(Icons.search,
+                                    color: Colors.white, size: 28),
                               ),
                             ),
                           ],
@@ -181,38 +194,41 @@ class _BridgeListState extends State<BridgeListScreen> {
                                 filled: true,
                                 fillColor: Color(0xccffffff),
                                 hintText: 'Escribe el nombre del municipio',
-                                contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: 16),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
-                                  borderSide: BorderSide(color: Colors.white, width: 2),
+                                  borderSide:
+                                      BorderSide(color: Colors.white, width: 2),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
-                                  borderSide: BorderSide(color: Colors.white, width: 2),
+                                  borderSide:
+                                      BorderSide(color: Colors.white, width: 2),
                                 ),
                               ),
                               onChanged: (value) {
-                                print("Filtrar por municipio: $value");
+                                debugPrint("Filtrar por municipio: $value");
                               },
                             ),
                           ),
                           SizedBox(width: 10),
                           GestureDetector(
                             onTap: () {
-                              print("Buscar municipio");
+                              debugPrint("Buscar municipio");
                             },
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.3),
+                                color: const Color.fromRGBO(255, 255, 255, 0.3),
                                 shape: BoxShape.circle,
                               ),
                               padding: EdgeInsets.all(6),
-                              child: Icon(Icons.search, color: Colors.white, size: 28),
+                              child: Icon(Icons.search,
+                                  color: Colors.white, size: 28),
                             ),
                           ),
                         ],
                       ),
-
                   ],
                 ),
               ),
@@ -231,11 +247,9 @@ class _BridgeListState extends State<BridgeListScreen> {
                     padding: const EdgeInsets.all(12),
                     child: Column(
                       children: [
-
                         Expanded(
                           child: ListView.builder(
                             itemCount: puentes.length,
-
                             itemBuilder: (context, index) {
                               final puente = puentes[index];
 
@@ -251,13 +265,17 @@ class _BridgeListState extends State<BridgeListScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(12),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text("Nombre: ${puente['nombre']}", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      Text("Nombre: ${puente['nombre']}",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold)),
                                       SizedBox(height: 4),
                                       Text("Municipio: $municipio"),
                                       SizedBox(height: 4),
-                                      Text("Fecha de creación: ${puente['fecha']}"),
+                                      Text(
+                                          "Fecha de creación: ${puente['fecha']}"),
                                       SizedBox(height: 12),
                                       Align(
                                         alignment: Alignment.centerRight,
@@ -266,22 +284,29 @@ class _BridgeListState extends State<BridgeListScreen> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => InspectionFormScreen(
+                                                builder: (context) =>
+                                                    InspectionFormScreen(
                                                   usuarioId: 1,
                                                   puenteId: 1,
                                                 ),
                                               ),
                                             );
                                           },
-                                          icon: Icon(Icons.add, size: 20, color: Color(0xff281537),),
+                                          icon: Icon(
+                                            Icons.add,
+                                            size: 20,
+                                            color: Color(0xff281537),
+                                          ),
                                           label: Text("Inspección"),
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Color(0xff01579a),
                                             foregroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(70),
+                                              borderRadius:
+                                                  BorderRadius.circular(70),
                                             ),
-                                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 16, vertical: 8),
                                             textStyle: TextStyle(fontSize: 14),
                                           ),
                                         ),
@@ -293,7 +318,6 @@ class _BridgeListState extends State<BridgeListScreen> {
                             },
                           ),
                         ),
-
                       ],
                     ),
                   ),
