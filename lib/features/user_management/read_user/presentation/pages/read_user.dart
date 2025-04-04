@@ -140,7 +140,7 @@ class _UsuariosState extends State<ListaUsuarios> {
               child: Text("Eliminar"),
               onPressed: () {
                 setState(() {
-                  _usuarios.removeWhere((u) => u.id == idUsuario);
+                  _usuarios.removeWhere((u) => u.id == int.parse(idUsuario));
                   _datos.removeWhere((u) => u['id'] == idUsuario);
                   _datosFiltrados.removeWhere((u) => u['id'] == idUsuario);
                 });

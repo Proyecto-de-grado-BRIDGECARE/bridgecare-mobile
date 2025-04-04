@@ -13,7 +13,7 @@ class RegistroUsuario extends StatefulWidget {
 class _RegistroUsuarioState extends State<RegistroUsuario> {
   final _formKey = GlobalKey<FormState>();
 
-  Map<String, dynamic> _formData = {
+  final Map<String, dynamic> _formData = {
     "id": 0,
     "nombres": "",
     "apellidos": "",
@@ -37,17 +37,21 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Usuario registrado con éxito")),
-        );
-        Navigator.pop(context);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Usuario registrado con éxito")),
+          );
+          Navigator.pop(context);
+        }
       } else {
         throw Exception('Error al registrar usuario: ${response.body}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e")),
+        );
+      }
     }
   }
 
@@ -96,17 +100,22 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
               height: double.infinity,
               width: double.infinity,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     children: [
                       _buildTextField("Nombres", "nombres"),
                       _buildTextField("Apellidos", "apellidos"),
-                      _buildTextField("Número de Identificación", "identificacion", isNumeric: true),
-                      _buildTextField("Correo Electrónico", "correo", isEmail: true),
+                      _buildTextField(
+                          "Número de Identificación", "identificacion",
+                          isNumeric: true),
+                      _buildTextField("Correo Electrónico", "correo",
+                          isEmail: true),
                       _buildTextField("Municipio", "municipio"),
-                      _buildTextField("Contraseña", "contrasenia", isPassword: true),
+                      _buildTextField("Contraseña", "contrasenia",
+                          isPassword: true),
                       const SizedBox(height: 30),
                       GestureDetector(
                         onTap: _enviarDatos,
@@ -151,7 +160,8 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                               onTap: () {
                                 Navigator.pushReplacement(
                                   context,
-                                  MaterialPageRoute(builder: (context) => LoginPage()),
+                                  MaterialPageRoute(
+                                      builder: (context) => LoginPage()),
                                 );
                               },
                               child: const Text(
@@ -167,7 +177,6 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                           ],
                         ),
                       ),
-
                     ],
                   ),
                 ),
@@ -178,13 +187,14 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
       ),
     );
   }
+
   Widget _buildTextField(
-      String label,
-      String key, {
-        bool isPassword = false,
-        bool isEmail = false,
-        bool isNumeric = false,
-      }) {
+    String label,
+    String key, {
+    bool isPassword = false,
+    bool isEmail = false,
+    bool isNumeric = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
@@ -192,8 +202,8 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
         keyboardType: isEmail
             ? TextInputType.emailAddress
             : isNumeric
-            ? TextInputType.number
-            : TextInputType.text,
+                ? TextInputType.number
+                : TextInputType.text,
         decoration: InputDecoration(
           suffixIcon: isPassword
               ? const Icon(Icons.visibility_off, color: Colors.grey)
