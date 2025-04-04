@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       ),
 
       themeMode: Provider.of<ThemeProvider>(context).themeMode,
-      initialRoute: '/SearchBridge',
+      initialRoute: '/Auth',
       routes: AppRoutes.routes,
     );
   }

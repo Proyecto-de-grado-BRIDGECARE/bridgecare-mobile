@@ -3,7 +3,7 @@ import 'package:bridgecare/features/auth/presentation/pages/login_page.dart';
 import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
 import 'package:bridgecare/features/search_bridge/presentation/pages/search_bridge.dart';
 import 'package:bridgecare/features/search_bridge/presentation/pages/search_inspection.dart';
-import 'package:bridgecare/features/user_auth/autorizacion_usuario.dart';
+import 'package:bridgecare/features/user_auth/user_auth.dart';
 import 'package:bridgecare/features/user_management/create_user/presentation/pages/create_user.dart';
 import 'package:bridgecare/features/user_management/read_user/presentation/pages/read_user.dart';
 import 'package:bridgecare/features/user_management/update_user/presentation/pages/update_user.dart';
@@ -21,7 +21,7 @@ class AppRoutes {
     '/autorizaciónUsuario': (context) => AutorizacionUsuario(),
     '/updateUser': (context) => ModificarUsuario(),
     '/createUser': (context) => RegistroUsuario(),
-    '/SearchBridge': (context) => BridgeListScreen()
-
+    '/SearchBridge': (context) => BridgeListScreen(),
+    '/Auth' :(context) => AutorizacionUsuario()
   };
 }
