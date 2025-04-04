@@ -113,7 +113,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
       });
       final jsonString = jsonEncoder.convert(cleanedData);
 
-      // debugPrint(jsonString);
+      debugPrint(jsonString);
 
       // Send to backend
       final url = Uri.parse('http://192.168.1.6:8082/api/inventario/add');
@@ -314,7 +314,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
   @override
   Widget build(BuildContext context) {
     return FormTemplate(
-      title: 'Creación de Inventario',
+      title: 'Formulario de Inventario',
       formKey: _formKey,
       onSave: _saveForm,
       sections: [
@@ -554,25 +554,28 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
           content: Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0),
             child: Center(
-              child: SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: ElevatedButton(
-                    onPressed: _saveForm,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF003366),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 32.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: ElevatedButton(
+                      onPressed: _saveForm,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF003366),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: const Text(
-                      'GUARDAR',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1.0,
+                      child: const Text(
+                        'GUARDAR',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ),
                   ),
