@@ -1,5 +1,5 @@
+import 'package:bridgecare/features/administrador/puentes_admin.dart';
 import 'package:flutter/material.dart';
-import 'package:bridgecare/features/search_bridge/presentation/pages/search_bridge.dart';
 import 'package:lottie/lottie.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
@@ -150,7 +150,7 @@ class HomePage extends StatelessWidget {
                       onTap: () {
                         PersistentNavBarNavigator.pushNewScreen(
                           context,
-                          screen: BridgeListScreen(),
+                          screen: PuentesAdmin(),
                           withNavBar: false,
                         );
                       },

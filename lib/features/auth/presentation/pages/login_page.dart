@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if (token != null) {
         themeProvider.setLightMode();
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/main');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -143,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                           TextFormField(
                             controller: _emailController,
                             autovalidateMode:
-                            AutovalidateMode.onUserInteraction,
+                                AutovalidateMode.onUserInteraction,
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12.0,
@@ -157,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
                                 fontSize: 12,
                               ),
                               floatingLabelBehavior:
-                              FloatingLabelBehavior.never,
+                                  FloatingLabelBehavior.never,
                               enabledBorder: _normalBorder(
                                 Colors.grey.shade400,
                                 1,
@@ -188,7 +188,7 @@ class _LoginPageState extends State<LoginPage> {
                           TextFormField(
                             controller: _passwordController,
                             autovalidateMode:
-                            AutovalidateMode.onUserInteraction,
+                                AutovalidateMode.onUserInteraction,
                             obscureText: _obscurePassword,
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(
@@ -203,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                                 fontSize: 12,
                               ),
                               floatingLabelBehavior:
-                              FloatingLabelBehavior.never,
+                                  FloatingLabelBehavior.never,
                               enabledBorder: _normalBorder(
                                 Colors.grey.shade400,
                                 1,
@@ -227,7 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 onPressed: () {
                                   setState(
-                                        () => _obscurePassword = !_obscurePassword,
+                                    () => _obscurePassword = !_obscurePassword,
                                   );
                                 },
                               ),
@@ -259,21 +259,21 @@ class _LoginPageState extends State<LoginPage> {
                               onPressed: _isLoading ? null : _login,
                               child: _isLoading
                                   ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.black,
-                                  strokeWidth: 2.0,
-                                ),
-                              )
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.black,
+                                        strokeWidth: 2.0,
+                                      ),
+                                    )
                                   : const Text(
-                                'Iniciar Sesión',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                              ),
+                                      'Iniciar Sesión',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -302,7 +302,6 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
-
                         ],
                       ),
                     ),

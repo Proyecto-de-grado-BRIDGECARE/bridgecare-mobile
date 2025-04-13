@@ -1,8 +1,8 @@
+import 'package:bridgecare/features/administrador/usuarios_admin.dart';
 import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
 import 'package:bridgecare/features/search_bridge/presentation/pages/search_inspection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:bridgecare/features/user_management/read_user/presentation/pages/read_user.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 class BottomNavWrapper extends StatefulWidget {
@@ -37,7 +37,7 @@ class _BottomNavWrapperState extends State<BottomNavWrapper> {
     return [
       HomePage(),
       InspeccionesPage(),
-      ListaUsuarios(),
+      UsuariosAdmin(),
     ];
   }
 

@@ -105,7 +105,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
       final jsonString = jsonEncoder.convert(cleanedData);
 
       // Send to backend
-      final url = Uri.parse('http://192.168.1.6:8082/api/inventario/add');
+      final url = Uri.parse('http://10.43.101.76:8082/api/inventario/add');
       final response = await http.post(
         url,
         headers: {
