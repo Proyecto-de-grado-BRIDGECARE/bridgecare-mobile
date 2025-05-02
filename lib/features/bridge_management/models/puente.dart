@@ -57,4 +57,14 @@ class Puente {
       ],
     },
   };
+
+  factory Puente.fromJson(Map<String, dynamic> json) {
+    return Puente(
+        id: json['id'],
+        identif: json['identif'],
+        nombre: json['nombre'],
+        carretera: json['carretera'],
+        pr: json['pr'],
+        regional: json['regional']);
+  }
 }

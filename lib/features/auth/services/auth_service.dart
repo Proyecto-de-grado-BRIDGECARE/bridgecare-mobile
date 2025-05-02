@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String baseUrl =
-      "http://localhost:8080/api/auth"; // Temporary backend URL
+      "http://192.168.10.14:8080/api/auth"; // Temporary backend URL
 
   /// Logs in the user and stores the JWT token locally
   Future<String?> login(LoginRequest request) async {

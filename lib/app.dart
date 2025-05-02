@@ -30,9 +30,8 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.dark, // 👈 Este valor es obligatorio
         ),
       ),
-
       themeMode: Provider.of<ThemeProvider>(context).themeMode,
-      initialRoute: '/homeAdmin',
+      initialRoute: '/login',
       routes: AppRoutes.routes,
     );
   }

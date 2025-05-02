@@ -14,4 +14,13 @@ class Inventario {
   static const Map<String, dynamic> formFields = {
     'observaciones': {'type': 'text', 'label': 'Observaciones'},
   };
+
+  factory Inventario.fromJson(Map<String, dynamic> json) {
+    return Inventario(
+      id: json['id'],
+      observaciones: json['observaciones'],
+      puenteId: json['puente_id'],
+      usuarioId: json['usuario_id'],
+    );
+  }
 }

@@ -3,6 +3,7 @@ import 'package:bridgecare/features/search_bridge/presentation/pages/search_brid
 import 'package:lottie/lottie.dart';
 
 import '../../../bridge_management/inventory/presentation/pages/inventario_form_page.dart';
+
 class CustomButton extends StatefulWidget {
   final String text;
   final VoidCallback onTap;
@@ -80,7 +81,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: Container(
         height: double.infinity,
         width: double.infinity,
@@ -114,7 +114,8 @@ class HomePage extends StatelessWidget {
                   top: 20,
                   right: 5,
                   child: IconButton(
-                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
+                    icon: const Icon(Icons.more_vert,
+                        color: Color(0xff01579a), size: 50),
                     onPressed: () {
                       // Aquí puedes abrir un menú o hacer lo que necesites
                     },
@@ -145,7 +146,10 @@ class HomePage extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => InventoryFormScreen(usuarioId: 1,)),
+                          MaterialPageRoute(
+                              builder: (_) => InventoryFormScreen(
+                                    usuarioId: 1,
+                                  )),
                         );
                       },
                       defaultColor: Color(0xccffffff),
