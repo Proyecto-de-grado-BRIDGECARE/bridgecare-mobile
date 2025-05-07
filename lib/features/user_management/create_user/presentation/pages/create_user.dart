@@ -1,7 +1,11 @@
 import 'dart:convert';
 import 'package:bridgecare/features/auth/presentation/pages/login_page.dart';
+import 'package:bridgecare/features/user_management/models/usuario.dart';
+import 'package:bridgecare/features/user_management/services/usuario_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+import '../../../../administrador/presentation/home_admin.dart';
 
 class RegistroUsuario extends StatefulWidget {
   const RegistroUsuario({super.key});
@@ -30,19 +34,28 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
     _formKey.currentState!.save();
 
     try {
-      final response = await http.post(
-        Uri.parse("https://tu-api.com/usuarios"),
-        headers: {"Content-Type": "application/json"},
-        body: json.encode(_formData),
+      final usuario = Usuario(
+        nombres: _formData["nombres"],
+        apellidos: _formData["apellidos"],
+        identificacion: _formData["identificacion"],
+        tipoUsuario: _formData["tipoUsuario"],
+        correo: _formData["correo"],
+        municipio: _formData["municipio"],
+        contrasenia: _formData["contrasenia"],
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Usuario registrado con éxito")),
-        );
-        Navigator.pop(context);
+      await UserService().registerUsuario(usuario);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Usuario registrado con éxito")),
+      );
+
+      if (_formData["tipoUsuario"] == 2) {
+        Navigator.pushReplacementNamed(context, '/homeAdmin');
+      } else if (_formData["tipoUsuario"] == 0) {
+        Navigator.pushReplacementNamed(context, '/homeMunicipal');
       } else {
-        throw Exception('Error al registrar usuario: ${response.body}');
+        Navigator.pushReplacementNamed(context, '/home');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -50,6 +63,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +121,41 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                       _buildTextField("Correo Electrónico", "correo", isEmail: true),
                       _buildTextField("Municipio", "municipio"),
                       _buildTextField("Contraseña", "contrasenia", isPassword: true),
+                      const SizedBox(height: 20),
+                      DropdownButtonFormField<int>(
+                        value: _formData["tipoUsuario"],
+                        decoration: const InputDecoration(
+                          label: Text(
+                            'Tipo de Usuario',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xff281537),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff3ab4fb)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff281537)),
+                          ),
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: 1, child: Text('Estudiante')),
+                          DropdownMenuItem(value: 0, child: Text('Municipal')),
+                          DropdownMenuItem(value: 2, child: Text('Administrador')),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _formData["tipoUsuario"] = value ?? 2;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) return 'Seleccione un tipo de usuario';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+
                       const SizedBox(height: 30),
                       GestureDetector(
                         onTap: _enviarDatos,
@@ -122,6 +171,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                               ],
                             ),
                           ),
+
                           child: const Center(
                             child: Text(
                               'REGISTRAR',
@@ -194,6 +244,9 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
             : isNumeric
             ? TextInputType.number
             : TextInputType.text,
+        style: const TextStyle(
+          color: Color(0xff27252b),
+        ),
         decoration: InputDecoration(
           suffixIcon: isPassword
               ? const Icon(Icons.visibility_off, color: Colors.grey)
@@ -230,6 +283,47 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
           } else {
             _formData[key] = value;
           }
+        },
+      ),
+    );
+  }
+  Widget _buildDropdownField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: DropdownButtonFormField<int>(
+        value: _formData["tipoUsuario"],
+        icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+        decoration: const InputDecoration(
+          label: Text(
+            'Tipo de Usuario',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xff281537),
+            ),
+          ),
+          floatingLabelBehavior: FloatingLabelBehavior.always, // 🔥 mantiene el label siempre arriba
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xff3ab4fb)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xff281537)),
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          isDense: true, // 🔥 ayuda a mantener altura similar al TextFormField
+        ),
+        items: const [
+          DropdownMenuItem(value: 1, child: Text('Estudiante')),
+          DropdownMenuItem(value: 0, child: Text('Municipal')),
+          DropdownMenuItem(value: 2, child: Text('Administrador')),
+        ],
+        onChanged: (value) {
+          setState(() {
+            _formData["tipoUsuario"] = value ?? 2;
+          });
+        },
+        validator: (value) {
+          if (value == null) return 'Seleccione un tipo de usuario';
+          return null;
         },
       ),
     );

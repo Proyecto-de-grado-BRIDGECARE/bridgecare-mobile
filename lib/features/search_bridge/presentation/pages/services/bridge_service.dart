@@ -4,18 +4,18 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BridgeService {
-  final String baseUrl = "http://192.168.10.14:8081/api/puentes";
+  final String baseUrl = "http://192.168.1.16:8081/api/puentes";
 
   Future<List<Puente>> getAllPuentes() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
     if (token == null) {
-      throw Exception("🔐 No se encontró token de autenticación.");
+      throw Exception("No se encontró token de autenticación.");
     }
 
-    // 🔥 Imprimir el token en consola
-    print('🔐 Token enviado: $token');
+    // Imprimir el token en consola
+    print('Token enviado: $token');
 
     final response = await http.get(
       Uri.parse("$baseUrl/all"),

@@ -1,7 +1,8 @@
-import 'package:bridgecare/features/administrador/puentes_admin.dart';
-import 'package:bridgecare/features/administrador/usuarios_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/home_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/list_user_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/user_auth.dart';
+import 'package:bridgecare/features/user_management/read_user/presentation/pages/read_user.dart';
 import 'package:flutter/material.dart';
-
 class CustomButton extends StatefulWidget {
   final String text;
   final VoidCallback onTap;
@@ -73,8 +74,8 @@ class _CustomButtonState extends State<CustomButton> {
   }
 }
 
-class HomeAdmin extends StatelessWidget {
-  const HomeAdmin({Key? key}) : super(key: key);
+class UsuariosAdmin extends StatelessWidget {
+  const UsuariosAdmin({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -97,38 +98,54 @@ class HomeAdmin extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 Container(
-                  height: 180,
+                  height: 100,
                   width: double.infinity,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(50.0),
-                      bottomRight: Radius.circular(50.0),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20.0),
+                      bottomRight: Radius.circular(20.0),
                     ),
                   ),
                 ),
-                //menu estatico ¡¡¡¡¡¡¡¡¡¡
+                //Icono de retroceso a la izquierda
+                Positioned(
+                  top: 20,
+                  left: 5,
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 40),
+                    onPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomeAdmin()),
+                            (Route<dynamic> route) => false,
+                      );
+                    },
+                  ),
+                ),
+                // ☰ Icono de menú a la derecha
                 Positioned(
                   top: 20,
                   right: 5,
                   child: IconButton(
                     icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
                     onPressed: () {
-                      // Aquí puedes abrir un menú o hacer lo que necesites
+                      // Menú u otra acción
                     },
                   ),
                 ),
               ],
             ),
+
             Expanded(
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CustomButton(
-                      text: 'Puentes',
+                      text: 'Aceptar usuarios',
                       onTap: () {
-                       Navigator.push(context,MaterialPageRoute(builder: (_) => PuentesAdmin()),);
+                        Navigator.push(context,MaterialPageRoute(builder: (_) => DetallesUsuario(user:{},)),);
                       },
                       defaultColor: Color(0xccffffff),
                       pressedColor: Colors.white.withOpacity(0.2),
@@ -136,9 +153,9 @@ class HomeAdmin extends StatelessWidget {
                     ),
                     const SizedBox(height: 30),
                     CustomButton(
-                      text: 'Usuarios',
+                      text: 'Ver usuarios existentes',
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => UsuariosAdmin()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => UsuariosListAdminScreen()),);
                       },
                       defaultColor: Color(0xccffffff),
                       pressedColor: Colors.white.withOpacity(0.2),

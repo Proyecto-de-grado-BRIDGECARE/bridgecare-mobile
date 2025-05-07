@@ -19,16 +19,47 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../models/dtos/inventario_dto.dart';
+
 class InventoryFormScreen extends StatefulWidget {
   final int usuarioId;
+  final InventarioDTO? inventario;
 
-  const InventoryFormScreen({required this.usuarioId, super.key});
+  const InventoryFormScreen({
+    required this.usuarioId,
+    this.inventario, // <- opcional: null si es crear
+    super.key,
+  });
 
   @override
   InventoryFormScreenState createState() => InventoryFormScreenState();
 }
 
 class InventoryFormScreenState extends State<InventoryFormScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.inventario != null) {
+      final inventario = widget.inventario!;
+
+      _formData['observaciones'] = inventario.observaciones;
+      _formData['puente'] = {'id': inventario.puente.id};
+
+      _formData['pasos'] = inventario.pasos.map((p) => p.toJson()).toList();
+      _formData['datos_administrativos'] = inventario.datosAdministrativos?.toJson() ?? {};
+      _formData['datos_tecnicos'] = inventario.datosTecnicos?.toJson() ?? {};
+      _formData['superestructuras'] = inventario.superestructuras.map((s) => s.toJson()).toList();
+      _formData['subestructura'] = inventario.subestructura?.toJson() ?? {};
+      _formData['apoyo'] = inventario.apoyo?.toJson() ?? {};
+      _formData['miembros_interesados'] = inventario.miembrosInteresados?.toJson() ?? {};
+      _formData['posicion_geografica'] = inventario.posicionGeografica?.toJson() ?? {};
+      _formData['carga'] = inventario.carga?.toJson() ?? {};
+
+    }
+  }
+
+
   final _formKey = GlobalKey<FormState>();
   final Map<String, dynamic> _formData = {
     'observaciones': '',
@@ -55,6 +86,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
     'posicion_geografica': <String, dynamic>{},
     'carga': <String, dynamic>{},
   };
+
 
   Future<void> _saveForm() async {
     if (_formKey.currentState!.validate()) {

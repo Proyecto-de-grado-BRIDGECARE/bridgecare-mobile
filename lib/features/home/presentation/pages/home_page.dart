@@ -113,12 +113,21 @@ class HomePage extends StatelessWidget {
                 Positioned(
                   top: 20,
                   right: 5,
-                  child: IconButton(
-                    icon: const Icon(Icons.more_vert,
-                        color: Color(0xff01579a), size: 50),
-                    onPressed: () {
-                      // Aquí puedes abrir un menú o hacer lo que necesites
+                  child: PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
+                    onSelected: (value) {
+                      if (value == 'logout') {
+                        // Acción para cerrar sesión
+                        // Por ejemplo: limpiar token, navegar al login, etc.
+                        Navigator.pushReplacementNamed(context, '/login'); // ajusta la ruta
+                      }
                     },
+                    itemBuilder: (BuildContext context) => [
+                      const PopupMenuItem<String>(
+                        value: 'logout',
+                        child: Text('Cerrar sesión'),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(

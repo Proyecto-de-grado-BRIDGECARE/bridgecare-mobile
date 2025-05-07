@@ -17,4 +17,32 @@ class InventarioService {
       throw Exception('Error al cargar inventarios');
     }
   }
+
+  Future<Inventario?> getInventarioPorPuente(int puenteId) async {
+    final response = await http.get(Uri.parse("$baseUrl/por-puente/$puenteId"));
+
+    if (response.statusCode == 200) {
+      if (response.body.isNotEmpty) {
+        return Inventario.fromJson(jsonDecode(response.body));
+      } else {
+        return null; // no existe inventario
+      }
+    } else if (response.statusCode == 404) {
+      return null; // backend devuelve 404 si no existe
+    } else {
+      throw Exception('Error al obtener inventario del puente');
+    }
+  }
+
+  Future<void> eliminarInventario(int inventarioId) async {
+    final response = await http.delete(Uri.parse("$baseUrl/$inventarioId"));
+
+    if (response.statusCode == 200) {
+      print('Inventario eliminado');
+    } else {
+      throw Exception('Error al eliminar inventario');
+    }
+  }
+
+
 }

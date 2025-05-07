@@ -1,7 +1,7 @@
-import 'package:bridgecare/features/administrador/home_admin.dart';
-import 'package:bridgecare/features/administrador/user_auth.dart';
-import 'package:bridgecare/features/user_management/read_user/presentation/pages/read_user.dart';
+import 'package:bridgecare/features/administrador/presentation/list_puentes_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/usuarios_admin.dart';
 import 'package:flutter/material.dart';
+
 class CustomButton extends StatefulWidget {
   final String text;
   final VoidCallback onTap;
@@ -73,8 +73,8 @@ class _CustomButtonState extends State<CustomButton> {
   }
 }
 
-class UsuariosAdmin extends StatelessWidget {
-  const UsuariosAdmin({Key? key}) : super(key: key);
+class HomeAdmin extends StatelessWidget {
+  const HomeAdmin({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -97,54 +97,53 @@ class UsuariosAdmin extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 Container(
-                  height: 100,
+                  height: 180,
                   width: double.infinity,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(20.0),
-                      bottomRight: Radius.circular(20.0),
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(50.0),
+                      bottomRight: Radius.circular(50.0),
                     ),
                   ),
                 ),
-                //Icono de retroceso a la izquierda
-                Positioned(
-                  top: 20,
-                  left: 5,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 40),
-                    onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => const HomeAdmin()),
-                            (Route<dynamic> route) => false,
-                      );
-                    },
-                  ),
-                ),
-                // ☰ Icono de menú a la derecha
+                //menu estatico ¡¡¡¡¡¡¡¡¡¡
                 Positioned(
                   top: 20,
                   right: 5,
-                  child: IconButton(
+                  child: PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
-                    onPressed: () {
-                      // Menú u otra acción
+                    onSelected: (value) {
+                      if (value == 'logout') {
+                        // Acción para cerrar sesión
+                        // Por ejemplo: limpiar token, navegar al login, etc.
+                        Navigator.pushReplacementNamed(context, '/login'); // ajusta la ruta
+                      }
                     },
+                    itemBuilder: (BuildContext context) => [
+                      const PopupMenuItem<String>(
+                        value: 'logout',
+                        child: Text('Cerrar sesión'),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-
+            const SizedBox(height: 100),
+            const Text(
+              'Usted desea:',
+              style: TextStyle(fontSize: 30, color: Colors.white),
+            ),
             Expanded(
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CustomButton(
-                      text: 'Aceptar usuarios',
+                      text: 'Puentes',
                       onTap: () {
-                        Navigator.push(context,MaterialPageRoute(builder: (_) => AutorizacionUsuario()),);
+                       Navigator.push(context,MaterialPageRoute(builder: (_) => PuentesListAdminScreen()),);
                       },
                       defaultColor: Color(0xccffffff),
                       pressedColor: Colors.white.withOpacity(0.2),
@@ -152,9 +151,9 @@ class UsuariosAdmin extends StatelessWidget {
                     ),
                     const SizedBox(height: 30),
                     CustomButton(
-                      text: 'Ver usuarios existentes',
+                      text: 'Usuarios',
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => ListaUsuarios()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => UsuariosAdmin()),);
                       },
                       defaultColor: Color(0xccffffff),
                       pressedColor: Colors.white.withOpacity(0.2),

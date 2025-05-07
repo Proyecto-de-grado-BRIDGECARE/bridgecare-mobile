@@ -1,4 +1,4 @@
-import 'package:bridgecare/features/administrador/user_details.dart';
+import 'package:bridgecare/features/administrador/presentation/user_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -8,6 +8,9 @@ class AutorizacionUsuario extends StatefulWidget {
   @override
   State<AutorizacionUsuario> createState() => _AutorizacionPage();
 }
+//final UserService _userService = UserService();
+//List<Usuario> _usuario= [];
+//List<Usuario> _usuarioFiltrados = [];
 
 class _AutorizacionPage extends State<AutorizacionUsuario> {
   List<Map<String, String>> usuariosPendientes = [

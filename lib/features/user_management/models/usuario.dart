@@ -1,5 +1,5 @@
 class Usuario {
-  final int id;
+  final int? id;
   final String nombres;
   final String apellidos;
   final int identificacion;
@@ -9,7 +9,7 @@ class Usuario {
   final String? contrasenia;
 
   Usuario({
-    required this.id,
+    this.id,
     required this.nombres,
     required this.apellidos,
     required this.identificacion,

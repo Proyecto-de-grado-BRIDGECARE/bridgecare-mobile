@@ -1,57 +1,72 @@
-import 'package:bridgecare/features/administrador/home_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/home_admin.dart';
 import 'package:flutter/material.dart';
 
-class PuentesAdmin extends StatefulWidget {
-  const PuentesAdmin({Key? key}) : super(key: key);
+import '../../bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
+import '../../bridge_management/inventory/models/dtos/inventario_dto.dart';
+import '../../bridge_management/inventory/models/entities/inventario.dart';
+import '../../bridge_management/inventory/presentation/pages/inventario_form_page.dart';
+import '../../bridge_management/models/puente.dart';
+import '../../bridge_management/services/inventory_service.dart';
+import '../../search_bridge/presentation/pages/services/bridge_service.dart';
+
+class PuentesListAdminScreen extends StatefulWidget {
+
+  PuentesListAdminScreen({super.key});
 
   @override
-  State<PuentesAdmin> createState() => _PuentesAdminState();
+  State<PuentesListAdminScreen> createState() => _PuentesListAdminState();
 }
 
-class _PuentesAdminState extends State<PuentesAdmin> {
+class _PuentesListAdminState extends State<PuentesListAdminScreen> {
   bool isFirstChecked = true;
   bool isSecondChecked = false;
-  String filtro = '';
+  final InventarioService _inventarioService = InventarioService(); //para eliminar inventario
+  final BridgeService _puenteService = BridgeService(); //litar puentes
+  List<Puente> _puentes = [];
+  List<Puente> _puentesFiltrados = [];
 
-  List<Map<String, dynamic>> puentes = [
-    {
-      'nombre': 'Puente A',
-      'municipio': 'Arbelaez',
-      'tieneInventario': true,
-      'tieneInspeccion': true,
-    },
-    {
-      'nombre': 'Puente B',
-      'municipio': 'San Bernardo',
-      'tieneInventario': true,
-      'tieneInspeccion': false,
-    },
-    {
-      'nombre': 'Puente C',
-      'municipio': 'Pasca',
-      'tieneInventario': false,
-      'tieneInspeccion': false,
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _cargarPuentes();
+  }
+
+  Future<void> _cargarPuentes() async {
+    try {
+      final data = await _puenteService.getAllPuentes();
+      setState(() {
+        _puentes = data;
+        _puentesFiltrados = data;
+      });
+    } catch (e) {
+      print("Error al cargar puentes: $e");
+    }
+  }
+
+  void _filtrar(String texto) {
+    final query = texto.toLowerCase();
+
+    setState(() {
+      if (isFirstChecked) {
+        _puentesFiltrados = _puentes
+            .where((puente) => puente.nombre.toLowerCase().contains(query))
+            .toList();
+      } else if (isSecondChecked) {
+        _puentesFiltrados = _puentes
+            .where((puente) => puente.regional.toLowerCase().contains(query))
+            .toList();
+      } else {
+        _puentesFiltrados = _puentes;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final puentesFiltrados = puentes.where((puente) {
-      if (isFirstChecked) {
-        return puente['nombre']
-            .toLowerCase()
-            .contains(filtro.toLowerCase());
-      } else {
-        return puente['municipio']
-            .toLowerCase()
-            .contains(filtro.toLowerCase());
-      }
-    }).toList();
-
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
               Color(0xff281537),
@@ -66,15 +81,13 @@ class _PuentesAdminState extends State<PuentesAdmin> {
             children: [
               // Header blanco con bordes
               Container(
-                height: 100,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Color(0xe6ffffff),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(20),
                     bottomRight: Radius.circular(20),
                   ),
                 ),
-
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                 child: Row(
                   children: [
@@ -100,7 +113,6 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                   ],
                 ),
               ),
-
               // Filtros
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -115,7 +127,8 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                           children: [
                             Checkbox(
                               value: isFirstChecked,
-                              side: const BorderSide(color: Colors.white, width: 2), // Color del borde
+                              side: const BorderSide(
+                                  color: Colors.white, width: 2), // Color del borde
                               onChanged: (bool? value) {
                                 setState(() {
                                   if (!isSecondChecked || !value!) {
@@ -174,6 +187,7 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                                 ),
                                 onChanged: (value) {
                                   print("Filtrar por puente: $value");
+                                  _filtrar(value);
                                 },
                               ),
                             ),
@@ -216,6 +230,7 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                               ),
                               onChanged: (value) {
                                 print("Filtrar por municipio: $value");
+                                _filtrar(value);
                               },
                             ),
                           ),
@@ -240,7 +255,7 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                 ),
               ),
 
-              const SizedBox(height: 10),
+              SizedBox(height: 16),
 
               // Lista de puentes
               Expanded(
@@ -252,102 +267,74 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     padding: const EdgeInsets.all(12),
-                    child: ListView.builder(
-                      itemCount: puentesFiltrados.length,
-                      itemBuilder: (context, index) {
-                        final puente = puentesFiltrados[index];
-
-                        return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 2,
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Nombre: ${puente['nombre']}",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 4),
-                                Text("Municipio: ${puente['municipio']}"),
-                                const SizedBox(height: 12),
-                                Wrap(
-                                  spacing: 4,
-                                  children: [
-                                    ElevatedButton.icon(
-                                      onPressed: puente['tieneInventario']
-                                          ? () {
-                                        // editar inventario
-                                      }
-                                          : null,
-                                      icon: const Icon(Icons.edit, size: 18),
-                                      label: const Text("Inventario"),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xff01579a),
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(50),
-                                        ),
-                                      ),
-                                    ),
-                                    ElevatedButton.icon(
-                                      onPressed: puente['tieneInventario']
-                                          ? () {
-                                        // editar inspección
-                                      }
-                                          : null,
-                                      icon: const Icon(Icons.edit_note, size: 18),
-                                      label: const Text("Inspección"),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange,
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(50),
-                                        ),
-                                      ),
-                                    ),
-                                    ElevatedButton.icon(
-                                      onPressed: puente['tieneInventario']
-                                          ? () {
-                                        // eliminar inventario
-                                      }
-                                          : null,
-                                      icon: const Icon(Icons.delete, size: 18),
-                                      label: const Text("Eliminar Inv."),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(50),
-                                        ),
-                                      ),
-                                    ),
-                                    ElevatedButton.icon(
-                                      onPressed: puente['tieneInspeccion']
-                                          ? () {
-                                        // eliminar inspección
-                                      }
-                                          : null,
-                                      icon: const Icon(Icons.delete_forever, size: 18),
-                                      label: const Text("Eliminar Insc."),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.redAccent,
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(50),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: _puentesFiltrados.length,
+                            itemBuilder: (context, index) {
+                              final puente = _puentesFiltrados[index];
+                              return Card(
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                              ],
-                            ),
+                                elevation: 2,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Nombre: ${puente.nombre}",
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold)),
+                                      const SizedBox(height: 4),
+                                      Text("Municipio: ${puente.regional}"),
+                                      const SizedBox(height: 12),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: ElevatedButton.icon(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    InspectionFormScreen(
+                                                      usuarioId:
+                                                      1, // Reemplazar con el real si lo tienes
+                                                      puenteId: puente.id!,
+                                                    ),
+                                              ),
+                                            );
+                                          },
+                                          icon: const Icon(Icons.add,
+                                              size: 20,
+                                              color: Color(0xff281537)),
+                                          label: const Text("Inspección"),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                            const Color(0xff01579a),
+                                            foregroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                              BorderRadius.circular(70),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 16, vertical: 8),
+                                            textStyle:
+                                            const TextStyle(fontSize: 14),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -358,4 +345,5 @@ class _PuentesAdminState extends State<PuentesAdmin> {
       ),
     );
   }
+
 }

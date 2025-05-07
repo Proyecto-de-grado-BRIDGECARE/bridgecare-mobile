@@ -1,7 +1,7 @@
 import 'package:bridgecare/core/widgets/navbar.dart';
-import 'package:bridgecare/features/administrador/home_admin.dart';
-import 'package:bridgecare/features/administrador/user_auth.dart';
-import 'package:bridgecare/features/administrador/user_details.dart';
+import 'package:bridgecare/features/administrador/presentation/home_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/list_user_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/user_auth.dart';
 import 'package:bridgecare/features/auth/presentation/pages/login_page.dart';
 import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
 import 'package:bridgecare/features/search_bridge/presentation/pages/search_bridge.dart';
@@ -20,12 +20,12 @@ class AppRoutes {
     '/modificarUsuario': (context) => ModificarUsuario(),
     '/usuarios': (context) => ListaUsuarios(),
     '/inspecciones': (context) => InspeccionesPage(),
-    '/autorizaciónUsuario': (context) => AutorizacionUsuario(),
+    //'/autorizaciónUsuario': (context) => AutorizacionUsuario(),
     '/updateUser': (context) => ModificarUsuario(),
     '/createUser': (context) => RegistroUsuario(),
     '/SearchBridge': (context) => BridgeListScreen(),
     //Rutas administrador
-    '/Autorizacion' :(context) => AutorizacionUsuario(),
+    //'/Autorizacion' :(context) => AutorizacionUsuario(),
     '/det': (context) => DetallesUsuario(user: {},), //no sirve aun
     '/homeAdmin': (context) => const HomeAdmin()
   };

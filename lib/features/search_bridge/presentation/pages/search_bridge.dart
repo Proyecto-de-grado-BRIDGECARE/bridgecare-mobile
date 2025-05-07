@@ -109,9 +109,6 @@ class _BridgeListState extends State<BridgeListScreen> {
               ),
               // Barra de búsqueda fuera del header
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              ),
-              Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
