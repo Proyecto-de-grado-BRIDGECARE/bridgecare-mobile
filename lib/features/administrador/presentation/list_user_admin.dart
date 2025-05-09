@@ -1,11 +1,6 @@
-import 'package:bridgecare/features/administrador/presentation/user_auth.dart';
 import 'package:bridgecare/features/administrador/presentation/usuarios_admin.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:bridgecare/features/user_management/models/usuario.dart';
 
@@ -88,22 +83,27 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const UsuariosAdmin()),
+                            builder: (context) => const UsuariosAdmin(),
+                          ),
                               (Route<dynamic> route) => false,
                         );
                       },
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Administrar Usuarios',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
+                    const Flexible( // ← Solución clave
+                      child: Text(
+                        'Administrar Usuarios',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis, // ← Evita overflow visual
                       ),
                     ),
                   ],
                 ),
+
               ),
               // Barra de búsqueda fuera del header
               Padding(
@@ -192,26 +192,85 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(12),
                                   child: Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text("Nombre: ${usuario.nombres}",
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold)),
-                                      const SizedBox(height: 4),
-                                      Text("Apellidos: ${usuario.apellidos}"),
-                                      const SizedBox(height: 12),
-                                      Text("tipoUsuario: ${usuario.tipoUsuario}",
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold)),
-                                      const SizedBox(height: 4),
-
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text("Nombre: ${usuario.nombres}",
+                                                    style: const TextStyle(
+                                                        fontWeight: FontWeight.bold, fontSize: 16)),
+                                                const SizedBox(height: 4),
+                                                Text("Apellidos: ${usuario.apellidos}"),
+                                                const SizedBox(height: 4),
+                                                Text("Tipo Usuario: ${usuario.tipoUsuario}"),
+                                              ],
+                                            ),
+                                          ),
+                                          Column(
+                                            children: [
+                                              IconButton(
+                                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                                onPressed: () {
+                                                  print("Editar usuario ${usuario.id}");
+                                                  // Navigator.push(...);
+                                                },
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(Icons.delete, color: Colors.red),
+                                                onPressed: () async {
+                                                  final confirm = await showDialog<bool>(
+                                                    context: context,
+                                                    builder: (context) => AlertDialog(
+                                                      title: const Text('¿Eliminar usuario?'),
+                                                      content: const Text('Esta acción no se puede deshacer.'),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () => Navigator.pop(context, false),
+                                                          child: const Text('Cancelar'),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () => Navigator.pop(context, true),
+                                                          child: const Text('Eliminar'),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                  if (confirm == true) {
+                                                    try {
+                                                      await _usuarioService.deleteUsuario(usuario.id.toString());
+                                                      setState(() {
+                                                        _usuarios.removeWhere((u) => u.id == usuario.id);
+                                                        _usuariosFiltrados.removeWhere((u) => u.id == usuario.id);
+                                                      });
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        const SnackBar(content: Text("Usuario eliminado")),
+                                                      );
+                                                    } catch (e) {
+                                                      print("Error al eliminar: $e");
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(content: Text("Error: $e")),
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 ),
                               );
+
                             },
                           ),
+
                         ),
                       ],
                     ),
@@ -224,57 +283,5 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
       ),
     );
   }
-
-  /*DataRow toElement(Map<String, dynamic> usuario) {
-    return DataRow(
-      cells: [
-        DataCell(Text(usuario['noId'])),
-        DataCell(Text(usuario['nombre'])),
-        DataCell(
-          IconButton(
-            icon: const Icon(Icons.edit, color: Colors.orange),
-            onPressed: () {
-              Navigator.pushNamed(context, '/updateUser');
-            },
-          ),
-        ),
-        DataCell(
-          IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () {
-              _mostrarDialogoEliminar(usuario['id']);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _mostrarDialogoEliminar(String idUsuario) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Eliminar usuario"),
-        content: const Text("¿Estás seguro de que deseas eliminar este usuario?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancelar"),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _usuarios.removeWhere((u) => u.id == idUsuario);
-                _datos.removeWhere((u) => u['id'] == idUsuario);
-                _datosFiltrados.removeWhere((u) => u['id'] == idUsuario);
-              });
-              Navigator.pop(context);
-            },
-            child: const Text("Eliminar", style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }*/
 }
 

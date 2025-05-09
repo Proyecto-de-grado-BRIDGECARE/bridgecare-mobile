@@ -1,4 +1,3 @@
-import 'package:bridgecare/core/widgets/navbar.dart';
 import 'package:bridgecare/features/administrador/presentation/home_admin.dart';
 import 'package:bridgecare/features/administrador/presentation/list_user_admin.dart';
 import 'package:bridgecare/features/administrador/presentation/user_auth.dart';
@@ -15,7 +14,6 @@ class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
     '/login': (context) => const LoginPage(),
     '/home' : (context) => const HomePage(),
-    '/main': (context) => const BottomNavWrapper(),
     //'/registro': (context) => RegistroUsuario(),
     '/modificarUsuario': (context) => ModificarUsuario(),
     '/usuarios': (context) => ListaUsuarios(),

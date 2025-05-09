@@ -277,11 +277,11 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          Wrap(
+                            alignment: WrapAlignment.center,
                             children: [
                               const Text(
-                                "¿No tienes una cuenta?",
+                                "¿No tienes una cuenta? ",
                                 style: TextStyle(
                                   color: Colors.white70,
                                   fontSize: 12,

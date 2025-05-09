@@ -102,16 +102,20 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                       },
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Administrar Puentes',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
+                    Flexible( // <- Aquí el cambio importante
+                      child: Text(
+                        'Administrar Puentes',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis, // Previene overflow visual
                       ),
                     ),
                   ],
                 ),
+
               ),
               // Filtros
               Padding(

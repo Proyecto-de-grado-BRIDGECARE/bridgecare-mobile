@@ -98,7 +98,7 @@ class UsuariosAdmin extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 Container(
-                  height: 100,
+                  height: 140,
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Colors.white,
@@ -110,10 +110,10 @@ class UsuariosAdmin extends StatelessWidget {
                 ),
                 //Icono de retroceso a la izquierda
                 Positioned(
-                  top: 20,
-                  left: 5,
+                  top: 45,
+                  left: 10,
                   child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 40),
+                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 60),
                     onPressed: () {
                       Navigator.pushAndRemoveUntil(
                         context,
@@ -125,13 +125,23 @@ class UsuariosAdmin extends StatelessWidget {
                 ),
                 // ☰ Icono de menú a la derecha
                 Positioned(
-                  top: 20,
+                  top: 45,
                   right: 5,
-                  child: IconButton(
-                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
-                    onPressed: () {
-                      // Menú u otra acción
+                  child: PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 55),
+                    onSelected: (value) {
+                      if (value == 'logout') {
+                        // Acción para cerrar sesión
+                        // Por ejemplo: limpiar token, navegar al login, etc.
+                        Navigator.pushReplacementNamed(context, '/login'); // ajusta la ruta
+                      }
                     },
+                    itemBuilder: (BuildContext context) => [
+                      const PopupMenuItem<String>(
+                        value: 'logout',
+                        child: Text('Cerrar sesión'),
+                      ),
+                    ],
                   ),
                 ),
               ],

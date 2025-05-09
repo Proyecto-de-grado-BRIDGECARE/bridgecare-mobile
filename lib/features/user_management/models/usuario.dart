@@ -22,11 +22,11 @@ class Usuario {
   // JSON Serialisation
   factory Usuario.fromJson(Map<String, dynamic> json) {
     return Usuario(
-      id: json['id'] as int,
+      id: json['id'] as int?,
       nombres: json['nombres'] as String,
       apellidos: json['apellidos'] as String,
       identificacion: json['identificacion'] as int,
-      tipoUsuario: json['tipo_usuario'] as int,
+      tipoUsuario: json['tipoUsuario'] as int,
       correo: json['correo'] as String,
       municipio: json['municipio'] as String?,
       contrasenia: json['contrasenia'] as String?,
@@ -34,15 +34,16 @@ class Usuario {
   }
 
   Map<String, dynamic> toJson() {
+
     return {
       'id': id,
       'nombres': nombres,
       'apellidos': apellidos,
       'identificacion': identificacion,
-      'tipo_usuario': tipoUsuario,
+      'tipoUsuario': tipoUsuario,
       'correo': correo,
       if (municipio != null) 'municipio': municipio,
-      if (contrasenia != null) 'contrasenia': contrasenia,
+      'contrasenia': contrasenia,
     };
   }
 }

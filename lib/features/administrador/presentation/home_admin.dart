@@ -109,10 +109,10 @@ class HomeAdmin extends StatelessWidget {
                 ),
                 //menu estatico ¡¡¡¡¡¡¡¡¡¡
                 Positioned(
-                  top: 20,
+                  top: 45,
                   right: 5,
                   child: PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
+                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 55),
                     onSelected: (value) {
                       if (value == 'logout') {
                         // Acción para cerrar sesión

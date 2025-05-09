@@ -35,6 +35,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
 
     try {
       final usuario = Usuario(
+        id: 0,
         nombres: _formData["nombres"],
         apellidos: _formData["apellidos"],
         identificacion: _formData["identificacion"],
@@ -171,7 +172,6 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                               ],
                             ),
                           ),
-
                           child: const Center(
                             child: Text(
                               'REGISTRAR',

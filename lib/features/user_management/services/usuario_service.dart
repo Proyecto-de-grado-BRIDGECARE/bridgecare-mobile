@@ -10,11 +10,13 @@ class UserService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token'); // Asegúrate de que 'token' esté guardado correctamente
 
-    if (token == null || token.isEmpty) {
+    if (token == null) {
       throw Exception("No se encontró token de autenticación.");
     }
+    print('Token enviado: $token');
 
     final response = await http.get(
+
       Uri.parse("$baseUrl/users"), // Ruta completa: /api/usuarios/users
       headers: {
         'Authorization': 'Bearer $token',
@@ -71,19 +73,13 @@ class UserService {
       throw Exception("Error al registrar usuario: ${error["message"] ?? response.statusCode}");
     }
   }
-
-}
-  /*
   Future<void> deleteUsuario(String idUsuario) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-
     if (token == null) {
       throw Exception("No se encontró token de autenticación.");
     }
-
     print('Token enviado para eliminar: $token');
-
     final response = await http.delete(
       Uri.parse("$baseUrl/$idUsuario"),
       headers: {
@@ -91,13 +87,16 @@ class UserService {
         'Content-Type': 'application/json',
       },
     );
-
     print('🗑️ Delete status code: ${response.statusCode}');
     print('🗑️ Delete response body: ${response.body}');
 
     if (response.statusCode != 200) {
       throw Exception(" Error al eliminar usuario: ${response.statusCode}");
     }
-  }*/
+  }
+
+}
+
+
 
 

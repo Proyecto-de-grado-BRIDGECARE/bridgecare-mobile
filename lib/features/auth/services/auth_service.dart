@@ -7,16 +7,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String baseUrl =
-      "https://api.bridgecare.com.co/auth" ; // Temporary backend URL
+      "https://api.bridgecare.com.co/auth"; // Temporary backend URL
 
-  /// Logs in the user and stores the JWT token locally
   Future<String?> login(LoginRequest request) async {
     final url = Uri.parse("$baseUrl/login");
+
+    String credentials = "${request.username}:${request.password}";
+    String basicAuth = "Basic ${base64Encode(utf8.encode(credentials))}";
 
     try {
       final response = await http.post(
         url,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": basicAuth,
+        },
         body: jsonEncode(request.toJson()),
       );
 
@@ -30,7 +35,7 @@ class AuthService {
 
         return loginResponse.token;
       } else {
-        debugPrint("Login failed: ${response.body}");
+        debugPrint("Login failed: ${response.statusCode} - ${response.body}");
         return null;
       }
     } catch (e) {
@@ -60,12 +65,13 @@ class AuthService {
 
     try {
       final response = await http.get(
-        Uri.parse("$baseUrl/getUser"),
+        Uri.parse("$baseUrl/me"),
         headers: {"Authorization": "Bearer $token"},
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        debugPrint(response.body);
         return Usuario.fromJson(data);
       } else {
         debugPrint("Failed to fetch user: ${response.body}");
@@ -74,6 +80,26 @@ class AuthService {
     } catch (e) {
       debugPrint("Error fetching user: $e");
       return null;
+    }
+  }
+
+  Future<bool> validateToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+
+    if (token == null) return false;
+    try {
+      final response = await http.get(
+        Uri.parse("$baseUrl/me"),
+        headers: {"Authorization": "Bearer $token"},
+      ).timeout(Duration(seconds: 5), onTimeout: () {
+        return http.Response("Timeout", 408);
+      });
+
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("Token validation error: $e");
+      return false;
     }
   }
 }

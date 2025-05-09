@@ -1,5 +1,4 @@
 import 'package:bridgecare/core/providers/theme_provider.dart';
-import 'package:bridgecare/core/widgets/navbar.dart';
 import 'package:bridgecare/features/auth/presentation/pages/login_page.dart';
 import 'package:bridgecare/features/auth/services/auth_service.dart';
 import 'package:flutter/material.dart';
@@ -35,26 +34,7 @@ class SplashToLoginTransitionState extends State<SplashToLoginTransition> {
           setState(() {
             _opacity = 1.0; // Start fade-in
           });
-          Future.delayed(Duration(milliseconds: 1000), () {
-            // Match fade duration
-            if (mounted) {
-              Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      BottomNavWrapper(), // Replace with your main screen widget
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: child,
-                    );
-                  },
-                  transitionDuration: Duration(milliseconds: 1000),
-                ),
-              );
-            }
-          });
+
         } else {
           setState(() {
             _opacity = 1.0; // Trigger fade-in to login

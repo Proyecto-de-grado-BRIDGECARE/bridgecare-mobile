@@ -2,7 +2,6 @@
 
 import 'package:bridgecare/config/app_routes.dart';
 import 'package:bridgecare/core/providers/theme_provider.dart';
-import 'package:bridgecare/core/widgets/navbar.dart';
 import 'package:bridgecare/features/bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
 import 'package:bridgecare/shared/widgets/splash_transition.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: Provider.of<ThemeProvider>(context).themeMode,
-      initialRoute: '/login',
+      initialRoute: '/homeAdmin',
       routes: AppRoutes.routes,
     );
   }
