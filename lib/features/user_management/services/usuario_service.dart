@@ -81,7 +81,7 @@ class UserService {
     }
     print('Token enviado para eliminar: $token');
     final response = await http.delete(
-      Uri.parse("$baseUrl/$idUsuario"),
+      Uri.parse("$baseUrl/users/$idUsuario"),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',

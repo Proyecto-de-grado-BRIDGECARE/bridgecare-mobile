@@ -290,47 +290,87 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                     crossAxisAlignment:
                                     CrossAxisAlignment.start,
                                     children: [
-                                      Text("Nombre: ${puente.nombre}",
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold)),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              "Nombre: ${puente.nombre}",
+                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.delete, color: Colors.redAccent),
+                                            iconSize: 32.0,
+                                            tooltip: 'Eliminar puente',
+                                            onPressed: () async {
+                                              final confirm = await showDialog<bool>(
+                                                context: context,
+                                                builder: (context) => AlertDialog(
+                                                  title: const Text('Confirmar eliminación'),
+                                                  content: Text('¿Eliminar el puente "${puente.nombre}"?'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () => Navigator.of(context).pop(false),
+                                                      child: const Text('Cancelar'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () => Navigator.of(context).pop(true),
+                                                      child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+
+                                              if (confirm == true) {
+                                                try {
+                                                  //await _inventarioService.eliminarInventarioYpuente(puente.id!);
+                                                  _cargarPuentes();
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    const SnackBar(content: Text('Puente eliminado exitosamente')),
+                                                  );
+                                                } catch (e) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text('Error al eliminar: $e')),
+                                                  );
+                                                }
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                       const SizedBox(height: 4),
                                       Text("Municipio: ${puente.regional}"),
+
                                       const SizedBox(height: 12),
-                                      Align(
-                                        alignment: Alignment.centerRight,
+                                      Center(
                                         child: ElevatedButton.icon(
                                           onPressed: () {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) =>
-                                                    InspectionFormScreen(
-                                                      usuarioId:
-                                                      1, // Reemplazar con el real si lo tienes
-                                                      puenteId: puente.id!,
-                                                    ),
+                                                builder: (context) => InspectionFormScreen(
+                                                  usuarioId: 1, // Reemplaza con el real
+                                                  puenteId: puente.id!,
+                                                ),
                                               ),
                                             );
                                           },
-                                          icon: const Icon(Icons.add,
-                                              size: 20,
-                                              color: Color(0xff281537)),
-                                          label: const Text("Inspección"),
+                                          icon: const Icon(Icons.description,
+                                              size: 20, color: Color(0xff281537)),
+                                          label: const Text("Inspecciones"),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                            const Color(0xff01579a),
+                                            backgroundColor: const Color(0xff01579a),
                                             foregroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.circular(70),
+                                              borderRadius: BorderRadius.circular(70),
                                             ),
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 16, vertical: 8),
-                                            textStyle:
-                                            const TextStyle(fontSize: 14),
+                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                            textStyle: const TextStyle(fontSize: 14),
                                           ),
                                         ),
-                                      )
+                                      ),
+
                                     ],
                                   ),
                                 ),

@@ -37,6 +37,14 @@ class _LoginPageState extends State<LoginPage> {
     _passwordController.dispose();
     super.dispose();
   }
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
 
   Future<void> _login() async {
     FocusScope.of(context).unfocus();
@@ -54,18 +62,31 @@ class _LoginPageState extends State<LoginPage> {
       setState(() => _isLoading = false);
 
       if (token != null) {
-        themeProvider.setLightMode();
-        Navigator.pushReplacementNamed(context, '/home');
+        // Obtener info del usuario
+        final user = await _authService.getUser();
+
+        if (user != null) {
+          themeProvider.setLightMode();
+
+          switch (user.tipoUsuario) {
+            case 0:
+              Navigator.pushReplacementNamed(context, '/homeMunicipal');
+              break;
+            case 2:
+              Navigator.pushReplacementNamed(context, '/homeAdmin');
+              break;
+            default:
+              Navigator.pushReplacementNamed(context, '/home');
+          }
+        } else {
+          _showError("Error obteniendo datos del usuario.");
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Credenciales inválidas.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        _showError("Credenciales inválidas.");
       }
     }
   }
+
 
   OutlineInputBorder _normalBorder(Color color, double width) {
     return OutlineInputBorder(

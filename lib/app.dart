@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: Provider.of<ThemeProvider>(context).themeMode,
-      initialRoute: '/homeAdmin',
+      initialRoute: '/home',
       routes: AppRoutes.routes,
     );
   }

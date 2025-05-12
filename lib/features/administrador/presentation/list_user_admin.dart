@@ -13,6 +13,7 @@ class UsuariosListAdminScreen extends StatefulWidget {
   State<UsuariosListAdminScreen> createState() => _UsuariosListAdminState();
 }
 
+
 class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
   bool isFirstChecked = true;
   bool isSecondChecked = false;
