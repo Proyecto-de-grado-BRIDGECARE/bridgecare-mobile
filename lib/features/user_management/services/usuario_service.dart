@@ -94,6 +94,41 @@ class UserService {
       throw Exception(" Error al eliminar usuario: ${response.statusCode}");
     }
   }
+  Future<void> updateUsuario(Usuario usuario) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null) {
+      throw Exception("No se encontró token de autenticación.");
+    }
+
+    final url = Uri.parse("$baseUrl/users/${usuario.id}");
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(usuario.toJson()),
+    );
+
+    print('✏️ Update status code: ${response.statusCode}');
+    print('✏️ Update response: ${response.body}');
+
+    if (response.statusCode != 200) {
+      final body = response.body.trim();
+      if (body.isNotEmpty) {
+        try {
+          final error = jsonDecode(body);
+          throw Exception("Error al actualizar usuario: ${error["message"] ?? body}");
+        } catch (_) {
+          throw Exception("Error al actualizar usuario: $body");
+        }
+      } else {
+        throw Exception("Error al actualizar usuario: respuesta vacía");
+      }
+    }
+  }
 
 }
 

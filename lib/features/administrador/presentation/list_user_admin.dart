@@ -1,4 +1,5 @@
 import 'package:bridgecare/features/administrador/presentation/usuarios_admin.dart';
+import 'package:bridgecare/features/user_management/create_user/presentation/pages/create_user.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
@@ -81,13 +82,12 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
-                        Navigator.pushAndRemoveUntil(
+                        Navigator.pushNamedAndRemoveUntil(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const UsuariosAdmin(),
-                          ),
+                          '/homeAdmin',
                               (Route<dynamic> route) => false,
                         );
+
                       },
                     ),
                     const SizedBox(width: 8),
@@ -218,7 +218,11 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                                                 icon: const Icon(Icons.edit, color: Colors.blue),
                                                 onPressed: () {
                                                   print("Editar usuario ${usuario.id}");
-                                                  // Navigator.push(...);
+                                                  Navigator.push(context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => RegistroUsuario(usuario: usuario),
+                                                    ),
+                                                  ).then((_) => _cargarUsuarios());
                                                 },
                                               ),
                                               IconButton(

@@ -1,4 +1,5 @@
 import 'package:bridgecare/features/administrador/presentation/list_puentes_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/list_user_admin.dart';
 import 'package:bridgecare/features/administrador/presentation/usuarios_admin.dart';
 import 'package:flutter/material.dart';
 
@@ -141,7 +142,7 @@ class HomeAdmin extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CustomButton(
-                      text: 'Puentes',
+                      text: 'Ver puentes',
                       onTap: () {
                        Navigator.push(context,MaterialPageRoute(builder: (_) => PuentesListAdminScreen()),);
                       },
@@ -151,9 +152,9 @@ class HomeAdmin extends StatelessWidget {
                     ),
                     const SizedBox(height: 30),
                     CustomButton(
-                      text: 'Usuarios',
+                      text: 'Ver usuarios',
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => UsuariosAdmin()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => UsuariosListAdminScreen()),);
                       },
                       defaultColor: Color(0xccffffff),
                       pressedColor: Colors.white.withOpacity(0.2),

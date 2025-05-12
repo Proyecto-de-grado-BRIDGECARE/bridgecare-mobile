@@ -6,9 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../../administrador/presentation/home_admin.dart';
+import '../../../../administrador/presentation/list_user_admin.dart';
 
 class RegistroUsuario extends StatefulWidget {
-  const RegistroUsuario({super.key});
+  final Usuario? usuario;
+  const RegistroUsuario({super.key, this.usuario});
 
   @override
   State<RegistroUsuario> createState() => _RegistroUsuarioState();
@@ -18,7 +20,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
   final _formKey = GlobalKey<FormState>();
 
   Map<String, dynamic> _formData = {
-    "id": 0,
+    "id": null,
     "nombres": "",
     "apellidos": "",
     "identificacion": "",
@@ -28,42 +30,60 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
     "contrasenia": "",
   };
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.usuario != null) {
+      _formData = {
+        "id": widget.usuario!.id,
+        "nombres": widget.usuario!.nombres,
+        "apellidos": widget.usuario!.apellidos,
+        "identificacion": widget.usuario!.identificacion,
+        "tipoUsuario": widget.usuario!.tipoUsuario,
+        "correo": widget.usuario!.correo,
+        "municipio": widget.usuario!.municipio,
+        "contrasenia": "", // no mostrar contraseñas en edición
+      };
+    }
+  }
+
   Future<void> _enviarDatos() async {
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
 
+    final usuario = Usuario(
+      id: _formData["id"],
+      nombres: _formData["nombres"],
+      apellidos: _formData["apellidos"],
+      identificacion: _formData["identificacion"],
+      tipoUsuario: _formData["tipoUsuario"],
+      correo: _formData["correo"],
+      municipio: _formData["municipio"],
+      contrasenia: _formData["contrasenia"] == "" ? null : _formData["contrasenia"],
+    );
+
     try {
-      final usuario = Usuario(
-        id: 0,
-        nombres: _formData["nombres"],
-        apellidos: _formData["apellidos"],
-        identificacion: _formData["identificacion"],
-        tipoUsuario: _formData["tipoUsuario"],
-        correo: _formData["correo"],
-        municipio: _formData["municipio"],
-        contrasenia: _formData["contrasenia"],
-      );
-
-      await UserService().registerUsuario(usuario);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Usuario registrado con éxito")),
-      );
-
-      if (_formData["tipoUsuario"] == 2) {
-        Navigator.pushReplacementNamed(context, '/homeAdmin');
-      } else if (_formData["tipoUsuario"] == 0) {
-        Navigator.pushReplacementNamed(context, '/homeMunicipal');
+      if (widget.usuario != null) {
+        await UserService().updateUsuario(usuario); // deberías tener este método
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Usuario actualizado con éxito")),
+        );
       } else {
-        Navigator.pushReplacementNamed(context, '/home');
+        await UserService().registerUsuario(usuario);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Usuario registrado con éxito")),
+        );
       }
+
+      Navigator.pushReplacementNamed(context, '/homeAdmin');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $e")),
       );
     }
   }
+
 
 
   @override
@@ -85,17 +105,18 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                 end: Alignment.bottomRight,
               ),
             ),
-            child: const Padding(
-              padding: EdgeInsets.only(top: 70.0, left: 22),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 70.0, left: 22),
               child: Text(
-                'Crea tu cuenta',
-                style: TextStyle(
+                widget.usuario != null ? 'Editar usuario' : 'Crea tu cuenta',
+                style: const TextStyle(
                   fontSize: 30,
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+
           ),
           // Formulario en tarjeta blanca redondeada
           Padding(
@@ -172,16 +193,17 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                               ],
                             ),
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Text(
-                              'REGISTRAR',
-                              style: TextStyle(
+                              widget.usuario != null ? 'EDITAR' : 'REGISTRAR',
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
                                 color: Colors.white,
                               ),
                             ),
                           ),
+
                         ),
                       ),
                       const SizedBox(height: 40),
@@ -190,30 +212,50 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Text(
-                              "¿Ya tienes una cuenta?",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => LoginPage()),
-                                );
-                              },
-                              child: const Text(
-                                "Inicia sesión",
+                            if (widget.usuario == null) ...[
+                              const Text(
+                                "¿Ya tienes una cuenta?",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 17,
-                                  color: Colors.black,
-                                  decoration: TextDecoration.underline,
+                                  color: Colors.grey,
                                 ),
                               ),
-                            ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => LoginPage()),
+                                  );
+                                },
+                                child: const Text(
+                                  "Inicia sesión",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                    color: Colors.black,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ] else ...[
+                              GestureDetector(
+                                onTap: () {
+                                   Navigator.pushReplacement(
+                                     context,
+                                     MaterialPageRoute(builder: (context) => UsuariosListAdminScreen()),
+                                   );
+                                },
+                                child: const Text(
+                                  "← Volver a la lista de usuarios",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                    color: Colors.black,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -238,6 +280,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
+        initialValue: _formData[key]?.toString() ?? "",
         obscureText: isPassword,
         keyboardType: isEmail
             ? TextInputType.emailAddress
@@ -266,6 +309,15 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
           ),
         ),
         validator: (value) {
+          if (key == "contrasenia") {
+            // Si es modo registro, la contraseña es obligatoria
+            if (widget.usuario == null && (value == null || value.isEmpty)) {
+              return "Por favor, ingrese $label";
+            }
+            // Si es modo edición y la deja vacía, es válido (no se cambiará)
+            return null;
+          }
+
           if (value == null || value.isEmpty) {
             return "Por favor, ingrese $label";
           }
@@ -277,6 +329,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
           }
           return null;
         },
+
         onSaved: (value) {
           if (isNumeric) {
             _formData[key] = int.tryParse(value!) ?? 0;

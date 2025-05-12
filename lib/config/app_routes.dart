@@ -6,12 +6,10 @@ import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
 import 'package:bridgecare/features/search_bridge/presentation/pages/search_bridge.dart';
 import 'package:bridgecare/features/search_bridge/presentation/pages/search_inspection.dart';
 import 'package:bridgecare/features/user_management/create_user/presentation/pages/create_user.dart';
-import 'package:bridgecare/features/user_management/read_user/presentation/pages/read_user.dart';
 import 'package:bridgecare/features/user_management/update_user/presentation/pages/update_user.dart';
 import 'package:flutter/material.dart';
 
 import '../features/bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
-import '../features/bridge_management/inventory/presentation/pages/inventario_form_page.dart';
 
 class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
@@ -19,7 +17,6 @@ class AppRoutes {
     '/home' : (context) => const HomePage(),
     //'/registro': (context) => RegistroUsuario(),
     '/modificarUsuario': (context) => ModificarUsuario(),
-    '/usuarios': (context) => ListaUsuarios(),
     '/inspecciones': (context) => InspeccionesPage(),
     //'/autorizaciónUsuario': (context) => AutorizacionUsuario(),
     '/updateUser': (context) => ModificarUsuario(),
@@ -29,6 +26,6 @@ class AppRoutes {
     //Rutas administrador
     //'/Autorizacion' :(context) => AutorizacionUsuario(),
     '/det': (context) => DetallesUsuario(user: {},), //no sirve aun
-    '/homeAdmin': (context) => const HomeAdmin()
+    '/homeAdmin': (context) => const HomeAdmin(),
   };
 }
