@@ -95,7 +95,11 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
       // Retrieve token from SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       var token = prefs.getString('token');
-      token ??= 'asdf';
+      if (token == null || token.isEmpty) {
+        debugPrint('❌ Error: No token found in SharedPreferences');
+        return;
+      }
+
       // if (token == null) {
       //   debugPrint('Error: No token found in SharedPreferences');
       // return;
@@ -129,7 +133,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
       // }
 
       // Send to backend
-      final url = Uri.parse('http://localhost:8080/api/inventario/create');
+      final url = Uri.parse('http://192.168.1.16:8082/api/inventario/add');
       final response = await http.post(
         url,
         headers: {

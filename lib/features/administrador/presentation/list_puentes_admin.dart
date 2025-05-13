@@ -324,7 +324,7 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
 
                                               if (confirm == true) {
                                                 try {
-                                                  //await _inventarioService.eliminarInventarioYpuente(puente.id!);
+                                                  await _puenteService.deletePuenteCascada(puente.id!);
                                                   _cargarPuentes();
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     const SnackBar(content: Text('Puente eliminado exitosamente')),
