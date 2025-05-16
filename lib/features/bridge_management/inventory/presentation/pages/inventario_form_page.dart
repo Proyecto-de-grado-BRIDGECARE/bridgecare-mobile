@@ -617,7 +617,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         );
 
         if (response.statusCode == 200 || response.statusCode == 201) {
-          final responseData = jsonDecode(response.body);
+          final responseData = jsonDecode(response.body);wp
           final puenteId = responseData['puente']['id'];
           final usuarioId = responseData['usuario']['id'];
 
