@@ -3,6 +3,7 @@ import 'package:bridgecare/features/auth/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bridgecare/core/providers/theme_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -65,7 +66,10 @@ class _LoginPageState extends State<LoginPage> {
         // Obtener info del usuario
         final user = await _authService.getUser();
 
-        if (user != null) {
+        if (user != null && user.id != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setInt('usuario_id', user.id!); // Usa ! porque ya validaste que no es null
+
           themeProvider.setLightMode();
 
           switch (user.tipoUsuario) {

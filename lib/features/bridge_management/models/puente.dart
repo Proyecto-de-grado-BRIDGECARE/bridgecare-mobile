@@ -16,15 +16,15 @@ class Puente {
   });
 
   static const Map<String, dynamic> formFields = {
-    'nombre': {'type': 'text', 'label': 'Nombre'},
-    'identif': {'type': 'text', 'label': 'Identificador'},
+    'nombre': {'type': 'text', 'label': 'Nombre', 'required': true},
+    'identif': {'type': 'text', 'label': 'Identificador', 'required': true},
     'carretera': {
       'type': 'number',
       'label': 'Carretera',
       'maxLength': 10, // Max 10 digits enforced in UI
-    },
-    'pr': {'type': 'text', 'label': 'PR'},
-    'regional': {'type': 'text', 'label': 'Regional'},
+      'required': true},
+    'pr': {'type': 'text', 'label': 'PR', 'required': true},
+    'regional': {'type': 'text', 'label': 'Regional', 'required': true},
   };
 
   factory Puente.fromJson(Map<String, dynamic> json) {

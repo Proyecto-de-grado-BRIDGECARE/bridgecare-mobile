@@ -2,7 +2,8 @@ class Inventario {
   final int? id;
   final String observaciones;
   final int puenteId;
-  final int? usuarioId;
+  final int?
+  usuarioId;
 
   Inventario({
     this.id,
