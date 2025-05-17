@@ -605,7 +605,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         // }
 
         // Send to backend
-        final url = Uri.parse('http://192.168.1.16:8082/api/inventario/add');
+        final url = Uri.parse('http://192.168.20.24:8082/api/inventario/add');
 
         final response = await http.post(
           url,
@@ -617,7 +617,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         );
 
         if (response.statusCode == 200 || response.statusCode == 201) {
-          final responseData = jsonDecode(response.body);wp
+          final responseData = jsonDecode(response.body);
           final puenteId = responseData['puente']['id'];
           final usuarioId = responseData['usuario']['id'];
 

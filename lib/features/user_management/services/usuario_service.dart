@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserService {
-  final String baseUrl = "http://192.168.1.16:8084/api/usuarios"; // cambia IP según backend
+  final String baseUrl = "http://192.168.20.24:8084/api/usuarios"; // cambia IP según backend
 
   Future<List<Usuario>> getAllUsuarios() async {
     final prefs = await SharedPreferences.getInstance();
