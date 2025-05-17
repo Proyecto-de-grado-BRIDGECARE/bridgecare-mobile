@@ -391,10 +391,23 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
   }
   Future<bool> _tieneAlertas(int puenteId) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
+      if (token == null || token.isEmpty) {
+        debugPrint('❌ Error: No token found in SharedPreferences');
+        return false;
+      }
+
       final response = await http.get(
-        Uri.parse('http://192.168.20.24:8086/api/alertas/puente/$puenteId'),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse('http://192.168.20.24:8086/api/alerta/puente/$puenteId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
       );
+
+      debugPrint('🔍 Alerta response status: ${response.statusCode}');
+      debugPrint('🔍 Alerta response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -403,10 +416,12 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
         return false;
       }
     } catch (e) {
-      print('Error al verificar alertas: $e');
+      debugPrint('❌ Error al verificar alertas: $e');
       return false;
     }
   }
+
+
   Future<String> _getToken() async {
     // Usa SharedPreferences u otro método según tu app
     final prefs = await SharedPreferences.getInstance();

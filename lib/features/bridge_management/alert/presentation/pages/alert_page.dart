@@ -20,6 +20,19 @@ class _AlertScreenState extends State<AlertScreen> {
     super.initState();
     _alertas = _alertService.getAlertasPorPuente(widget.puenteId);
   }
+  Color getAlertColor(String tipo) {
+    switch (tipo.toUpperCase()) {
+      case 'CRITICA':
+        return Colors.red;
+      case 'PRECAUCION':
+        return Colors.orange;
+      case 'NORMAL':
+        return Colors.green;
+      default:
+        return Colors.blueGrey;
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -107,9 +120,10 @@ class _AlertScreenState extends State<AlertScreen> {
                                   children: [
                                     Text(
                                       alerta.tipo,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18,
+                                        color: getAlertColor(alerta.tipo), // ← aquí se aplica el color dinámico
                                       ),
                                     ),
                                     const SizedBox(height: 4),
