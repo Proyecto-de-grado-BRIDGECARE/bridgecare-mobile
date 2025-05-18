@@ -5,8 +5,6 @@ class Inspeccion {
   final String administrador;
   final int anioProximaInspeccion;
   final String observacionesGenerales;
-  final int puenteId;
-  final int usuarioId;
   final DateTime fecha;
 
   Inspeccion({
@@ -17,8 +15,6 @@ class Inspeccion {
     required this.anioProximaInspeccion,
     required this.observacionesGenerales,
     required this.fecha,
-    required this.puenteId,
-    required this.usuarioId,
   });
 
   static const Map<String, dynamic> formFields = {

@@ -2,7 +2,7 @@ import 'package:bridgecare/features/administrador/home_admin.dart';
 import 'package:flutter/material.dart';
 
 class PuentesAdmin extends StatefulWidget {
-  const PuentesAdmin({Key? key}) : super(key: key);
+  const PuentesAdmin({super.key});
 
   @override
   State<PuentesAdmin> createState() => _PuentesAdminState();
@@ -38,13 +38,9 @@ class _PuentesAdminState extends State<PuentesAdmin> {
   Widget build(BuildContext context) {
     final puentesFiltrados = puentes.where((puente) {
       if (isFirstChecked) {
-        return puente['nombre']
-            .toLowerCase()
-            .contains(filtro.toLowerCase());
+        return puente['nombre'].toLowerCase().contains(filtro.toLowerCase());
       } else {
-        return puente['municipio']
-            .toLowerCase()
-            .contains(filtro.toLowerCase());
+        return puente['municipio'].toLowerCase().contains(filtro.toLowerCase());
       }
     }).toList();
 
@@ -74,7 +70,6 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                     bottomRight: Radius.circular(20),
                   ),
                 ),
-
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                 child: Row(
                   children: [
@@ -83,8 +78,9 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                       onPressed: () {
                         Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(builder: (context) => const HomeAdmin()),
-                              (Route<dynamic> route) => false,
+                          MaterialPageRoute(
+                              builder: (context) => const HomeAdmin()),
+                          (Route<dynamic> route) => false,
                         );
                       },
                     ),
@@ -115,7 +111,9 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                           children: [
                             Checkbox(
                               value: isFirstChecked,
-                              side: const BorderSide(color: Colors.white, width: 2), // Color del borde
+                              side: const BorderSide(
+                                  color: Colors.white,
+                                  width: 2), // Color del borde
                               onChanged: (bool? value) {
                                 setState(() {
                                   if (!isSecondChecked || !value!) {
@@ -125,14 +123,18 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                                 });
                               },
                             ),
-                            Text("Puente", style: TextStyle(color: Colors.white, fontSize: 18)),
+                            Text("Puente",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18)),
                           ],
                         ),
                         Row(
                           children: [
                             Checkbox(
                               value: isSecondChecked,
-                              side: const BorderSide(color: Colors.white, width: 2), // Color del borde
+                              side: const BorderSide(
+                                  color: Colors.white,
+                                  width: 2), // Color del borde
                               onChanged: (bool? value) {
                                 setState(() {
                                   if (!isFirstChecked || !value!) {
@@ -142,7 +144,9 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                                 });
                               },
                             ),
-                            Text("Municipio", style: TextStyle(color: Colors.white, fontSize: 18)),
+                            Text("Municipio",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18)),
                           ],
                         ),
                       ],
@@ -162,33 +166,38 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                                   filled: true,
                                   fillColor: Color(0xccffffff),
                                   hintText: 'Escribe el nombre del puente',
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                                  contentPadding:
+                                      EdgeInsets.symmetric(horizontal: 16),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide(color: Colors.white, width: 2),
+                                    borderSide: BorderSide(
+                                        color: Colors.white, width: 2),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide(color: Colors.white, width: 2),
+                                    borderSide: BorderSide(
+                                        color: Colors.white, width: 2),
                                   ),
                                 ),
                                 onChanged: (value) {
-                                  print("Filtrar por puente: $value");
+                                  debugPrint("Filtrar por puente: $value");
                                 },
                               ),
                             ),
                             SizedBox(width: 10),
                             GestureDetector(
                               onTap: () {
-                                print("Buscar puente");
+                                debugPrint("Buscar puente");
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color:
+                                      const Color.fromRGBO(255, 255, 255, 0.3),
                                   shape: BoxShape.circle,
                                 ),
                                 padding: EdgeInsets.all(6),
-                                child: Icon(Icons.search, color: Colors.white, size: 28),
+                                child: Icon(Icons.search,
+                                    color: Colors.white, size: 28),
                               ),
                             ),
                           ],
@@ -204,38 +213,41 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                                 filled: true,
                                 fillColor: Color(0xccffffff),
                                 hintText: 'Escribe el nombre del municipio',
-                                contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: 16),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
-                                  borderSide: BorderSide(color: Colors.white, width: 2),
+                                  borderSide:
+                                      BorderSide(color: Colors.white, width: 2),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
-                                  borderSide: BorderSide(color: Colors.white, width: 2),
+                                  borderSide:
+                                      BorderSide(color: Colors.white, width: 2),
                                 ),
                               ),
                               onChanged: (value) {
-                                print("Filtrar por municipio: $value");
+                                debugPrint("Filtrar por municipio: $value");
                               },
                             ),
                           ),
                           SizedBox(width: 10),
                           GestureDetector(
                             onTap: () {
-                              print("Buscar municipio");
+                              debugPrint("Buscar municipio");
                             },
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.3),
+                                color: const Color.fromRGBO(255, 255, 255, 0.3),
                                 shape: BoxShape.circle,
                               ),
                               padding: EdgeInsets.all(6),
-                              child: Icon(Icons.search, color: Colors.white, size: 28),
+                              child: Icon(Icons.search,
+                                  color: Colors.white, size: 28),
                             ),
                           ),
                         ],
                       ),
-
                   ],
                 ),
               ),
@@ -280,40 +292,44 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                                     ElevatedButton.icon(
                                       onPressed: puente['tieneInventario']
                                           ? () {
-                                        // editar inventario
-                                      }
+                                              // editar inventario
+                                            }
                                           : null,
                                       icon: const Icon(Icons.edit, size: 18),
                                       label: const Text("Inventario"),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xff01579a),
+                                        backgroundColor:
+                                            const Color(0xff01579a),
                                         foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(50),
+                                          borderRadius:
+                                              BorderRadius.circular(50),
                                         ),
                                       ),
                                     ),
                                     ElevatedButton.icon(
                                       onPressed: puente['tieneInventario']
                                           ? () {
-                                        // editar inspección
-                                      }
+                                              // editar inspección
+                                            }
                                           : null,
-                                      icon: const Icon(Icons.edit_note, size: 18),
+                                      icon:
+                                          const Icon(Icons.edit_note, size: 18),
                                       label: const Text("Inspección"),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.orange,
                                         foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(50),
+                                          borderRadius:
+                                              BorderRadius.circular(50),
                                         ),
                                       ),
                                     ),
                                     ElevatedButton.icon(
                                       onPressed: puente['tieneInventario']
                                           ? () {
-                                        // eliminar inventario
-                                      }
+                                              // eliminar inventario
+                                            }
                                           : null,
                                       icon: const Icon(Icons.delete, size: 18),
                                       label: const Text("Eliminar Inv."),
@@ -321,23 +337,26 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                                         backgroundColor: Colors.red,
                                         foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(50),
+                                          borderRadius:
+                                              BorderRadius.circular(50),
                                         ),
                                       ),
                                     ),
                                     ElevatedButton.icon(
                                       onPressed: puente['tieneInspeccion']
                                           ? () {
-                                        // eliminar inspección
-                                      }
+                                              // eliminar inspección
+                                            }
                                           : null,
-                                      icon: const Icon(Icons.delete_forever, size: 18),
+                                      icon: const Icon(Icons.delete_forever,
+                                          size: 18),
                                       label: const Text("Eliminar Insc."),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.redAccent,
                                         foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(50),
+                                          borderRadius:
+                                              BorderRadius.circular(50),
                                         ),
                                       ),
                                     ),

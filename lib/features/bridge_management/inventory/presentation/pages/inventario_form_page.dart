@@ -116,7 +116,6 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
       );
 
       // Check response and show popup
-      // Check response and show popup
       if (response.statusCode == 200 && mounted) {
         // Parse the inventarioId from the response
         final inventarioId =

@@ -2,6 +2,7 @@ import 'package:bridgecare/features/administrador/home_admin.dart';
 import 'package:bridgecare/features/administrador/user_auth.dart';
 import 'package:bridgecare/features/user_management/read_user/presentation/pages/read_user.dart';
 import 'package:flutter/material.dart';
+
 class CustomButton extends StatefulWidget {
   final String text;
   final VoidCallback onTap;
@@ -74,12 +75,11 @@ class _CustomButtonState extends State<CustomButton> {
 }
 
 class UsuariosAdmin extends StatelessWidget {
-  const UsuariosAdmin({Key? key}) : super(key: key);
+  const UsuariosAdmin({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: Container(
         height: double.infinity,
         width: double.infinity,
@@ -112,12 +112,14 @@ class UsuariosAdmin extends StatelessWidget {
                   top: 20,
                   left: 5,
                   child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 40),
+                    icon: const Icon(Icons.arrow_back,
+                        color: Colors.black, size: 40),
                     onPressed: () {
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (context) => const HomeAdmin()),
-                            (Route<dynamic> route) => false,
+                        MaterialPageRoute(
+                            builder: (context) => const HomeAdmin()),
+                        (Route<dynamic> route) => false,
                       );
                     },
                   ),
@@ -127,7 +129,8 @@ class UsuariosAdmin extends StatelessWidget {
                   top: 20,
                   right: 5,
                   child: IconButton(
-                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
+                    icon: const Icon(Icons.more_vert,
+                        color: Color(0xff01579a), size: 50),
                     onPressed: () {
                       // Menú u otra acción
                     },
@@ -135,7 +138,6 @@ class UsuariosAdmin extends StatelessWidget {
                 ),
               ],
             ),
-
             Expanded(
               child: Center(
                 child: Column(
@@ -144,20 +146,27 @@ class UsuariosAdmin extends StatelessWidget {
                     CustomButton(
                       text: 'Aceptar usuarios',
                       onTap: () {
-                        Navigator.push(context,MaterialPageRoute(builder: (_) => AutorizacionUsuario()),);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => AutorizacionUsuario()),
+                        );
                       },
                       defaultColor: Color(0xccffffff),
-                      pressedColor: Colors.white.withOpacity(0.2),
+                      pressedColor: const Color.fromRGBO(255, 255, 255, 0.2),
                       textColor: Colors.black,
                     ),
                     const SizedBox(height: 30),
                     CustomButton(
                       text: 'Ver usuarios existentes',
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => ListaUsuarios()),);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => ListaUsuarios()),
+                        );
                       },
                       defaultColor: Color(0xccffffff),
-                      pressedColor: Colors.white.withOpacity(0.2),
+                      pressedColor: const Color.fromRGBO(255, 255, 255, 0.2),
                       textColor: Colors.black,
                     ),
                   ],

@@ -1,17 +1,21 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:bridgecare/shared/services/queue_manager.dart';
 
 class DynamicForm extends StatefulWidget {
   final Map<String, dynamic> fields;
   final Map<String, dynamic>? initialData;
   final Function(Map<String, dynamic>) onSave;
+  final Map<String, dynamic>? extraData;
 
   const DynamicForm({
     super.key,
     required this.fields,
     this.initialData,
     required this.onSave,
+    this.extraData,
   });
 
   @override
@@ -24,7 +28,7 @@ class DynamicFormState extends State<DynamicForm>
   final Map<String, TextEditingController> _controllers = {};
 
   @override
-  bool get wantKeepAlive => true; // Keep state alive
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -32,7 +36,6 @@ class DynamicFormState extends State<DynamicForm>
     if (widget.initialData != null) {
       _formData.addAll(widget.initialData!);
     }
-    // Initialize controllers for text and number fields
     widget.fields.forEach((key, fieldInfo) {
       if (fieldInfo['type'] == 'text' || fieldInfo['type'] == 'number') {
         _controllers[key] =
@@ -43,7 +46,7 @@ class DynamicFormState extends State<DynamicForm>
                   ? double.tryParse(_controllers[key]!.text)
                   : _controllers[key]!.text)
               : null;
-          widget.onSave(_formData); // Update parent form data in real-time
+          widget.onSave(_formData);
         });
       }
     });
@@ -55,9 +58,11 @@ class DynamicFormState extends State<DynamicForm>
     super.dispose();
   }
 
-  InputDecoration _getInputDecoration(String label) {
+  InputDecoration _getInputDecoration(String label, {bool readOnly = false}) {
     return InputDecoration(
       labelText: label,
+      filled: readOnly,
+      fillColor: readOnly ? Colors.grey[300] : Colors.transparent,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.0),
         borderSide: BorderSide(color: Colors.grey[400]!),
@@ -77,16 +82,24 @@ class DynamicFormState extends State<DynamicForm>
 
     switch (fieldInfo['type']) {
       case 'text':
+        final isReadOnly = fieldInfo['readOnly'] == true;
         field = TextFormField(
           controller: _controllers[fieldName],
-          decoration: _getInputDecoration(fieldInfo['label']),
+          decoration:
+              _getInputDecoration(fieldInfo['label'], readOnly: isReadOnly),
+          enabled: !isReadOnly, // <- simpler
+          readOnly: isReadOnly,
+          enableInteractiveSelection: !isReadOnly,
+          style: isReadOnly ? TextStyle(color: Colors.grey[700]) : null,
           onSaved: (value) => _formData[fieldName] = value,
         );
         break;
+
       case 'number':
         field = TextFormField(
           controller: _controllers[fieldName],
           decoration: _getInputDecoration(fieldInfo['label']),
+          readOnly: fieldInfo['readOnly'] == true,
           keyboardType: TextInputType.number,
           onSaved: (value) => _formData[fieldName] =
               value != null && value.isNotEmpty
@@ -181,9 +194,7 @@ class DynamicFormState extends State<DynamicForm>
         );
         break;
       case 'image':
-        // Initialize as empty list if not set
-        _formData[fieldName] ??=
-            initialValue ?? <XFile>[]; // Start with XFiles, later URLs
+        _formData[fieldName] ??= initialValue ?? <XFile>[];
         final maxImages = fieldInfo['maxImages'] as int? ?? 5;
         final List<XFile> images = _formData[fieldName] as List<XFile>;
 
@@ -205,18 +216,15 @@ class DynamicFormState extends State<DynamicForm>
                         if (snapshot.hasData) {
                           return GestureDetector(
                             onTap: () {
-                              // Show larger image in a dialog
                               showDialog(
                                 context: context,
                                 builder: (context) => Dialog(
                                   backgroundColor: Colors.transparent,
                                   child: GestureDetector(
-                                    onTap: () =>
-                                        Navigator.pop(context), // Close on tap
+                                    onTap: () => Navigator.pop(context),
                                     child: Image.memory(
                                       snapshot.data!,
-                                      fit: BoxFit
-                                          .contain, // Fit within screen bounds
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
                                 ),
@@ -268,6 +276,24 @@ class DynamicFormState extends State<DynamicForm>
                       images.add(pickedFile);
                       widget.onSave(_formData);
                     });
+                    if (widget.extraData != null && mounted) {
+                      try {
+                        final queueManager = context.read<QueueManager>();
+                        await queueManager.queueImage(
+                          pickedFile,
+                          widget.extraData!['puenteId'] as int,
+                          widget.extraData!['inspectionId'] as String,
+                          widget.extraData!['componentKey'] as String,
+                        );
+                      } catch (e) {
+                        debugPrint('Failed to queue image: $e');
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error queuing image: $e')),
+                          );
+                        }
+                      }
+                    }
                   }
                 },
                 icon: Icon(Icons.add_a_photo),
@@ -281,15 +307,14 @@ class DynamicFormState extends State<DynamicForm>
     }
 
     return Padding(
-      padding:
-          const EdgeInsets.only(bottom: 8.0), // Should be 'bottom' or similar
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: field,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    super.build(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: widget.fields.entries

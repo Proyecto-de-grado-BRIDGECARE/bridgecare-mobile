@@ -74,12 +74,11 @@ class _CustomButtonState extends State<CustomButton> {
 }
 
 class HomeAdmin extends StatelessWidget {
-  const HomeAdmin({Key? key}) : super(key: key);
+  const HomeAdmin({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: Container(
         height: double.infinity,
         width: double.infinity,
@@ -112,7 +111,8 @@ class HomeAdmin extends StatelessWidget {
                   top: 20,
                   right: 5,
                   child: IconButton(
-                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
+                    icon: const Icon(Icons.more_vert,
+                        color: Color(0xff01579a), size: 50),
                     onPressed: () {
                       // Aquí puedes abrir un menú o hacer lo que necesites
                     },
@@ -128,20 +128,26 @@ class HomeAdmin extends StatelessWidget {
                     CustomButton(
                       text: 'Puentes',
                       onTap: () {
-                       Navigator.push(context,MaterialPageRoute(builder: (_) => PuentesAdmin()),);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => PuentesAdmin()),
+                        );
                       },
                       defaultColor: Color(0xccffffff),
-                      pressedColor: Colors.white.withOpacity(0.2),
+                      pressedColor: const Color.fromRGBO(255, 255, 255, 0.2),
                       textColor: Colors.black,
                     ),
                     const SizedBox(height: 30),
                     CustomButton(
                       text: 'Usuarios',
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => UsuariosAdmin()),);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => UsuariosAdmin()),
+                        );
                       },
                       defaultColor: Color(0xccffffff),
-                      pressedColor: Colors.white.withOpacity(0.2),
+                      pressedColor: const Color.fromRGBO(255, 255, 255, 0.2),
                       textColor: Colors.black,
                     ),
                   ],

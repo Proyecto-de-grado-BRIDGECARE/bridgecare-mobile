@@ -1,9 +1,8 @@
 import 'package:bridgecare/features/administrador/puentes_admin.dart';
+import 'package:bridgecare/features/bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-
-import '../../../bridge_management/inventory/presentation/pages/inventario_form_page.dart';
 
 class CustomButton extends StatefulWidget {
   final String text;
@@ -136,7 +135,10 @@ class HomePage extends StatelessWidget {
                       onTap: () {
                         PersistentNavBarNavigator.pushNewScreen(
                           context,
-                          screen: InventoryFormScreen(),
+                          // TODO CHANGE INSPECTION TO INVENTARIO
+                          screen: InspectionFormScreen(
+                            puenteId: 1,
+                          ),
                           withNavBar: false,
                         );
                       },

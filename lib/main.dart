@@ -1,11 +1,13 @@
 import 'package:bridgecare/core/providers/theme_provider.dart';
+import 'package:bridgecare/shared/services/background_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:bridgecare/app.dart';
 
-void main() {
+void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  await BackgroundService.initialize();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   initializeApp().then((_) {
