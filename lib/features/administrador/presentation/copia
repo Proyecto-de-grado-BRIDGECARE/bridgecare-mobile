@@ -1,8 +1,16 @@
-import 'package:bridgecare/features/administrador/home_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/home_admin.dart';
 import 'package:flutter/material.dart';
 
+import '../../bridge_management/inventory/models/dtos/inventario_dto.dart';
+import '../../bridge_management/inventory/models/entities/inventario.dart';
+import '../../bridge_management/inventory/presentation/pages/inventario_form_page.dart';
+import '../../bridge_management/models/puente.dart';
+import '../../bridge_management/services/inventory_service.dart';
+import '../../search_bridge/presentation/pages/services/bridge_service.dart';
+
 class PuentesAdmin extends StatefulWidget {
-  const PuentesAdmin({Key? key}) : super(key: key);
+
+  PuentesAdmin({super.key});
 
   @override
   State<PuentesAdmin> createState() => _PuentesAdminState();
@@ -13,36 +21,49 @@ class _PuentesAdminState extends State<PuentesAdmin> {
   bool isSecondChecked = false;
   String filtro = '';
 
-  List<Map<String, dynamic>> puentes = [
-    {
-      'nombre': 'Puente A',
-      'municipio': 'Arbelaez',
-      'tieneInventario': true,
-      'tieneInspeccion': true,
-    },
-    {
-      'nombre': 'Puente B',
-      'municipio': 'San Bernardo',
-      'tieneInventario': true,
-      'tieneInspeccion': false,
-    },
-    {
-      'nombre': 'Puente C',
-      'municipio': 'Pasca',
-      'tieneInventario': false,
-      'tieneInspeccion': false,
-    },
-  ];
+  final InventarioService _inventarioService = InventarioService();
+  final BridgeService _puenteService = BridgeService();
+  List<Puente> _puentes = [];
+  List<Puente> _puentesFiltrados = [];
+
+  Map<int, Inventario?> _inventariosPorPuente = {};
+
+
+  Future<void> _cargarPuentesConInventarios() async {
+    try {
+      final puentes = await _puenteService.getAllPuentes();
+      Map<int, Inventario?> inventariosMap = {};
+
+      for (final puente in puentes) {
+        final inventario = await _inventarioService.getInventarioPorPuente(puente.id!);
+        inventariosMap[puente.id!] = inventario;
+      }
+
+      setState(() {
+        _puentes = puentes;
+        _puentesFiltrados = puentes;
+        _inventariosPorPuente = inventariosMap;
+      });
+    } catch (e) {
+      print('Error al cargar puentes e inventarios: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarPuentesConInventarios();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final puentesFiltrados = puentes.where((puente) {
+    final puentesFiltrados = _puentes.where((puente) {
       if (isFirstChecked) {
-        return puente['nombre']
+        return puente.nombre
             .toLowerCase()
             .contains(filtro.toLowerCase());
       } else {
-        return puente['municipio']
+        return puente.regional
             .toLowerCase()
             .contains(filtro.toLowerCase());
       }
@@ -256,7 +277,7 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                       itemCount: puentesFiltrados.length,
                       itemBuilder: (context, index) {
                         final puente = puentesFiltrados[index];
-
+                        final tieneInventario = _inventariosPorPuente[puente.id!] != null;
                         return Card(
                           margin: const EdgeInsets.symmetric(vertical: 8),
                           shape: RoundedRectangleBorder(
@@ -268,23 +289,33 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Nombre: ${puente['nombre']}",
+                                Text("Nombre: ${puente.nombre}",
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 4),
-                                Text("Municipio: ${puente['municipio']}"),
+                                Text("Municipio: ${puente.regional}"),
                                 const SizedBox(height: 12),
                                 Wrap(
                                   spacing: 4,
                                   children: [
                                     ElevatedButton.icon(
-                                      onPressed: puente['tieneInventario']
+                                      onPressed: tieneInventario
                                           ? () {
-                                        // editar inventario
-                                      }
+                                              final inventario = _inventariosPorPuente[puente.id!]!;
+                                              final dto = convertirAInventarioDTO(inventario);
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => InventoryFormScreen(
+                                                    usuarioId: inventario.usuarioId, //
+                                                    inventario: dto,
+                                                  ),
+                                                ),
+                                              );
+                                          }
                                           : null,
                                       icon: const Icon(Icons.edit, size: 18),
-                                      label: const Text("Inventario"),
+                                      label: const Text("Editar Inventario"),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: const Color(0xff01579a),
                                         foregroundColor: Colors.white,
@@ -294,25 +325,21 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                                       ),
                                     ),
                                     ElevatedButton.icon(
-                                      onPressed: puente['tieneInventario']
-                                          ? () {
-                                        // editar inspección
-                                      }
-                                          : null,
-                                      icon: const Icon(Icons.edit_note, size: 18),
-                                      label: const Text("Inspección"),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orange,
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(50),
-                                        ),
-                                      ),
-                                    ),
-                                    ElevatedButton.icon(
-                                      onPressed: puente['tieneInventario']
-                                          ? () {
-                                        // eliminar inventario
+                                      onPressed: tieneInventario
+                                          ? () async {
+                                        final inventario = _inventariosPorPuente[puente.id!]!;
+
+                                        try {
+                                          await _inventarioService.eliminarInventario(inventario.id!);
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Inventario eliminado')),
+                                          );
+                                          _cargarPuentesConInventarios(); // Recarga la lista
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Error al eliminar inventario')),
+                                          );
+                                        }
                                       }
                                           : null,
                                       icon: const Icon(Icons.delete, size: 18),
@@ -325,22 +352,7 @@ class _PuentesAdminState extends State<PuentesAdmin> {
                                         ),
                                       ),
                                     ),
-                                    ElevatedButton.icon(
-                                      onPressed: puente['tieneInspeccion']
-                                          ? () {
-                                        // eliminar inspección
-                                      }
-                                          : null,
-                                      icon: const Icon(Icons.delete_forever, size: 18),
-                                      label: const Text("Eliminar Insc."),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.redAccent,
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(50),
-                                        ),
-                                      ),
-                                    ),
+
                                   ],
                                 ),
                               ],
@@ -356,6 +368,137 @@ class _PuentesAdminState extends State<PuentesAdmin> {
           ),
         ),
       ),
+    );
+  }
+  InventarioDTO convertirAInventarioDTO(Inventario inventario) {
+    return InventarioDTO(
+      observaciones: inventario.observaciones,
+      puente: PuenteDTO(
+        id: inventario.puenteId,
+        nombre: '', // rellena con valor vacío si no lo tienes
+        identif: '',
+        carretera: '',
+        pr: '',
+        regional: '',
+      ),
+      pasos: [], // sin datos, inicia vacío
+      superestructuras: [], // sin datos, inicia vacío
+      apoyo: null,
+      carga: null,
+      datosAdministrativos: null,
+      datosTecnicos: null,
+      miembrosInteresados: null,
+      posicionGeografica: null,
+      subestructura: null,
+    );
+  }
+}
+
+////
+import 'package:bridgecare/features/administrador/presentation/user_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class AutorizacionUsuario extends StatefulWidget {
+  const AutorizacionUsuario({super.key});
+
+  @override
+  State<AutorizacionUsuario> createState() => _AutorizacionPage();
+}
+//final UserService _userService = UserService();
+//List<Usuario> _usuario= [];
+//List<Usuario> _usuarioFiltrados = [];
+
+class _AutorizacionPage extends State<AutorizacionUsuario> {
+  List<Map<String, String>> usuariosPendientes = [
+    {
+      "name": "Carlos Mendoza",
+      "email": "carlos@example.com",
+      "date": "12/03/2025",
+    },
+    {
+      "name": "Ana López",
+      "email": "ana@example.com",
+      "date": "10/03/2025",
+    },
+    {
+      "name": "Luis Torres",
+      "email": "luis@example.com",
+      "date": "08/03/2025",
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFFEBEBEB),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(120),
+        child: Container(
+          padding: EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
+          decoration: BoxDecoration(
+            color: Color(0xFFEBEBEB), // Mismo color de fondo
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(Icons.arrow_back, color: Colors.black),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text("notificaciones")));
+                    },
+                    icon: Icon(Icons.notifications, color: Colors.black),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Text(
+                  "Usuarios pendientes por actualizar",
+                  style: GoogleFonts.poppins(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      body: ListView.builder(
+          itemCount: usuariosPendientes.length,
+          itemBuilder: (context, index) {
+            final user = usuariosPendientes[index];
+            return Card(
+              margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: ListTile(
+                leading: Icon(Icons.person, size: 40),
+                title: Text(user["name"]!),
+                subtitle: Text(user["email"]!),
+                trailing: Text(user["date"]!),
+                onTap: () {
+                  // Navegar a pantalla de detalles
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetallesUsuario(user: user),
+                    ),
+                  );
+                },
+              ),
+            );
+          }),
     );
   }
 }

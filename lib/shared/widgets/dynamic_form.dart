@@ -10,7 +10,7 @@ class DynamicForm extends StatefulWidget {
   const DynamicForm({
     super.key,
     required this.fields,
-    this.initialData,
+    required this.initialData,
     required this.onSave,
   });
 
@@ -53,6 +53,40 @@ class DynamicFormState extends State<DynamicForm>
   void dispose() {
     _controllers.forEach((_, controller) => controller.dispose());
     super.dispose();
+  }
+
+  bool validateForm() {
+    final missingFields = widget.fields.entries.where((entry) {
+      final key = entry.key;
+      final fieldInfo = entry.value;
+      final isRequired = fieldInfo['required'] == true;
+      final value = _formData[key];
+
+      if (!isRequired) return false;
+
+      if (fieldInfo['type'] == 'image') {
+        return value == null || (value is List && value.isEmpty);
+      }
+
+      if (fieldInfo['type'] == 'checkbox') {
+        return value != true;
+      }
+
+      return value == null || (value is String && value.trim().isEmpty);
+    });
+
+    if (missingFields.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('⚠️ Por favor completa todos los campos obligatorios (nombre, identificador, carretera, regional)'),
+          backgroundColor: Colors.redAccent,
+          duration: Duration(seconds: 5),
+        ),
+      );
+      return false;
+    }
+
+    return true;
   }
 
   InputDecoration _getInputDecoration(String label) {

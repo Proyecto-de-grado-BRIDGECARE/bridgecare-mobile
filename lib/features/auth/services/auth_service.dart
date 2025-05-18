@@ -7,8 +7,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
   static const String baseUrl =
-      "http://10.43.101.76:8080/api/auth"; // Temporary backend URL
-
+      "https://api.bridgecare.com.co/auth"; // Temporary backend URL
+      //"http://192.168.1.16:443/api/auth";
+      //https://api.bridgecare.com.co/auth
   Future<String?> login(LoginRequest request) async {
     final url = Uri.parse("$baseUrl/login");
 
@@ -70,6 +71,7 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
+        debugPrint("🔍 JSON del usuario: ${response.body}");
         final data = jsonDecode(response.body);
         debugPrint(response.body);
         return Usuario.fromJson(data);

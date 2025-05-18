@@ -9,11 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../alert/presentation/pages/alert_page.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+
 
 class InspectionFormScreen extends StatefulWidget {
   final int puenteId;
 
-  const InspectionFormScreen({required this.puenteId, super.key});
+  const InspectionFormScreen(
+      { required this.puenteId, super.key, required int usuarioId});
 
   @override
   InspectionFormScreenState createState() => InspectionFormScreenState();
@@ -26,16 +31,18 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
     'inspeccion': {},
   };
   List<Map<String, String>> componentList = [];
+  int? usuarioId;
 
   @override
   void initState() {
     super.initState();
     _loadComponents();
+    _loadUserIdFromToken();
   }
 
   Future<void> _loadComponents() async {
     final String response =
-        await rootBundle.loadString('assets/data/inspection_components.json');
+    await rootBundle.loadString('assets/data/inspection_components.json');
     final List<dynamic> data = jsonDecode(response);
     setState(() {
       componentList =
@@ -46,6 +53,17 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
         _formData['reparaciones_${component['key']}'] = {};
       }
     });
+  }
+  Future<void> _loadUserIdFromToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('usuario_id');
+    if (userId != null) {
+      setState(() {
+        usuarioId = userId;
+      });
+    } else {
+      debugPrint("❌ No se encontró usuario_id en SharedPreferences");
+    }
   }
 
   int? _parseDropdownValue(String? value) {
@@ -69,7 +87,6 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
     });
   }
 
-  // ignore: unused_element
   Future<String> _fetchInspectorName(int usuarioId) async {
     // final response =
     //     await http.get(Uri.parse('https://your-api.com/usuarios/$usuarioId'));
@@ -84,118 +101,161 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
   Future<void> _saveForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
       try {
-        // Post Inspeccion
-        _formData['inspeccion']!['puenteId'] = widget.puenteId;
-        // _formData['inspeccion']!['usuarioId'] = widget.usuarioId;
         if (_formData['inspeccion']!['fecha'] != null) {
           _formData['inspeccion']!['fecha'] =
-              (_formData['inspeccion']!['fecha'] as DateTime)
-                  .toIso8601String()
-                  .split('T')[0];
+          (_formData['inspeccion']!['fecha'] as DateTime)
+              .toIso8601String()
+              .split('T')[0];
         }
-        final inspeccionResponse = await http.post(
-          Uri.parse('https://your-api.com/inspecciones'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(_formData['inspeccion']),
-        );
-        if (inspeccionResponse.statusCode != 201) {
-          throw Exception(
-              'Failed to create Inspeccion: ${inspeccionResponse.body}');
-        }
-        final inspeccionData = jsonDecode(inspeccionResponse.body);
-        final inspeccionId = inspeccionData['id'] as int;
 
-        // Post Componentes and Reparaciones
-        for (var component in componentList) {
+        // Construir componentes con imágenes subidas
+        final componentes = await Future.wait(componentList.map((component) async {
           final componentKey = component['key']!;
-          final componenteData =
-              Map<String, dynamic>.from(_formData[componentKey]!);
-          componenteData['nombre'] =
-              component['title']!.replaceAll('/', ' ').toUpperCase();
-          componenteData['calificacion'] =
-              _parseDropdownValue(componenteData['calificacion']?.toString());
-          componenteData['tipoDanio'] =
-              _parseDropdownValue(componenteData['tipoDanio']?.toString());
-          componenteData['inspeccionId'] = inspeccionId;
+          final comp = Map<String, dynamic>.from(_formData[componentKey] ?? {});
+          final reparacion = _formData['reparaciones_$componentKey'] ?? {};
 
-          if (componenteData['imagenUrls'] != null &&
-              (componenteData['imagenUrls'] as List).isNotEmpty) {
-            final List<XFile> images =
-                componenteData['imagenUrls'] as List<XFile>;
-            final List<String> uploadedUrls = [];
+          // Subida de imágenes
+          List<String> uploadedUrls = [];
+          if (comp['imagenUrls'] != null && (comp['imagenUrls'] as List).isNotEmpty) {
+            final List<XFile> images = comp['imagenUrls'] as List<XFile>;
             for (var image in images) {
               var request = http.MultipartRequest(
                 'POST',
-                Uri.parse(
-                    'https://your-api.com/upload-image'), // Backend endpoint
+                Uri.parse('http://192.168.20.24:8083/api/imagenes/upload'), // Actualiza si tu endpoint es otro
               );
-              request.files
-                  .add(await http.MultipartFile.fromPath('image', image.path));
+              request.files.add(await http.MultipartFile.fromPath('image', image.path));
+
               final response = await request.send();
               if (response.statusCode == 200) {
                 final responseData = await response.stream.bytesToString();
                 final url = jsonDecode(responseData)['url'] as String;
                 uploadedUrls.add(url);
               } else {
-                throw Exception(
-                    'Failed to upload image: ${response.reasonPhrase}');
+                throw Exception('Fallo al subir imagen: ${response.reasonPhrase}');
               }
             }
-            componenteData['imagenUrls'] =
-                uploadedUrls; // Replace XFiles with URLs
-          } else {
-            componenteData['imagenUrls'] = null;
           }
 
-          final componenteResponse = await http.post(
-            Uri.parse('https://your-api.com/componentes'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(componenteData),
+          return {
+            'nomb': component['title']!.replaceAll('/', ' ').toUpperCase(),
+            'calificacion': _parseDropdownValue(comp['calificacion']?.toString()),
+            'mantenimiento': comp['mantenimiento'] ?? '',
+            'inspEesp': comp['inspEesp'] ?? '',
+            'numeroFfotos': int.tryParse(comp['numeroFfotos']?.toString() ?? '0'),
+            'tipoDanio': _parseDropdownValue(comp['tipoDanio']?.toString()),
+            'danio': comp['danio'] ?? '',
+            'imagenUrls': uploadedUrls.isNotEmpty ? uploadedUrls : null,
+            'reparacion': reparacion.isNotEmpty ? [reparacion] : []
+          };
+        }).toList());
+
+        if (usuarioId == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No se pudo obtener el usuario autenticado')),
           );
-          if (componenteResponse.statusCode != 201) {
-            throw Exception(
-                'Failed to create Componente $componentKey: ${componenteResponse.body}');
-          }
-          final componenteDataResponse = jsonDecode(componenteResponse.body);
-          final componenteId = componenteDataResponse['id'] as int;
-
-          final reparacionData = Map<String, dynamic>.from(
-              _formData['reparaciones_$componentKey']!);
-          if (reparacionData.isNotEmpty) {
-            reparacionData['componenteId'] = componenteId;
-            final reparacionResponse = await http.post(
-              Uri.parse('https://your-api.com/reparaciones'),
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode(reparacionData),
-            );
-            if (reparacionResponse.statusCode != 201) {
-              throw Exception(
-                  'Failed to create Reparacion for $componentKey: ${reparacionResponse.body}');
-            }
-          }
+          return;
         }
-        if (mounted) {
+
+
+        // Armar objeto inspección
+        final inspeccion = {
+          ..._formData['inspeccion']!,
+          'usuario': {'id': usuarioId},
+          'puente': {'id': widget.puenteId},
+          'componentes': componentes,
+        };
+
+        final prefs = await SharedPreferences.getInstance();
+        var token = prefs.getString('token');
+        if (token == null || token.isEmpty) {
+          debugPrint('❌ Error: No token found in SharedPreferences');
+          return;
+        }
+        final decoded = JwtDecoder.decode(token);
+        debugPrint('🔍 Token decodificado: $decoded');
+        //if (token == null) {
+        //   debugPrint('Error: No token found in SharedPreferences');
+        // return;
+        // }
+        final userId = prefs.getInt('usuario_id');
+        if (userId != null) {
+          _formData['usuario']?['id'] = userId;
+        } else {
+          debugPrint("No se encontró usuario_id en SharedPreferences");
+          return;
+        }
+
+        print('Token: $token');
+        print('Request Body: ${jsonEncode(inspeccion)}');
+
+        // Enviar inspección
+        final response = await http.post(
+          Uri.parse('http://192.168.20.24:8083/api/inspeccion/add'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(inspeccion),
+        );
+
+        print('Response Status: ${response.statusCode}');
+        print('Response Body: ${response.body}');
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Inspección enviada con éxito')),
           );
+
+          final hayAlertas = await _tieneAlertas(widget.puenteId);
+          if (hayAlertas && mounted) {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('¡Atención!'),
+                content: const Text(
+                    'Se han generado alertas para esta inspección. ¿Deseas revisarlas?'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              AlertScreen(puenteId: widget.puenteId),
+                        ),
+                      );
+                    },
+                    child: const Text('Ver alertas'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cerrar'),
+                  ),
+                ],
+              ),
+            );
+          }
+        } else {
+          throw Exception('Error al enviar inspección: ${response.body}');
         }
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e')),
-          );
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, dynamic>>(
       future: Future.wait([
         _fetchPuenteData(widget.puenteId),
-        // _fetchInspectorName(widget.usuarioId),
+        _fetchInspectorName(usuarioId ?? 0),
       ]).then((results) => {'puente': results[0], 'inspector': results[1]}),
       builder: (context, snapshot) {
         if (!snapshot.hasData || componentList.isEmpty) {
@@ -329,4 +389,44 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
       },
     );
   }
+  Future<bool> _tieneAlertas(int puenteId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
+      if (token == null || token.isEmpty) {
+        debugPrint('❌ Error: No token found in SharedPreferences');
+        return false;
+      }
+
+      final response = await http.get(
+        Uri.parse('http://192.168.20.24:8086/api/alerta/puente/$puenteId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      debugPrint('🔍 Alerta response status: ${response.statusCode}');
+      debugPrint('🔍 Alerta response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.isNotEmpty;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      debugPrint('❌ Error al verificar alertas: $e');
+      return false;
+    }
+  }
+
+
+  Future<String> _getToken() async {
+    // Usa SharedPreferences u otro método según tu app
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('access_token') ?? '';
+  }
+
+
 }

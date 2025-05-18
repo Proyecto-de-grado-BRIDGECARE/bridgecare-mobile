@@ -1,5 +1,4 @@
 import 'package:bridgecare/core/providers/theme_provider.dart';
-import 'package:bridgecare/core/widgets/navbar.dart';
 import 'package:bridgecare/features/auth/presentation/pages/login_page.dart';
 import 'package:bridgecare/features/auth/services/auth_service.dart';
 import 'package:flutter/material.dart';
@@ -22,47 +21,10 @@ class SplashToLoginTransitionState extends State<SplashToLoginTransition> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-      _checkTokenAndTransition();
+      _startTransition();
     });
   }
 
-  Future<void> _checkTokenAndTransition() async {
-    // Start fade-in immediately
-    setState(() {
-      _opacity = 1.0;
-    });
-
-    bool isValidToken = await AuthService().validateToken();
-
-    if (isValidToken) {
-      themeProvider.setLightMode();
-      // Navigate to main screen with fade transition
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                BottomNavWrapper(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-            transitionDuration: const Duration(milliseconds: 1000),
-          ),
-        );
-      }
-    } else {
-      // Show login page after fade-in completes
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  // ignore: unused_element
   void _startTransition() {
     // Check login status before transitioning
     AuthService().isLoggedIn().then((loggedIn) {
@@ -72,26 +34,7 @@ class SplashToLoginTransitionState extends State<SplashToLoginTransition> {
           setState(() {
             _opacity = 1.0; // Start fade-in
           });
-          Future.delayed(Duration(milliseconds: 1000), () {
-            // Match fade duration
-            if (mounted) {
-              Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      BottomNavWrapper(),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(
-                      opacity: animation,
-                      child: child,
-                    );
-                  },
-                  transitionDuration: Duration(milliseconds: 1000),
-                ),
-              );
-            }
-          });
+
         } else {
           setState(() {
             _opacity = 1.0; // Trigger fade-in to login

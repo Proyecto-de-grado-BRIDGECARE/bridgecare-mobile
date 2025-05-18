@@ -3,6 +3,7 @@ import 'package:bridgecare/features/auth/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bridgecare/core/providers/theme_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -37,6 +38,14 @@ class _LoginPageState extends State<LoginPage> {
     _passwordController.dispose();
     super.dispose();
   }
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
 
   Future<void> _login() async {
     FocusScope.of(context).unfocus();
@@ -54,18 +63,34 @@ class _LoginPageState extends State<LoginPage> {
       setState(() => _isLoading = false);
 
       if (token != null) {
-        themeProvider.setLightMode();
-        Navigator.pushReplacementNamed(context, '/main');
+        // Obtener info del usuario
+        final user = await _authService.getUser();
+
+        if (user != null && user.id != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setInt('usuario_id', user.id!); // Usa ! porque ya validaste que no es null
+
+          themeProvider.setLightMode();
+
+          switch (user.tipoUsuario) {
+            case 0:
+              Navigator.pushReplacementNamed(context, '/homeMunicipal');
+              break;
+            case 2:
+              Navigator.pushReplacementNamed(context, '/homeAdmin');
+              break;
+            default:
+              Navigator.pushReplacementNamed(context, '/home');
+          }
+        } else {
+          _showError("Error obteniendo datos del usuario.");
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Credenciales inválidas.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        _showError("Credenciales inválidas.");
       }
     }
   }
+
 
   OutlineInputBorder _normalBorder(Color color, double width) {
     return OutlineInputBorder(
@@ -143,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                           TextFormField(
                             controller: _emailController,
                             autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
+                            AutovalidateMode.onUserInteraction,
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12.0,
@@ -157,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                                 fontSize: 12,
                               ),
                               floatingLabelBehavior:
-                                  FloatingLabelBehavior.never,
+                              FloatingLabelBehavior.never,
                               enabledBorder: _normalBorder(
                                 Colors.grey.shade400,
                                 1,
@@ -188,7 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                           TextFormField(
                             controller: _passwordController,
                             autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
+                            AutovalidateMode.onUserInteraction,
                             obscureText: _obscurePassword,
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(
@@ -203,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                                 fontSize: 12,
                               ),
                               floatingLabelBehavior:
-                                  FloatingLabelBehavior.never,
+                              FloatingLabelBehavior.never,
                               enabledBorder: _normalBorder(
                                 Colors.grey.shade400,
                                 1,
@@ -227,7 +252,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 onPressed: () {
                                   setState(
-                                    () => _obscurePassword = !_obscurePassword,
+                                        () => _obscurePassword = !_obscurePassword,
                                   );
                                 },
                               ),
@@ -259,29 +284,29 @@ class _LoginPageState extends State<LoginPage> {
                               onPressed: _isLoading ? null : _login,
                               child: _isLoading
                                   ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.black,
-                                        strokeWidth: 2.0,
-                                      ),
-                                    )
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.black,
+                                  strokeWidth: 2.0,
+                                ),
+                              )
                                   : const Text(
-                                      'Iniciar Sesión',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
+                                'Iniciar Sesión',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          Wrap(
+                            alignment: WrapAlignment.center,
                             children: [
                               const Text(
-                                "¿No tienes una cuenta?",
+                                "¿No tienes una cuenta? ",
                                 style: TextStyle(
                                   color: Colors.white70,
                                   fontSize: 12,
@@ -302,6 +327,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
+
                         ],
                       ),
                     ),

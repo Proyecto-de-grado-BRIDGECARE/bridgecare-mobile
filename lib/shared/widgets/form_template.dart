@@ -31,7 +31,7 @@ class FormTemplate extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-        backgroundColor: Colors.blueGrey[700],
+        backgroundColor: Color(0xff1780cc),
         actions: [
           IconButton(
             icon: const Icon(Icons.save, color: Colors.white),
@@ -62,8 +62,8 @@ class FormTemplate extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                       ),
-                      collapsedBackgroundColor: Colors.grey[200],
-                      backgroundColor: Colors.grey[100],
+                      collapsedBackgroundColor: Colors.white,
+                      backgroundColor: Colors.white,
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(

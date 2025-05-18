@@ -1,10 +1,16 @@
 import 'dart:convert';
 import 'package:bridgecare/features/auth/presentation/pages/login_page.dart';
+import 'package:bridgecare/features/user_management/models/usuario.dart';
+import 'package:bridgecare/features/user_management/services/usuario_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../../administrador/presentation/home_admin.dart';
+import '../../../../administrador/presentation/list_user_admin.dart';
+
 class RegistroUsuario extends StatefulWidget {
-  const RegistroUsuario({super.key});
+  final Usuario? usuario;
+  const RegistroUsuario({super.key, this.usuario});
 
   @override
   State<RegistroUsuario> createState() => _RegistroUsuarioState();
@@ -13,8 +19,8 @@ class RegistroUsuario extends StatefulWidget {
 class _RegistroUsuarioState extends State<RegistroUsuario> {
   final _formKey = GlobalKey<FormState>();
 
-  final Map<String, dynamic> _formData = {
-    "id": 0,
+  Map<String, dynamic> _formData = {
+    "id": null,
     "nombres": "",
     "apellidos": "",
     "identificacion": "",
@@ -24,36 +30,61 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
     "contrasenia": "",
   };
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.usuario != null) {
+      _formData = {
+        "id": widget.usuario!.id,
+        "nombres": widget.usuario!.nombres,
+        "apellidos": widget.usuario!.apellidos,
+        "identificacion": widget.usuario!.identificacion,
+        "tipoUsuario": widget.usuario!.tipoUsuario,
+        "correo": widget.usuario!.correo,
+        "municipio": widget.usuario!.municipio,
+        "contrasenia": "", // no mostrar contraseñas en edición
+      };
+    }
+  }
+
   Future<void> _enviarDatos() async {
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
 
-    try {
-      final response = await http.post(
-        Uri.parse("https://tu-api.com/usuarios"),
-        headers: {"Content-Type": "application/json"},
-        body: json.encode(_formData),
-      );
+    final usuario = Usuario(
+      id: _formData["id"],
+      nombres: _formData["nombres"],
+      apellidos: _formData["apellidos"],
+      identificacion: _formData["identificacion"],
+      tipoUsuario: _formData["tipoUsuario"],
+      correo: _formData["correo"],
+      municipio: _formData["municipio"],
+      contrasenia: _formData["contrasenia"] == "" ? null : _formData["contrasenia"],
+    );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Usuario registrado con éxito")),
-          );
-          Navigator.pop(context);
-        }
-      } else {
-        throw Exception('Error al registrar usuario: ${response.body}');
-      }
-    } catch (e) {
-      if (mounted) {
+    try {
+      if (widget.usuario != null) {
+        await UserService().updateUsuario(usuario); // deberías tener este método
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e")),
+          const SnackBar(content: Text("Usuario actualizado con éxito")),
+        );
+      } else {
+        await UserService().registerUsuario(usuario);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Usuario registrado con éxito")),
         );
       }
+
+      Navigator.pushReplacementNamed(context, '/homeAdmin');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -74,17 +105,18 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                 end: Alignment.bottomRight,
               ),
             ),
-            child: const Padding(
-              padding: EdgeInsets.only(top: 70.0, left: 22),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 70.0, left: 22),
               child: Text(
-                'Crea tu cuenta',
-                style: TextStyle(
+                widget.usuario != null ? 'Editar usuario' : 'Crea tu cuenta',
+                style: const TextStyle(
                   fontSize: 30,
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+
           ),
           // Formulario en tarjeta blanca redondeada
           Padding(
@@ -100,22 +132,52 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
               height: double.infinity,
               width: double.infinity,
               child: SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     children: [
                       _buildTextField("Nombres", "nombres"),
                       _buildTextField("Apellidos", "apellidos"),
-                      _buildTextField(
-                          "Número de Identificación", "identificacion",
-                          isNumeric: true),
-                      _buildTextField("Correo Electrónico", "correo",
-                          isEmail: true),
+                      _buildTextField("Número de Identificación", "identificacion", isNumeric: true),
+                      _buildTextField("Correo Electrónico", "correo", isEmail: true),
                       _buildTextField("Municipio", "municipio"),
-                      _buildTextField("Contraseña", "contrasenia",
-                          isPassword: true),
+                      _buildTextField("Contraseña", "contrasenia", isPassword: true),
+                      const SizedBox(height: 20),
+                      DropdownButtonFormField<int>(
+                        value: _formData["tipoUsuario"],
+                        decoration: const InputDecoration(
+                          label: Text(
+                            'Tipo de Usuario',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xff281537),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff3ab4fb)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff281537)),
+                          ),
+                        ),
+                        items: const [
+                          DropdownMenuItem(value: 1, child: Text('Estudiante')),
+                          DropdownMenuItem(value: 0, child: Text('Municipal')),
+                          DropdownMenuItem(value: 2, child: Text('Administrador')),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _formData["tipoUsuario"] = value ?? 2;
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null) return 'Seleccione un tipo de usuario';
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+
                       const SizedBox(height: 30),
                       GestureDetector(
                         onTap: _enviarDatos,
@@ -131,16 +193,17 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                               ],
                             ),
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Text(
-                              'REGISTRAR',
-                              style: TextStyle(
+                              widget.usuario != null ? 'EDITAR' : 'REGISTRAR',
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
                                 color: Colors.white,
                               ),
                             ),
                           ),
+
                         ),
                       ),
                       const SizedBox(height: 40),
@@ -149,34 +212,54 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Text(
-                              "¿Ya tienes una cuenta?",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => LoginPage()),
-                                );
-                              },
-                              child: const Text(
-                                "Inicia sesión",
+                            if (widget.usuario == null) ...[
+                              const Text(
+                                "¿Ya tienes una cuenta?",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 17,
-                                  color: Colors.black,
-                                  decoration: TextDecoration.underline,
+                                  color: Colors.grey,
                                 ),
                               ),
-                            ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => LoginPage()),
+                                  );
+                                },
+                                child: const Text(
+                                  "Inicia sesión",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                    color: Colors.black,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ] else ...[
+                              GestureDetector(
+                                onTap: () {
+                                   Navigator.pushReplacement(
+                                     context,
+                                     MaterialPageRoute(builder: (context) => UsuariosListAdminScreen()),
+                                   );
+                                },
+                                child: const Text(
+                                  "← Volver a la lista de usuarios",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                    color: Colors.black,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
+
                     ],
                   ),
                 ),
@@ -187,23 +270,26 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
       ),
     );
   }
-
   Widget _buildTextField(
-    String label,
-    String key, {
-    bool isPassword = false,
-    bool isEmail = false,
-    bool isNumeric = false,
-  }) {
+      String label,
+      String key, {
+        bool isPassword = false,
+        bool isEmail = false,
+        bool isNumeric = false,
+      }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
+        initialValue: _formData[key]?.toString() ?? "",
         obscureText: isPassword,
         keyboardType: isEmail
             ? TextInputType.emailAddress
             : isNumeric
-                ? TextInputType.number
-                : TextInputType.text,
+            ? TextInputType.number
+            : TextInputType.text,
+        style: const TextStyle(
+          color: Color(0xff27252b),
+        ),
         decoration: InputDecoration(
           suffixIcon: isPassword
               ? const Icon(Icons.visibility_off, color: Colors.grey)
@@ -223,6 +309,15 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
           ),
         ),
         validator: (value) {
+          if (key == "contrasenia") {
+            // Si es modo registro, la contraseña es obligatoria
+            if (widget.usuario == null && (value == null || value.isEmpty)) {
+              return "Por favor, ingrese $label";
+            }
+            // Si es modo edición y la deja vacía, es válido (no se cambiará)
+            return null;
+          }
+
           if (value == null || value.isEmpty) {
             return "Por favor, ingrese $label";
           }
@@ -234,12 +329,54 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
           }
           return null;
         },
+
         onSaved: (value) {
           if (isNumeric) {
             _formData[key] = int.tryParse(value!) ?? 0;
           } else {
             _formData[key] = value;
           }
+        },
+      ),
+    );
+  }
+  Widget _buildDropdownField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: DropdownButtonFormField<int>(
+        value: _formData["tipoUsuario"],
+        icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+        decoration: const InputDecoration(
+          label: Text(
+            'Tipo de Usuario',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xff281537),
+            ),
+          ),
+          floatingLabelBehavior: FloatingLabelBehavior.always, // 🔥 mantiene el label siempre arriba
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xff3ab4fb)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xff281537)),
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          isDense: true, // 🔥 ayuda a mantener altura similar al TextFormField
+        ),
+        items: const [
+          DropdownMenuItem(value: 1, child: Text('Estudiante')),
+          DropdownMenuItem(value: 0, child: Text('Municipal')),
+          DropdownMenuItem(value: 2, child: Text('Administrador')),
+        ],
+        onChanged: (value) {
+          setState(() {
+            _formData["tipoUsuario"] = value ?? 2;
+          });
+        },
+        validator: (value) {
+          if (value == null) return 'Seleccione un tipo de usuario';
+          return null;
         },
       ),
     );

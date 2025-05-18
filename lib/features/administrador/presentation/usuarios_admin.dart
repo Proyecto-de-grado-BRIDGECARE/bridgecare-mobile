@@ -1,5 +1,6 @@
-import 'package:bridgecare/features/administrador/home_admin.dart';
-import 'package:bridgecare/features/administrador/user_auth.dart';
+/*import 'package:bridgecare/features/administrador/presentation/home_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/list_user_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/user_auth.dart';
 import 'package:bridgecare/features/user_management/read_user/presentation/pages/read_user.dart';
 import 'package:flutter/material.dart';
 class CustomButton extends StatefulWidget {
@@ -97,7 +98,7 @@ class UsuariosAdmin extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 Container(
-                  height: 100,
+                  height: 140,
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Colors.white,
@@ -109,10 +110,10 @@ class UsuariosAdmin extends StatelessWidget {
                 ),
                 //Icono de retroceso a la izquierda
                 Positioned(
-                  top: 20,
-                  left: 5,
+                  top: 45,
+                  left: 10,
                   child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 40),
+                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 60),
                     onPressed: () {
                       Navigator.pushAndRemoveUntil(
                         context,
@@ -124,13 +125,23 @@ class UsuariosAdmin extends StatelessWidget {
                 ),
                 // ☰ Icono de menú a la derecha
                 Positioned(
-                  top: 20,
+                  top: 45,
                   right: 5,
-                  child: IconButton(
-                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
-                    onPressed: () {
-                      // Menú u otra acción
+                  child: PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 55),
+                    onSelected: (value) {
+                      if (value == 'logout') {
+                        // Acción para cerrar sesión
+                        // Por ejemplo: limpiar token, navegar al login, etc.
+                        Navigator.pushReplacementNamed(context, '/login'); // ajusta la ruta
+                      }
                     },
+                    itemBuilder: (BuildContext context) => [
+                      const PopupMenuItem<String>(
+                        value: 'logout',
+                        child: Text('Cerrar sesión'),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -144,7 +155,7 @@ class UsuariosAdmin extends StatelessWidget {
                     CustomButton(
                       text: 'Aceptar usuarios',
                       onTap: () {
-                        Navigator.push(context,MaterialPageRoute(builder: (_) => AutorizacionUsuario()),);
+                        Navigator.push(context,MaterialPageRoute(builder: (_) => DetallesUsuario(user:{},)),);
                       },
                       defaultColor: Color(0xccffffff),
                       pressedColor: Colors.white.withOpacity(0.2),
@@ -154,7 +165,7 @@ class UsuariosAdmin extends StatelessWidget {
                     CustomButton(
                       text: 'Ver usuarios existentes',
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => ListaUsuarios()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => UsuariosListAdminScreen()),);
                       },
                       defaultColor: Color(0xccffffff),
                       pressedColor: Colors.white.withOpacity(0.2),
@@ -169,4 +180,4 @@ class UsuariosAdmin extends StatelessWidget {
       ),
     );
   }
-}
+}*/

@@ -1,20 +1,27 @@
+import 'package:bridgecare/features/administrador/presentation/home_admin.dart';
 import 'package:flutter/material.dart';
-import '../../../bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
-import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
-import 'package:bridgecare/features/search_bridge/presentation/pages/services/bridge_service.dart';
-import 'package:bridgecare/features/bridge_management/models/puente.dart';
 
-class BridgeListScreen extends StatefulWidget {
-  BridgeListScreen({super.key});
+import '../../bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
+import '../../bridge_management/inventory/models/dtos/inventario_dto.dart';
+import '../../bridge_management/inventory/models/entities/inventario.dart';
+import '../../bridge_management/inventory/presentation/pages/inventario_form_page.dart';
+import '../../bridge_management/models/puente.dart';
+import '../../bridge_management/services/inventory_service.dart';
+import '../../search_bridge/presentation/pages/services/bridge_service.dart';
+
+class PuentesListAdminScreen extends StatefulWidget {
+
+  PuentesListAdminScreen({super.key});
 
   @override
-  State<BridgeListScreen> createState() => _BridgeListState();
+  State<PuentesListAdminScreen> createState() => _PuentesListAdminState();
 }
 
-class _BridgeListState extends State<BridgeListScreen> {
+class _PuentesListAdminState extends State<PuentesListAdminScreen> {
+  bool isFirstChecked = true;
   bool isSecondChecked = false;
-  bool isFirstChecked = false;
-  final BridgeService _puenteService = BridgeService();
+  final InventarioService _inventarioService = InventarioService(); //para eliminar inventario
+  final BridgeService _puenteService = BridgeService(); //litar puentes
   List<Puente> _puentes = [];
   List<Puente> _puentesFiltrados = [];
 
@@ -72,10 +79,10 @@ class _BridgeListState extends State<BridgeListScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              // Header azul con título
+              // Header blanco con bordes
               Container(
                 decoration: BoxDecoration(
-                  color: Color(0xccffffff),
+                  color: Color(0xe6ffffff),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(20),
                     bottomRight: Radius.circular(20),
@@ -89,25 +96,28 @@ class _BridgeListState extends State<BridgeListScreen> {
                       onPressed: () {
                         Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomePage()),
-                          (Route<dynamic> route) => false,
+                          MaterialPageRoute(builder: (context) => const HomeAdmin()),
+                              (Route<dynamic> route) => false,
                         );
                       },
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Lista de puentes',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
+                    Flexible( // <- Aquí el cambio importante
+                      child: Text(
+                        'Administrar Puentes',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis, // Previene overflow visual
                       ),
                     ),
                   ],
                 ),
+
               ),
-              // Barra de búsqueda fuera del header
+              // Filtros
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                 child: Column(
@@ -122,8 +132,7 @@ class _BridgeListState extends State<BridgeListScreen> {
                             Checkbox(
                               value: isFirstChecked,
                               side: const BorderSide(
-                                  color: Colors.white,
-                                  width: 2), // Color del borde
+                                  color: Colors.white, width: 2), // Color del borde
                               onChanged: (bool? value) {
                                 setState(() {
                                   if (!isSecondChecked || !value!) {
@@ -133,18 +142,14 @@ class _BridgeListState extends State<BridgeListScreen> {
                                 });
                               },
                             ),
-                            Text("Puente",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18)),
+                            Text("Puente", style: TextStyle(color: Colors.white, fontSize: 18)),
                           ],
                         ),
                         Row(
                           children: [
                             Checkbox(
                               value: isSecondChecked,
-                              side: const BorderSide(
-                                  color: Colors.white,
-                                  width: 2), // Color del borde
+                              side: const BorderSide(color: Colors.white, width: 2), // Color del borde
                               onChanged: (bool? value) {
                                 setState(() {
                                   if (!isFirstChecked || !value!) {
@@ -154,9 +159,7 @@ class _BridgeListState extends State<BridgeListScreen> {
                                 });
                               },
                             ),
-                            Text("Municipio",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18)),
+                            Text("Municipio", style: TextStyle(color: Colors.white, fontSize: 18)),
                           ],
                         ),
                       ],
@@ -176,17 +179,14 @@ class _BridgeListState extends State<BridgeListScreen> {
                                   filled: true,
                                   fillColor: Color(0xccffffff),
                                   hintText: 'Escribe el nombre del puente',
-                                  contentPadding:
-                                      EdgeInsets.symmetric(horizontal: 16),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide(
-                                        color: Colors.white, width: 2),
+                                    borderSide: BorderSide(color: Colors.white, width: 2),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
-                                    borderSide: BorderSide(
-                                        color: Colors.white, width: 2),
+                                    borderSide: BorderSide(color: Colors.white, width: 2),
                                   ),
                                 ),
                                 onChanged: (value) {
@@ -206,8 +206,7 @@ class _BridgeListState extends State<BridgeListScreen> {
                                   shape: BoxShape.circle,
                                 ),
                                 padding: EdgeInsets.all(6),
-                                child: Icon(Icons.search,
-                                    color: Colors.white, size: 28),
+                                child: Icon(Icons.search, color: Colors.white, size: 28),
                               ),
                             ),
                           ],
@@ -223,17 +222,14 @@ class _BridgeListState extends State<BridgeListScreen> {
                                 filled: true,
                                 fillColor: Color(0xccffffff),
                                 hintText: 'Escribe el nombre del municipio',
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 16),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 16),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
-                                  borderSide:
-                                      BorderSide(color: Colors.white, width: 2),
+                                  borderSide: BorderSide(color: Colors.white, width: 2),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
-                                  borderSide:
-                                      BorderSide(color: Colors.white, width: 2),
+                                  borderSide: BorderSide(color: Colors.white, width: 2),
                                 ),
                               ),
                               onChanged: (value) {
@@ -253,12 +249,12 @@ class _BridgeListState extends State<BridgeListScreen> {
                                 shape: BoxShape.circle,
                               ),
                               padding: EdgeInsets.all(6),
-                              child: Icon(Icons.search,
-                                  color: Colors.white, size: 28),
+                              child: Icon(Icons.search, color: Colors.white, size: 28),
                             ),
                           ),
                         ],
                       ),
+
                   ],
                 ),
               ),
@@ -271,7 +267,7 @@ class _BridgeListState extends State<BridgeListScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Color(0xccffffff),
+                      color: const Color(0xccffffff),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     padding: const EdgeInsets.all(12),
@@ -292,49 +288,89 @@ class _BridgeListState extends State<BridgeListScreen> {
                                   padding: const EdgeInsets.all(12),
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
-                                      Text("Nombre: ${puente.nombre}",
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold)),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              "Nombre: ${puente.nombre}",
+                                              style: const TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.delete, color: Colors.redAccent),
+                                            iconSize: 32.0,
+                                            tooltip: 'Eliminar puente',
+                                            onPressed: () async {
+                                              final confirm = await showDialog<bool>(
+                                                context: context,
+                                                builder: (context) => AlertDialog(
+                                                  title: const Text('Confirmar eliminación'),
+                                                  content: Text('¿Eliminar el puente "${puente.nombre}"?'),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () => Navigator.of(context).pop(false),
+                                                      child: const Text('Cancelar'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () => Navigator.of(context).pop(true),
+                                                      child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+
+                                              if (confirm == true) {
+                                                try {
+                                                  await _puenteService.deletePuenteCascada(puente.id!);
+                                                  _cargarPuentes();
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    const SnackBar(content: Text('Puente eliminado exitosamente')),
+                                                  );
+                                                } catch (e) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text('Error al eliminar: $e')),
+                                                  );
+                                                }
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                       const SizedBox(height: 4),
                                       Text("Municipio: ${puente.regional}"),
+
                                       const SizedBox(height: 12),
-                                      Align(
-                                        alignment: Alignment.centerRight,
+                                      Center(
                                         child: ElevatedButton.icon(
                                           onPressed: () {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) =>
-                                                    InspectionFormScreen(
-                                                  usuarioId:
-                                                      1, // Reemplazar con el real si lo tienes
+                                                builder: (context) => InspectionFormScreen(
+                                                  usuarioId: 1, // Reemplaza con el real
                                                   puenteId: puente.id!,
                                                 ),
                                               ),
                                             );
                                           },
-                                          icon: const Icon(Icons.add,
-                                              size: 20,
-                                              color: Color(0xff281537)),
-                                          label: const Text("Inspección"),
+                                          icon: const Icon(Icons.description,
+                                              size: 20, color: Color(0xff281537)),
+                                          label: const Text("Inspecciones"),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                const Color(0xff01579a),
+                                            backgroundColor: const Color(0xff01579a),
                                             foregroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(70),
+                                              borderRadius: BorderRadius.circular(70),
                                             ),
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 16, vertical: 8),
-                                            textStyle:
-                                                const TextStyle(fontSize: 14),
+                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                            textStyle: const TextStyle(fontSize: 14),
                                           ),
                                         ),
-                                      )
+                                      ),
+
                                     ],
                                   ),
                                 ),
@@ -353,4 +389,5 @@ class _BridgeListState extends State<BridgeListScreen> {
       ),
     );
   }
+
 }

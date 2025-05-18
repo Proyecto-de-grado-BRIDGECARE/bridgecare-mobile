@@ -1,5 +1,6 @@
-import 'package:bridgecare/features/administrador/puentes_admin.dart';
-import 'package:bridgecare/features/administrador/usuarios_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/list_puentes_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/list_user_admin.dart';
+import 'package:bridgecare/features/administrador/presentation/usuarios_admin.dart';
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatefulWidget {
@@ -109,16 +110,31 @@ class HomeAdmin extends StatelessWidget {
                 ),
                 //menu estatico ¡¡¡¡¡¡¡¡¡¡
                 Positioned(
-                  top: 20,
+                  top: 45,
                   right: 5,
-                  child: IconButton(
-                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
-                    onPressed: () {
-                      // Aquí puedes abrir un menú o hacer lo que necesites
+                  child: PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 55),
+                    onSelected: (value) {
+                      if (value == 'logout') {
+                        // Acción para cerrar sesión
+                        // Por ejemplo: limpiar token, navegar al login, etc.
+                        Navigator.pushReplacementNamed(context, '/login'); // ajusta la ruta
+                      }
                     },
+                    itemBuilder: (BuildContext context) => [
+                      const PopupMenuItem<String>(
+                        value: 'logout',
+                        child: Text('Cerrar sesión'),
+                      ),
+                    ],
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 100),
+            const Text(
+              'Usted desea:',
+              style: TextStyle(fontSize: 30, color: Colors.white),
             ),
             Expanded(
               child: Center(
@@ -126,9 +142,9 @@ class HomeAdmin extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     CustomButton(
-                      text: 'Puentes',
+                      text: 'Ver puentes',
                       onTap: () {
-                       Navigator.push(context,MaterialPageRoute(builder: (_) => PuentesAdmin()),);
+                       Navigator.push(context,MaterialPageRoute(builder: (_) => PuentesListAdminScreen()),);
                       },
                       defaultColor: Color(0xccffffff),
                       pressedColor: Colors.white.withOpacity(0.2),
@@ -136,9 +152,9 @@ class HomeAdmin extends StatelessWidget {
                     ),
                     const SizedBox(height: 30),
                     CustomButton(
-                      text: 'Usuarios',
+                      text: 'Ver usuarios',
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => UsuariosAdmin()),);
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => UsuariosListAdminScreen()),);
                       },
                       defaultColor: Color(0xccffffff),
                       pressedColor: Colors.white.withOpacity(0.2),

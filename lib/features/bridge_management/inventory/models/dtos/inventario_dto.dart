@@ -1,3 +1,5 @@
+import '../entities/inventario.dart';
+
 class InventarioDTO {
   String? observaciones;
   PuenteDTO puente;
@@ -25,12 +27,14 @@ class InventarioDTO {
     required this.superestructuras,
   });
 
+
   Map<String, dynamic> toJson() => {
         'observaciones': observaciones,
         'puente': puente.toJson(),
         'datosTecnicos': datosTecnicos?.toJson(),
         'subestructura': subestructura?.toJson(),
       };
+
 }
 
 class ApoyoDTO {
@@ -286,6 +290,7 @@ class PosicionGeograficaDTO {
 }
 
 class PuenteDTO {
+  final int? id;
   final String? nombre;
   final String? identif;
   final String? carretera;
@@ -293,6 +298,7 @@ class PuenteDTO {
   final String? regional;
 
   PuenteDTO({
+    this.id,
     this.nombre,
     this.identif,
     this.carretera,
@@ -301,6 +307,7 @@ class PuenteDTO {
   });
 
   Map<String, dynamic> toJson() => {
+        'id': id,
         'nombre': nombre,
         'identif': identif,
         'carretera': carretera,
