@@ -5,7 +5,7 @@ import 'package:bridgecare/features/search_bridge/presentation/pages/services/br
 import 'package:bridgecare/features/bridge_management/models/puente.dart';
 
 class BridgeListScreen extends StatefulWidget {
-  BridgeListScreen({super.key});
+  const BridgeListScreen({super.key});
 
   @override
   State<BridgeListScreen> createState() => _BridgeListState();
@@ -32,7 +32,7 @@ class _BridgeListState extends State<BridgeListScreen> {
         _puentesFiltrados = data;
       });
     } catch (e) {
-      print("Error al cargar puentes: $e");
+      debugPrint("Error al cargar puentes: $e");
     }
   }
 
@@ -190,7 +190,7 @@ class _BridgeListState extends State<BridgeListScreen> {
                                   ),
                                 ),
                                 onChanged: (value) {
-                                  print("Filtrar por puente: $value");
+                                  debugPrint("Filtrar por puente: $value");
                                   _filtrar(value);
                                 },
                               ),
@@ -198,7 +198,7 @@ class _BridgeListState extends State<BridgeListScreen> {
                             SizedBox(width: 10),
                             GestureDetector(
                               onTap: () {
-                                print("Buscar puente");
+                                debugPrint("Buscar puente");
                               },
                               child: Container(
                                 decoration: BoxDecoration(
@@ -237,7 +237,7 @@ class _BridgeListState extends State<BridgeListScreen> {
                                 ),
                               ),
                               onChanged: (value) {
-                                print("Filtrar por municipio: $value");
+                                debugPrint("Filtrar por municipio: $value");
                                 _filtrar(value);
                               },
                             ),
@@ -245,7 +245,7 @@ class _BridgeListState extends State<BridgeListScreen> {
                           SizedBox(width: 10),
                           GestureDetector(
                             onTap: () {
-                              print("Buscar municipio");
+                              debugPrint("Buscar municipio");
                             },
                             child: Container(
                               decoration: BoxDecoration(

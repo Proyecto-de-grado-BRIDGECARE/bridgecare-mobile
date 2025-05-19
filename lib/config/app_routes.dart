@@ -1,5 +1,4 @@
 import 'package:bridgecare/features/administrador/presentation/home_admin.dart';
-import 'package:bridgecare/features/administrador/presentation/list_user_admin.dart';
 import 'package:bridgecare/features/administrador/presentation/user_auth.dart';
 import 'package:bridgecare/features/auth/presentation/pages/login_page.dart';
 import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
@@ -14,7 +13,7 @@ import '../features/bridge_management/inspection/presentation/pages/inspeccion_f
 class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
     '/login': (context) => const LoginPage(),
-    '/home' : (context) => const HomePage(),
+    '/home': (context) => const HomePage(),
     //'/registro': (context) => RegistroUsuario(),
     '/modificarUsuario': (context) => ModificarUsuario(),
     '/inspecciones': (context) => InspeccionesPage(),
@@ -22,10 +21,13 @@ class AppRoutes {
     '/updateUser': (context) => ModificarUsuario(),
     '/createUser': (context) => RegistroUsuario(),
     '/SearchBridge': (context) => BridgeListScreen(),
-    '/forminspeccion': (context)=> InspectionFormScreen(usuarioId: 1, puenteId: 3),
+    '/forminspeccion': (context) =>
+        InspectionFormScreen(usuarioId: 1, puenteId: 3),
     //Rutas administrador
     //'/Autorizacion' :(context) => AutorizacionUsuario(),
-    '/det': (context) => DetallesUsuario(user: {},), //no sirve aun
+    '/det': (context) => DetallesUsuario(
+          user: {},
+        ), //no sirve aun
     '/homeAdmin': (context) => const HomeAdmin(),
   };
 }

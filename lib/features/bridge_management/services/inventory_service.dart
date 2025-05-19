@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:bridgecare/features/bridge_management/inventory/models/entities/inventario.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class InventarioService {
@@ -8,9 +9,9 @@ class InventarioService {
 
   //get all inventories
   Future<List<Inventario>> getInventarios() async {
-    final response = await http.get(Uri.parse("$baseUrl"));
+    final response = await http.get(Uri.parse(baseUrl));
 
-    if (response == 200) {
+    if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
       return data.map((item) => Inventario.fromJson(item)).toList();
     } else {
@@ -38,11 +39,9 @@ class InventarioService {
     final response = await http.delete(Uri.parse("$baseUrl/$inventarioId"));
 
     if (response.statusCode == 200) {
-      print('Inventario eliminado');
+      debugPrint('Inventario eliminado');
     } else {
       throw Exception('Error al eliminar inventario');
     }
   }
-
-
 }

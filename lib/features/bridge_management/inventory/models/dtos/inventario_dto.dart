@@ -1,5 +1,3 @@
-import '../entities/inventario.dart';
-
 class InventarioDTO {
   String? observaciones;
   PuenteDTO puente;
@@ -27,14 +25,12 @@ class InventarioDTO {
     required this.superestructuras,
   });
 
-
   Map<String, dynamic> toJson() => {
         'observaciones': observaciones,
         'puente': puente.toJson(),
         'datosTecnicos': datosTecnicos?.toJson(),
         'subestructura': subestructura?.toJson(),
       };
-
 }
 
 class ApoyoDTO {

@@ -4,12 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class AlertService {
   final String baseUrl = 'http://192.168.20.24:8086/api/alerta';
 
   Future<List<Alerta>> getAlertasPorInspeccion(int idInspeccion) async {
-    final response = await http.get(Uri.parse('$baseUrl/inspeccion/$idInspeccion'));
+    final response =
+        await http.get(Uri.parse('$baseUrl/inspeccion/$idInspeccion'));
     if (response.statusCode == 200) {
       final List<dynamic> body = json.decode(response.body);
       return body.map((json) => Alerta.fromJson(json)).toList();
@@ -21,7 +21,7 @@ class AlertService {
   Future<List<Alerta>> getAlertasPorPuente(int puenteId) async {
     final prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
-    print('Token: $token');
+    debugPrint('Token: $token');
 
     final response = await http.get(
       Uri.parse('$baseUrl/puente/$puenteId'),
@@ -39,6 +39,5 @@ class AlertService {
       debugPrint('❌ Body: ${utf8.decode(response.bodyBytes)}');
       throw Exception('Error al cargar alertas por puente');
     }
-
   }
 }

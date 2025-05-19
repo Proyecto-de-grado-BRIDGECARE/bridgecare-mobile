@@ -1,8 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
-import 'package:bridgecare/shared/services/queue_manager.dart';
 
 class DynamicForm extends StatefulWidget {
   final Map<String, dynamic> fields;
@@ -81,7 +79,8 @@ class DynamicFormState extends State<DynamicForm>
     if (missingFields.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('⚠️ Por favor completa todos los campos obligatorios (nombre, identificador, carretera, regional)'),
+          content: Text(
+              'Por favor completa todos los campos obligatorios (nombre, identificador, carretera, regional)'),
           backgroundColor: Colors.redAccent,
           duration: Duration(seconds: 5),
         ),
@@ -92,7 +91,7 @@ class DynamicFormState extends State<DynamicForm>
     return true;
   }
 
-  InputDecoration _getInputDecoration(String label) {
+  InputDecoration _getInputDecoration(String label, {bool readOnly = false}) {
     return InputDecoration(
       labelText: label,
       filled: readOnly,
@@ -228,7 +227,9 @@ class DynamicFormState extends State<DynamicForm>
         );
         break;
       case 'image':
-        _formData[fieldName] ??= initialValue ?? <XFile>[];
+        // Initialize as empty list if not set
+        _formData[fieldName] ??=
+            initialValue ?? <XFile>[]; // Start with XFiles, later URLs
         final maxImages = fieldInfo['maxImages'] as int? ?? 5;
         final List<XFile> images = _formData[fieldName] as List<XFile>;
 
@@ -250,15 +251,18 @@ class DynamicFormState extends State<DynamicForm>
                         if (snapshot.hasData) {
                           return GestureDetector(
                             onTap: () {
+                              // Show larger image in a dialog
                               showDialog(
                                 context: context,
                                 builder: (context) => Dialog(
                                   backgroundColor: Colors.transparent,
                                   child: GestureDetector(
-                                    onTap: () => Navigator.pop(context),
+                                    onTap: () =>
+                                        Navigator.pop(context), // Close on tap
                                     child: Image.memory(
                                       snapshot.data!,
-                                      fit: BoxFit.contain,
+                                      fit: BoxFit
+                                          .contain, // Fit within screen bounds
                                     ),
                                   ),
                                 ),
@@ -310,24 +314,6 @@ class DynamicFormState extends State<DynamicForm>
                       images.add(pickedFile);
                       widget.onSave(_formData);
                     });
-                    if (widget.extraData != null && mounted) {
-                      try {
-                        final queueManager = context.read<QueueManager>();
-                        await queueManager.queueImage(
-                          pickedFile,
-                          widget.extraData!['puenteId'] as int,
-                          widget.extraData!['inspectionId'] as String,
-                          widget.extraData!['componentKey'] as String,
-                        );
-                      } catch (e) {
-                        debugPrint('Failed to queue image: $e');
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error queuing image: $e')),
-                          );
-                        }
-                      }
-                    }
                   }
                 },
                 icon: Icon(Icons.add_a_photo),

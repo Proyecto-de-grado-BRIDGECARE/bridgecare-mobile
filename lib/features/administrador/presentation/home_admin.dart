@@ -1,6 +1,5 @@
 import 'package:bridgecare/features/administrador/presentation/list_puentes_admin.dart';
 import 'package:bridgecare/features/administrador/presentation/list_user_admin.dart';
-import 'package:bridgecare/features/administrador/presentation/usuarios_admin.dart';
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatefulWidget {
@@ -112,12 +111,14 @@ class HomeAdmin extends StatelessWidget {
                   top: 45,
                   right: 5,
                   child: PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 55),
+                    icon: const Icon(Icons.more_vert,
+                        color: Color(0xff01579a), size: 55),
                     onSelected: (value) {
                       if (value == 'logout') {
                         // Acción para cerrar sesión
                         // Por ejemplo: limpiar token, navegar al login, etc.
-                        Navigator.pushReplacementNamed(context, '/login'); // ajusta la ruta
+                        Navigator.pushReplacementNamed(
+                            context, '/login'); // ajusta la ruta
                       }
                     },
                     itemBuilder: (BuildContext context) => [
@@ -143,7 +144,11 @@ class HomeAdmin extends StatelessWidget {
                     CustomButton(
                       text: 'Ver puentes',
                       onTap: () {
-                       Navigator.push(context,MaterialPageRoute(builder: (_) => PuentesListAdminScreen()),);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => PuentesListAdminScreen()),
+                        );
                       },
                       defaultColor: Color(0xccffffff),
                       pressedColor: const Color.fromRGBO(255, 255, 255, 0.2),
@@ -153,7 +158,11 @@ class HomeAdmin extends StatelessWidget {
                     CustomButton(
                       text: 'Ver usuarios',
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => UsuariosListAdminScreen()),);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => UsuariosListAdminScreen()),
+                        );
                       },
                       defaultColor: Color(0xccffffff),
                       pressedColor: const Color.fromRGBO(255, 255, 255, 0.2),

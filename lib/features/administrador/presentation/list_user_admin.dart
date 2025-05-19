@@ -1,19 +1,16 @@
-import 'package:bridgecare/features/administrador/presentation/usuarios_admin.dart';
 import 'package:bridgecare/features/user_management/create_user/presentation/pages/create_user.dart';
 import 'package:flutter/material.dart';
 
-import 'package:http/http.dart' as http;
 import 'package:bridgecare/features/user_management/models/usuario.dart';
 
 import '../../user_management/services/usuario_service.dart';
 
 class UsuariosListAdminScreen extends StatefulWidget {
-  UsuariosListAdminScreen({super.key});
+  const UsuariosListAdminScreen({super.key});
 
   @override
   State<UsuariosListAdminScreen> createState() => _UsuariosListAdminState();
 }
-
 
 class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
   bool isFirstChecked = true;
@@ -36,16 +33,16 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
         _usuariosFiltrados = data;
       });
     } catch (e) {
-      print("Error al cargar usuarios: $e");
+      debugPrint("Error al cargar usuarios: $e");
     }
   }
 
   void _buscar(String texto) {
     final query = texto.toLowerCase();
     setState(() {
-        _usuariosFiltrados = _usuarios
-            .where((usuario) => usuario.nombres.toLowerCase().contains(query))
-            .toList();
+      _usuariosFiltrados = _usuarios
+          .where((usuario) => usuario.nombres.toLowerCase().contains(query))
+          .toList();
     });
   }
 
@@ -85,13 +82,13 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                         Navigator.pushNamedAndRemoveUntil(
                           context,
                           '/homeAdmin',
-                              (Route<dynamic> route) => false,
+                          (Route<dynamic> route) => false,
                         );
-
                       },
                     ),
                     const SizedBox(width: 8),
-                    const Flexible( // ← Solución clave
+                    const Flexible(
+                      // ← Solución clave
                       child: Text(
                         'Administrar Usuarios',
                         style: TextStyle(
@@ -99,12 +96,12 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
-                        overflow: TextOverflow.ellipsis, // ← Evita overflow visual
+                        overflow:
+                            TextOverflow.ellipsis, // ← Evita overflow visual
                       ),
                     ),
                   ],
                 ),
-
               ),
               // Barra de búsqueda fuera del header
               Padding(
@@ -126,7 +123,7 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                                   fillColor: Color(0xccffffff),
                                   hintText: 'Escribe el nombre del usuario',
                                   contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 16),
+                                      EdgeInsets.symmetric(horizontal: 16),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
                                     borderSide: BorderSide(
@@ -139,7 +136,7 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                                   ),
                                 ),
                                 onChanged: (value) {
-                                  print("Filtrar por usuario: $value");
+                                  debugPrint("Filtrar por usuario: $value");
                                   _buscar(value);
                                 },
                               ),
@@ -147,7 +144,7 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                             SizedBox(width: 10),
                             GestureDetector(
                               onTap: () {
-                                print("Buscar Usuario");
+                                debugPrint("Buscar Usuario");
                               },
                               child: Container(
                                 decoration: BoxDecoration(
@@ -193,72 +190,117 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(12),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Expanded(
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                Text("Nombre: ${usuario.nombres}",
+                                                Text(
+                                                    "Nombre: ${usuario.nombres}",
                                                     style: const TextStyle(
-                                                        fontWeight: FontWeight.bold, fontSize: 16)),
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16)),
                                                 const SizedBox(height: 4),
-                                                Text("Apellidos: ${usuario.apellidos}"),
+                                                Text(
+                                                    "Apellidos: ${usuario.apellidos}"),
                                                 const SizedBox(height: 4),
-                                                Text("Tipo Usuario: ${usuario.tipoUsuario}"),
+                                                Text(
+                                                    "Tipo Usuario: ${usuario.tipoUsuario}"),
                                               ],
                                             ),
                                           ),
                                           Column(
                                             children: [
                                               IconButton(
-                                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                                icon: const Icon(Icons.edit,
+                                                    color: Colors.blue),
                                                 onPressed: () {
-                                                  print("Editar usuario ${usuario.id}");
-                                                  Navigator.push(context,
+                                                  debugPrint(
+                                                      "Editar usuario ${usuario.id}");
+                                                  Navigator.push(
+                                                    context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => RegistroUsuario(usuario: usuario),
+                                                      builder: (context) =>
+                                                          RegistroUsuario(
+                                                              usuario: usuario),
                                                     ),
-                                                  ).then((_) => _cargarUsuarios());
+                                                  ).then(
+                                                      (_) => _cargarUsuarios());
                                                 },
                                               ),
                                               IconButton(
-                                                icon: const Icon(Icons.delete, color: Colors.red),
+                                                icon: const Icon(Icons.delete,
+                                                    color: Colors.red),
                                                 onPressed: () async {
-                                                  final confirm = await showDialog<bool>(
+                                                  final confirm =
+                                                      await showDialog<bool>(
                                                     context: context,
-                                                    builder: (context) => AlertDialog(
-                                                      title: const Text('¿Eliminar usuario?'),
-                                                      content: const Text('Esta acción no se puede deshacer.'),
+                                                    builder: (context) =>
+                                                        AlertDialog(
+                                                      title: const Text(
+                                                          '¿Eliminar usuario?'),
+                                                      content: const Text(
+                                                          'Esta acción no se puede deshacer.'),
                                                       actions: [
                                                         TextButton(
-                                                          onPressed: () => Navigator.pop(context, false),
-                                                          child: const Text('Cancelar'),
+                                                          onPressed: () =>
+                                                              Navigator.pop(
+                                                                  context,
+                                                                  false),
+                                                          child: const Text(
+                                                              'Cancelar'),
                                                         ),
                                                         TextButton(
-                                                          onPressed: () => Navigator.pop(context, true),
-                                                          child: const Text('Eliminar'),
+                                                          onPressed: () =>
+                                                              Navigator.pop(
+                                                                  context,
+                                                                  true),
+                                                          child: const Text(
+                                                              'Eliminar'),
                                                         ),
                                                       ],
                                                     ),
                                                   );
                                                   if (confirm == true) {
                                                     try {
-                                                      await _usuarioService.deleteUsuario(usuario.id.toString());
+                                                      await _usuarioService
+                                                          .deleteUsuario(usuario
+                                                              .id
+                                                              .toString());
                                                       setState(() {
-                                                        _usuarios.removeWhere((u) => u.id == usuario.id);
-                                                        _usuariosFiltrados.removeWhere((u) => u.id == usuario.id);
+                                                        _usuarios.removeWhere(
+                                                            (u) =>
+                                                                u.id ==
+                                                                usuario.id);
+                                                        _usuariosFiltrados
+                                                            .removeWhere((u) =>
+                                                                u.id ==
+                                                                usuario.id);
                                                       });
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        const SnackBar(content: Text("Usuario eliminado")),
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                            content: Text(
+                                                                "Usuario eliminado")),
                                                       );
                                                     } catch (e) {
-                                                      print("Error al eliminar: $e");
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(content: Text("Error: $e")),
+                                                      debugPrint(
+                                                          "Error al eliminar: $e");
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                            content: Text(
+                                                                "Error: $e")),
                                                       );
                                                     }
                                                   }
@@ -272,10 +314,8 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                                   ),
                                 ),
                               );
-
                             },
                           ),
-
                         ),
                       ],
                     ),
@@ -289,4 +329,3 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
     );
   }
 }
-

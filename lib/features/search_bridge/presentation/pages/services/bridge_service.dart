@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:bridgecare/features/bridge_management/models/puente.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,7 +16,7 @@ class BridgeService {
     }
 
     // Imprimir el token en consola
-    print('Token enviado: $token');
+    debugPrint('Token enviado: $token');
 
     final response = await http.get(
       Uri.parse("$baseUrl/all"),
@@ -25,8 +26,8 @@ class BridgeService {
       },
     );
 
-    print('📡 Status code: ${response.statusCode}');
-    print('📡 Response body: ${response.body}');
+    debugPrint('📡 Status code: ${response.statusCode}');
+    debugPrint('📡 Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonList = jsonDecode(response.body);
@@ -40,7 +41,8 @@ class BridgeService {
   }
 
   Future<void> deletePuente(int id) async {
-    final url = Uri.parse('$baseUrl/$id'); // ✅ concuerda con tu @DeleteMapping("/{id}")
+    final url =
+        Uri.parse('$baseUrl/$id'); // ✅ concuerda con tu @DeleteMapping("/{id}")
     final response = await http.delete(url);
 
     if (response.statusCode != 200) {
@@ -68,5 +70,4 @@ class BridgeService {
       throw Exception("Error al eliminar el puente: ${response.body}");
     }
   }
-
 }

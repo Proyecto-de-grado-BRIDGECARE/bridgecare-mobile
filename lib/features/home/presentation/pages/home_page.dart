@@ -1,4 +1,3 @@
-import 'package:bridgecare/features/administrador/puentes_admin.dart';
 import 'package:bridgecare/features/bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
 import 'package:flutter/material.dart';
 import 'package:bridgecare/features/search_bridge/presentation/pages/search_bridge.dart';
@@ -76,7 +75,7 @@ class _CustomButtonState extends State<CustomButton> {
 }
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -114,12 +113,14 @@ class HomePage extends StatelessWidget {
                   top: 20,
                   right: 5,
                   child: PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
+                    icon: const Icon(Icons.more_vert,
+                        color: Color(0xff01579a), size: 50),
                     onSelected: (value) {
                       if (value == 'logout') {
                         // Acción para cerrar sesión
                         // Por ejemplo: limpiar token, navegar al login, etc.
-                        Navigator.pushReplacementNamed(context, '/login'); // ajusta la ruta
+                        Navigator.pushReplacementNamed(
+                            context, '/login'); // ajusta la ruta
                       }
                     },
                     itemBuilder: (BuildContext context) => [
@@ -156,8 +157,10 @@ class HomePage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => InventoryFormScreen(
+                              // TODO change to inventoryformscreen
+                              builder: (_) => InspectionFormScreen(
                                     usuarioId: 1,
+                                    puenteId: 1,
                                   )),
                         );
                       },

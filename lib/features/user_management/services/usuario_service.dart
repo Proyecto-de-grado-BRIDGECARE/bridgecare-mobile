@@ -1,22 +1,24 @@
 import 'dart:convert';
 import 'package:bridgecare/features/user_management/models/usuario.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserService {
-  final String baseUrl = "http://192.168.20.24:8084/api/usuarios"; // cambia IP según backend
+  final String baseUrl =
+      "http://192.168.20.24:8084/api/usuarios"; // cambia IP según backend
 
   Future<List<Usuario>> getAllUsuarios() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token'); // Asegúrate de que 'token' esté guardado correctamente
+    final token = prefs.getString(
+        'token'); // Asegúrate de que 'token' esté guardado correctamente
 
     if (token == null) {
       throw Exception("No se encontró token de autenticación.");
     }
-    print('Token enviado: $token');
+    debugPrint('Token enviado: $token');
 
     final response = await http.get(
-
       Uri.parse("$baseUrl/users"), // Ruta completa: /api/usuarios/users
       headers: {
         'Authorization': 'Bearer $token',
@@ -24,20 +26,22 @@ class UserService {
       },
     );
 
-    print('📡 Código de estado: ${response.statusCode}');
-    print('📡 Respuesta: ${response.body}');
+    debugPrint('📡 Código de estado: ${response.statusCode}');
+    debugPrint('📡 Respuesta: ${response.body}');
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonList = jsonDecode(response.body);
       return jsonList.map((e) => Usuario.fromJson(e)).toList();
     } else if (response.statusCode == 403) {
-      throw Exception("Acceso prohibido: el token no tiene permisos suficientes.");
+      throw Exception(
+          "Acceso prohibido: el token no tiene permisos suficientes.");
     } else if (response.statusCode == 401) {
       throw Exception("No autorizado: el token es inválido o expiró.");
     } else {
       throw Exception("Error al obtener usuarios: ${response.statusCode}");
     }
   }
+
   Future<void> registerUsuario(Usuario nuevoUsuario) async {
     final url = Uri.parse("http://192.168.1.16:8084/api/usuarios/register");
 
@@ -46,18 +50,20 @@ class UserService {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: jsonEncode(nuevoUsuario.toJson()), // Asegúrate que Usuario tenga toJson()
+      body: jsonEncode(
+          nuevoUsuario.toJson()), // Asegúrate que Usuario tenga toJson()
     );
 
-    print('📨 Registro status code: ${response.statusCode}');
-    print('📨 Registro response: ${response.body}');
+    debugPrint('📨 Registro status code: ${response.statusCode}');
+    debugPrint('📨 Registro response: ${response.body}');
     if (response.statusCode != 200) {
       final body = response.body.trim();
 
       if (body.isNotEmpty) {
         try {
           final error = jsonDecode(body);
-          throw Exception("Error al registrar usuario: ${error["message"] ?? body}");
+          throw Exception(
+              "Error al registrar usuario: ${error["message"] ?? body}");
         } catch (_) {
           throw Exception("Error al registrar usuario: $body");
         }
@@ -67,19 +73,21 @@ class UserService {
     }
 
     if (response.statusCode == 200) {
-      print("✅ Usuario registrado correctamente");
+      debugPrint("✅ Usuario registrado correctamente");
     } else {
       final error = jsonDecode(response.body);
-      throw Exception("Error al registrar usuario: ${error["message"] ?? response.statusCode}");
+      throw Exception(
+          "Error al registrar usuario: ${error["message"] ?? response.statusCode}");
     }
   }
+
   Future<void> deleteUsuario(String idUsuario) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     if (token == null) {
       throw Exception("No se encontró token de autenticación.");
     }
-    print('Token enviado para eliminar: $token');
+    debugPrint('Token enviado para eliminar: $token');
     final response = await http.delete(
       Uri.parse("$baseUrl/users/$idUsuario"),
       headers: {
@@ -87,13 +95,14 @@ class UserService {
         'Content-Type': 'application/json',
       },
     );
-    print('🗑️ Delete status code: ${response.statusCode}');
-    print('🗑️ Delete response body: ${response.body}');
+    debugPrint('🗑️ Delete status code: ${response.statusCode}');
+    debugPrint('🗑️ Delete response body: ${response.body}');
 
     if (response.statusCode != 200) {
       throw Exception(" Error al eliminar usuario: ${response.statusCode}");
     }
   }
+
   Future<void> updateUsuario(Usuario usuario) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -112,15 +121,16 @@ class UserService {
       body: jsonEncode(usuario.toJson()),
     );
 
-    print('✏️ Update status code: ${response.statusCode}');
-    print('✏️ Update response: ${response.body}');
+    debugPrint('✏️ Update status code: ${response.statusCode}');
+    debugPrint('✏️ Update response: ${response.body}');
 
     if (response.statusCode != 200) {
       final body = response.body.trim();
       if (body.isNotEmpty) {
         try {
           final error = jsonDecode(body);
-          throw Exception("Error al actualizar usuario: ${error["message"] ?? body}");
+          throw Exception(
+              "Error al actualizar usuario: ${error["message"] ?? body}");
         } catch (_) {
           throw Exception("Error al actualizar usuario: $body");
         }
@@ -129,9 +139,4 @@ class UserService {
       }
     }
   }
-
 }
-
-
-
-

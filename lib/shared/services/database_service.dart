@@ -1,8 +1,14 @@
+import 'package:bridgecare/features/bridge_management/inspection/models/models.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as path;
 
 class DatabaseService {
-  Database? _database;
+  static Database? _database;
+  static const String _dbName = 'form_app.db';
+  static const String _imagesTable = 'images';
+  static const String _formsTable = 'forms';
+  static const String _queueTable = 'queue';
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -11,191 +17,193 @@ class DatabaseService {
   }
 
   Future<Database> _initDatabase() async {
-    final path = join(await getDatabasesPath(), 'bridgecare.db');
+    final documentsDirectory = await getApplicationDocumentsDirectory();
+    final dbPath = path.join(documentsDirectory.path, _dbName);
     return await openDatabase(
-      path,
+      dbPath,
       version: 2,
       onCreate: (db, version) async {
         await db.execute('''
-        CREATE TABLE image_chunks (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          image_id TEXT,
-          chunk_index INTEGER,
-          data TEXT,
-          retry_count INTEGER,
-          timestamp TEXT,
-          initiated INTEGER,
-          filename TEXT,
-          bridge_id INTEGER,
-          inspection_id TEXT,
-          component_key TEXT
-        )
-      ''');
+          CREATE TABLE $_imagesTable (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            inspeccion_uuid TEXT NOT NULL,
+            componente_uuid TEXT NOT NULL,
+            image_uuid TEXT NOT NULL UNIQUE,
+            puente_id TEXT NOT NULL,
+            upload_status TEXT NOT NULL DEFAULT 'pending',
+            chunk_count INTEGER NOT NULL DEFAULT 0,
+            chunks_uploaded INTEGER NOT NULL DEFAULT 0,
+            local_path TEXT NOT NULL,
+            created_at TEXT NOT NULL
+          )
+        ''');
         await db.execute('''
-        CREATE TABLE inspection_queue (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          inspection_id TEXT,
-          bridge_id INTEGER,
-          data TEXT,
-          retry_count INTEGER,
-          timestamp TEXT
-        )
-      ''');
+          CREATE TABLE $_formsTable (
+            inspeccion_uuid TEXT PRIMARY KEY,
+            payload TEXT NOT NULL,
+            submit_status TEXT NOT NULL DEFAULT 'pending',
+            created_at TEXT NOT NULL,
+            puente_id TEXT NOT NULL
+          )
+        ''');
         await db.execute('''
-        CREATE TABLE image_urls (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          inspection_id TEXT,
-          component_key TEXT,
-          url TEXT
-        )
-      ''');
+          CREATE TABLE $_queueTable (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            task_type TEXT NOT NULL,
+            data TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending',
+            created_at TEXT NOT NULL,
+            depends_on TEXT,
+            retry_count INTEGER NOT NULL DEFAULT 0
+          )
+        ''');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           await db.execute('''
-          CREATE TABLE image_urls (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            inspection_id TEXT,
-            component_key TEXT,
-            url TEXT
-          )
-        ''');
+            CREATE TABLE $_formsTable (
+              inspeccion_uuid TEXT PRIMARY KEY,
+              payload TEXT NOT NULL,
+              submit_status TEXT NOT NULL DEFAULT 'pending',
+              created_at TEXT NOT NULL,
+              puente_id TEXT NOT NULL
+            )
+          ''');
+          await db.execute('''
+            CREATE TABLE $_queueTable (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              task_type TEXT NOT NULL,
+              data TEXT NOT NULL,
+              status TEXT NOT NULL DEFAULT 'pending',
+              created_at TEXT NOT NULL,
+              depends_on TEXT,
+              retry_count INTEGER NOT NULL DEFAULT 0
+            )
+          ''');
         }
       },
     );
   }
 
-  Future<void> updateInspectionId(String oldId, String newId) async {
+  Future<void> insertImage(ImageData image) async {
+    final db = await database;
+    await db.insert(
+      _imagesTable,
+      image.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<ImageData>> getImagesByFormAndSection(
+    String inspeccionUuid,
+    String? componenteUuid,
+  ) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps;
+    if (componenteUuid == null) {
+      maps = await db.query(
+        _imagesTable,
+        where: 'inspeccion_uuid = ?',
+        whereArgs: [inspeccionUuid],
+      );
+    } else {
+      maps = await db.query(
+        _imagesTable,
+        where: 'inspeccion_uuid = ? AND componente_uuid = ?',
+        whereArgs: [inspeccionUuid, componenteUuid],
+      );
+    }
+    return maps.map((map) => ImageData.fromMap(map)).toList();
+  }
+
+  Future<void> insertForm(
+    String inspeccionUuid,
+    String payload,
+    String puenteId,
+  ) async {
+    final db = await database;
+    await db.insert(
+        _formsTable,
+        {
+          'inspeccion_uuid': inspeccionUuid,
+          'payload': payload,
+          'submit_status': 'pending',
+          'created_at': DateTime.now().toIso8601String(),
+          'puente_id': puenteId,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<List<Map<String, dynamic>>> getPendingForms() async {
+    final db = await database;
+    return await db.query(
+      _formsTable,
+      where: 'submit_status = ?',
+      whereArgs: ['pending'],
+    );
+  }
+
+  Future<void> updateFormStatus(String inspeccionUuid, String status) async {
     final db = await database;
     await db.update(
-      'image_chunks',
-      {'inspection_id': newId.toString()},
-      where: 'inspection_id = ?',
-      whereArgs: [oldId],
-    );
-    await db.update(
-      'inspection_queue',
-      {'inspection_id': newId.toString()},
-      where: 'inspection_id = ?',
-      whereArgs: [oldId],
-    );
-    await db.update(
-      'image_urls',
-      {'inspection_id': newId.toString()},
-      where: 'inspection_id = ?',
-      whereArgs: [oldId],
+      _formsTable,
+      {'submit_status': status},
+      where: 'inspeccion_uuid = ?',
+      whereArgs: [inspeccionUuid],
     );
   }
 
-  Future<List<String>> getImageUrls(
-      String inspectionId, String componentKey) async {
+  Future<void> enqueueTask({
+    required String taskType,
+    required String data,
+    String? dependsOn,
+    String? inspeccionUuid,
+  }) async {
     final db = await database;
-    final result = await db.query(
-      'image_urls',
-      where: 'inspection_id = ? AND component_key = ?',
-      whereArgs: [inspectionId, componentKey],
-    );
-    return result.map((row) => row['url'] as String).toList();
-  }
-
-  Future<void> insertInspectionJson(Map<String, dynamic> json) async {
-    final db = await database;
-    await db.insert('inspection_queue', json);
-  }
-
-  Future<Map<String, dynamic>?> getInspectionJson(String inspectionId) async {
-    final db = await database;
-    final result = await db.query('inspection_queue',
-        where: 'inspection_id = ?', whereArgs: [inspectionId], limit: 1);
-    return result.isNotEmpty ? result[0] : null;
-  }
-
-  Future<List<Map<String, dynamic>>> getQueuedInspections() async {
-    final db = await database;
-    return await db.query('inspection_queue');
-  }
-
-  Future<bool> hasSubmittedInspections() async {
-    final db = await database;
-    final result = await db.query('inspection_queue',
-        where: 'submitted = ?', whereArgs: [1], limit: 1);
-    return result.isNotEmpty;
-  }
-
-  Future<void> insertImageChunk(Map<String, dynamic> chunk) async {
-    final db = await database;
-    await db.insert('image_chunks', chunk);
-  }
-
-  Future<void> updateImageChunk(int id, Map<String, dynamic> updates) async {
-    final db = await database;
-    await db.update('image_chunks', updates, where: 'id = ?', whereArgs: [id]);
-  }
-
-  Future<void> updateImageChunks(
-      String imageId, Map<String, dynamic> updates) async {
-    final db = await database;
-    await db.update('image_chunks', updates,
-        where: 'image_id = ?', whereArgs: [imageId]);
-  }
-
-  Future<void> deleteImageChunk(int id) async {
-    final db = await database;
-    await db.delete('image_chunks', where: 'id = ?', whereArgs: [id]);
-  }
-
-  Future<List<Map<String, dynamic>>> getImageChunks(String imageId) async {
-    final db = await database;
-    return await db
-        .query('image_chunks', where: 'image_id = ?', whereArgs: [imageId]);
-  }
-
-  Future<List<Map<String, dynamic>>> getQueuedImages() async {
-    final db = await database;
-    return await db.query('image_chunks',
-        columns: [
-          'image_id',
-          'filename',
-          'bridge_id',
-          'inspection_id',
-          'component_key'
-        ],
-        distinct: true);
-  }
-
-  Future<int> getImageQueueCount() async {
-    final db = await database;
-    final result = await db
-        .rawQuery('SELECT COUNT(DISTINCT image_id) as count FROM image_chunks');
-    return result[0]['count'] as int;
-  }
-
-  Future<void> updateInspectionJson(
-      int id, Map<String, dynamic> updates) async {
-    final db = await database;
-    await db
-        .update('inspection_queue', updates, where: 'id = ?', whereArgs: [id]);
-  }
-
-  Future<void> deleteInspectionJson(int id) async {
-    final db = await database;
-    await db.delete('inspection_queue', where: 'id = ?', whereArgs: [id]);
-  }
-
-  Future<int> getJsonQueueCount() async {
-    final db = await database;
-    final result =
-        await db.rawQuery('SELECT COUNT(*) as count FROM inspection_queue');
-    return result[0]['count'] as int;
-  }
-
-  Future<void> storeImageUrl(
-      String inspectionId, String componentKey, String url) async {
-    final db = await database;
-    await db.insert('image_urls', {
-      'inspection_id': inspectionId.toString(),
-      'component_key': componentKey,
-      'url': url,
+    await db.insert(_queueTable, {
+      'task_type': taskType,
+      'data': data,
+      'status': 'pending',
+      'created_at': DateTime.now().toIso8601String(),
+      'depends_on': dependsOn,
+      'retry_count': 0,
     });
+  }
+
+  Future<List<Map<String, dynamic>>> getPendingTasks() async {
+    final db = await database;
+    return await db.query(
+      _queueTable,
+      where: 'status = ?',
+      whereArgs: ['pending'],
+      orderBy: 'created_at ASC',
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getFailedTasks() async {
+    final db = await database;
+    return await db.query(
+      _queueTable,
+      where: 'status = ?',
+      whereArgs: ['failed'],
+    );
+  }
+
+  Future<void> updateTaskStatus(int taskId, String status) async {
+    final db = await database;
+    await db.update(
+      _queueTable,
+      {'status': status},
+      where: 'id = ?',
+      whereArgs: [taskId],
+    );
+  }
+
+  Future<void> incrementRetryCount(int taskId) async {
+    final db = await database;
+    await db.rawUpdate(
+      'UPDATE $_queueTable SET retry_count = retry_count + 1 WHERE id = ?',
+      [taskId],
+    );
   }
 }

@@ -1,11 +1,8 @@
-import 'dart:convert';
 import 'package:bridgecare/features/auth/presentation/pages/login_page.dart';
 import 'package:bridgecare/features/user_management/models/usuario.dart';
 import 'package:bridgecare/features/user_management/services/usuario_service.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
-import '../../../../administrador/presentation/home_admin.dart';
 import '../../../../administrador/presentation/list_user_admin.dart';
 
 class RegistroUsuario extends StatefulWidget {
@@ -60,31 +57,38 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
       tipoUsuario: _formData["tipoUsuario"],
       correo: _formData["correo"],
       municipio: _formData["municipio"],
-      contrasenia: _formData["contrasenia"] == "" ? null : _formData["contrasenia"],
+      contrasenia:
+          _formData["contrasenia"] == "" ? null : _formData["contrasenia"],
     );
 
     try {
       if (widget.usuario != null) {
-        await UserService().updateUsuario(usuario); // deberías tener este método
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Usuario actualizado con éxito")),
-        );
+        await UserService()
+            .updateUsuario(usuario); // deberías tener este método
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Usuario actualizado con éxito")),
+          );
+        }
       } else {
         await UserService().registerUsuario(usuario);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Usuario registrado con éxito")),
+          );
+        }
+      }
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/homeAdmin');
+      }
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Usuario registrado con éxito")),
+          SnackBar(content: Text("Error: $e")),
         );
       }
-
-      Navigator.pushReplacementNamed(context, '/homeAdmin');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +120,6 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                 ),
               ),
             ),
-
           ),
           // Formulario en tarjeta blanca redondeada
           Padding(
@@ -132,17 +135,22 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
               height: double.infinity,
               width: double.infinity,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     children: [
                       _buildTextField("Nombres", "nombres"),
                       _buildTextField("Apellidos", "apellidos"),
-                      _buildTextField("Número de Identificación", "identificacion", isNumeric: true),
-                      _buildTextField("Correo Electrónico", "correo", isEmail: true),
+                      _buildTextField(
+                          "Número de Identificación", "identificacion",
+                          isNumeric: true),
+                      _buildTextField("Correo Electrónico", "correo",
+                          isEmail: true),
                       _buildTextField("Municipio", "municipio"),
-                      _buildTextField("Contraseña", "contrasenia", isPassword: true),
+                      _buildTextField("Contraseña", "contrasenia",
+                          isPassword: true),
                       const SizedBox(height: 20),
                       DropdownButtonFormField<int>(
                         value: _formData["tipoUsuario"],
@@ -164,7 +172,8 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                         items: const [
                           DropdownMenuItem(value: 1, child: Text('Estudiante')),
                           DropdownMenuItem(value: 0, child: Text('Municipal')),
-                          DropdownMenuItem(value: 2, child: Text('Administrador')),
+                          DropdownMenuItem(
+                              value: 2, child: Text('Administrador')),
                         ],
                         onChanged: (value) {
                           setState(() {
@@ -172,12 +181,13 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                           });
                         },
                         validator: (value) {
-                          if (value == null) return 'Seleccione un tipo de usuario';
+                          if (value == null) {
+                            return 'Seleccione un tipo de usuario';
+                          }
                           return null;
                         },
                       ),
                       const SizedBox(height: 20),
-
                       const SizedBox(height: 30),
                       GestureDetector(
                         onTap: _enviarDatos,
@@ -203,7 +213,6 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                               ),
                             ),
                           ),
-
                         ),
                       ),
                       const SizedBox(height: 40),
@@ -224,7 +233,8 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                                 onTap: () {
                                   Navigator.pushReplacement(
                                     context,
-                                    MaterialPageRoute(builder: (context) => LoginPage()),
+                                    MaterialPageRoute(
+                                        builder: (context) => LoginPage()),
                                   );
                                 },
                                 child: const Text(
@@ -240,10 +250,12 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                             ] else ...[
                               GestureDetector(
                                 onTap: () {
-                                   Navigator.pushReplacement(
-                                     context,
-                                     MaterialPageRoute(builder: (context) => UsuariosListAdminScreen()),
-                                   );
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            UsuariosListAdminScreen()),
+                                  );
                                 },
                                 child: const Text(
                                   "← Volver a la lista de usuarios",
@@ -259,7 +271,6 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                           ],
                         ),
                       ),
-
                     ],
                   ),
                 ),
@@ -270,13 +281,14 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
       ),
     );
   }
+
   Widget _buildTextField(
-      String label,
-      String key, {
-        bool isPassword = false,
-        bool isEmail = false,
-        bool isNumeric = false,
-      }) {
+    String label,
+    String key, {
+    bool isPassword = false,
+    bool isEmail = false,
+    bool isNumeric = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
@@ -285,8 +297,8 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
         keyboardType: isEmail
             ? TextInputType.emailAddress
             : isNumeric
-            ? TextInputType.number
-            : TextInputType.text,
+                ? TextInputType.number
+                : TextInputType.text,
         style: const TextStyle(
           color: Color(0xff27252b),
         ),
@@ -329,7 +341,6 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
           }
           return null;
         },
-
         onSaved: (value) {
           if (isNumeric) {
             _formData[key] = int.tryParse(value!) ?? 0;
@@ -340,6 +351,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
       ),
     );
   }
+
   Widget _buildDropdownField() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -354,7 +366,8 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
               color: Color(0xff281537),
             ),
           ),
-          floatingLabelBehavior: FloatingLabelBehavior.always, // 🔥 mantiene el label siempre arriba
+          floatingLabelBehavior: FloatingLabelBehavior
+              .always, // 🔥 mantiene el label siempre arriba
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Color(0xff3ab4fb)),
           ),
