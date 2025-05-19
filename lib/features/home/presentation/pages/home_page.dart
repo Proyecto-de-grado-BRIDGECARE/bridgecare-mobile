@@ -1,8 +1,8 @@
+import 'package:bridgecare/features/administrador/puentes_admin.dart';
+import 'package:bridgecare/features/bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
 import 'package:flutter/material.dart';
 import 'package:bridgecare/features/search_bridge/presentation/pages/search_bridge.dart';
 import 'package:lottie/lottie.dart';
-
-import '../../../bridge_management/inventory/presentation/pages/inventario_form_page.dart';
 
 class CustomButton extends StatefulWidget {
   final String text;

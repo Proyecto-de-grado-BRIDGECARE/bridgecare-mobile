@@ -93,7 +93,7 @@ class _ListaUsuariosState extends State<ListaUsuarios> {
     );
   }
 
-  void _mostrarDialogoEliminar(String idUsuario) {
+  void _mostrarDialogoEliminar(int idUsuario) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(

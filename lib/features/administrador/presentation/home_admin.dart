@@ -75,12 +75,11 @@ class _CustomButtonState extends State<CustomButton> {
 }
 
 class HomeAdmin extends StatelessWidget {
-  const HomeAdmin({Key? key}) : super(key: key);
+  const HomeAdmin({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: Container(
         height: double.infinity,
         width: double.infinity,
@@ -147,7 +146,7 @@ class HomeAdmin extends StatelessWidget {
                        Navigator.push(context,MaterialPageRoute(builder: (_) => PuentesListAdminScreen()),);
                       },
                       defaultColor: Color(0xccffffff),
-                      pressedColor: Colors.white.withOpacity(0.2),
+                      pressedColor: const Color.fromRGBO(255, 255, 255, 0.2),
                       textColor: Colors.black,
                     ),
                     const SizedBox(height: 30),
@@ -157,7 +156,7 @@ class HomeAdmin extends StatelessWidget {
                         Navigator.push(context, MaterialPageRoute(builder: (_) => UsuariosListAdminScreen()),);
                       },
                       defaultColor: Color(0xccffffff),
-                      pressedColor: Colors.white.withOpacity(0.2),
+                      pressedColor: const Color.fromRGBO(255, 255, 255, 0.2),
                       textColor: Colors.black,
                     ),
                   ],

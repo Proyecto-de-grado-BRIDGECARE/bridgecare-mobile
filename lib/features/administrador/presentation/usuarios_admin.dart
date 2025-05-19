@@ -3,6 +3,7 @@ import 'package:bridgecare/features/administrador/presentation/list_user_admin.d
 import 'package:bridgecare/features/administrador/presentation/user_auth.dart';
 import 'package:bridgecare/features/user_management/read_user/presentation/pages/read_user.dart';
 import 'package:flutter/material.dart';
+
 class CustomButton extends StatefulWidget {
   final String text;
   final VoidCallback onTap;
@@ -75,12 +76,11 @@ class _CustomButtonState extends State<CustomButton> {
 }
 
 class UsuariosAdmin extends StatelessWidget {
-  const UsuariosAdmin({Key? key}) : super(key: key);
+  const UsuariosAdmin({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: Container(
         height: double.infinity,
         width: double.infinity,
@@ -117,8 +117,9 @@ class UsuariosAdmin extends StatelessWidget {
                     onPressed: () {
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (context) => const HomeAdmin()),
-                            (Route<dynamic> route) => false,
+                        MaterialPageRoute(
+                            builder: (context) => const HomeAdmin()),
+                        (Route<dynamic> route) => false,
                       );
                     },
                   ),
@@ -146,7 +147,6 @@ class UsuariosAdmin extends StatelessWidget {
                 ),
               ],
             ),
-
             Expanded(
               child: Center(
                 child: Column(
@@ -158,7 +158,7 @@ class UsuariosAdmin extends StatelessWidget {
                         Navigator.push(context,MaterialPageRoute(builder: (_) => DetallesUsuario(user:{},)),);
                       },
                       defaultColor: Color(0xccffffff),
-                      pressedColor: Colors.white.withOpacity(0.2),
+                      pressedColor: const Color.fromRGBO(255, 255, 255, 0.2),
                       textColor: Colors.black,
                     ),
                     const SizedBox(height: 30),
@@ -168,7 +168,7 @@ class UsuariosAdmin extends StatelessWidget {
                         Navigator.push(context, MaterialPageRoute(builder: (_) => UsuariosListAdminScreen()),);
                       },
                       defaultColor: Color(0xccffffff),
-                      pressedColor: Colors.white.withOpacity(0.2),
+                      pressedColor: const Color.fromRGBO(255, 255, 255, 0.2),
                       textColor: Colors.black,
                     ),
                   ],

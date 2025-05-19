@@ -1,14 +1,18 @@
 import 'dart:convert';
+import 'package:bridgecare/features/auth/services/auth_service.dart';
 import 'package:bridgecare/features/bridge_management/inspection/models/componente.dart';
 import 'package:bridgecare/features/bridge_management/inspection/models/inspeccion.dart';
 import 'package:bridgecare/features/bridge_management/inspection/models/reparacion.dart';
+import 'package:bridgecare/shared/services/api_service.dart';
+import 'package:bridgecare/shared/services/database_service.dart';
+import 'package:bridgecare/shared/services/queue_manager.dart';
 import 'package:bridgecare/shared/widgets/dynamic_form.dart';
 import 'package:bridgecare/features/bridge_management/models/puente.dart';
 import 'package:bridgecare/shared/widgets/form_template.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../alert/presentation/pages/alert_page.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -26,9 +30,14 @@ class InspectionFormScreen extends StatefulWidget {
 
 class InspectionFormScreenState extends State<InspectionFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final Map<String, Map<String, dynamic>> _formData = {
-    'puente': {},
-    'inspeccion': {},
+  final Map<String, dynamic> _inspectionFormData = {
+    'inspeccionData': <String, dynamic>{},
+  };
+
+  final Map<String, dynamic> _formData = {
+    'puente': <String, dynamic>{},
+    'usuario': <String, dynamic>{},
+    'componentes': <Map<String, dynamic>>[],
   };
   List<Map<String, String>> componentList = [];
   int? usuarioId;
@@ -47,12 +56,48 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
     setState(() {
       componentList =
           data.map((item) => Map<String, String>.from(item)).toList();
-      // Initialize _formData with component keys after loading
-      for (var component in componentList) {
-        _formData[component['key']!] = {};
-        _formData['reparaciones_${component['key']}'] = {};
-      }
+      _formData['componentes'] = componentList.map((component) {
+        return {
+          'nombre': component['title']!,
+          'calificacion': '',
+          'tipoDanio': '',
+          'reparaciones': <Map<String, String>>[
+            {'tipo': '', 'cantidad': '', 'anio': '', 'costo': ''},
+            {'tipo': '', 'cantidad': '', 'anio': '', 'costo': ''},
+          ],
+        };
+      }).toList();
     });
+  }
+
+  Future<void> _loadUserIntoFormData() async {
+    final user = await AuthService().getUser();
+    if (user != null) {
+      setState(() {
+        _formData['usuario'] = {
+          'id': user.id,
+          'nombres': user.nombres,
+          'apellidos': user.apellidos,
+          'identificacion': user.identificacion,
+          'tipo_usuario': user.tipoUsuario,
+          'correo': user.correo,
+          if (user.municipio != null) 'municipio': user.municipio,
+        };
+      });
+    } else {
+      debugPrint("Failed to load user data");
+    }
+  }
+  Future<void> _loadUserIdFromToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('usuario_id');
+    if (userId != null) {
+      setState(() {
+        usuarioId = userId;
+      });
+    } else {
+      debugPrint("❌ No se encontró usuario_id en SharedPreferences");
+    }
   }
   Future<void> _loadUserIdFromToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -73,12 +118,6 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
   }
 
   Future<Map<String, dynamic>> _fetchPuenteData(int puenteId) async {
-    // final response =
-    //     await http.get(Uri.parse('https://your-api.com/puentes/$puenteId'));
-    // if (response.statusCode == 200) {
-    //   return jsonDecode(response.body);
-    // }
-    // throw Exception('Failed to fetch Puente data');
     return Future.value({
       'nombre': 'Puente Ejemplo',
       'identificador': 'P001',
@@ -205,7 +244,8 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Inspección enviada con éxito')),
+            const SnackBar(
+                content: Text('Inspección en cola para sincronización')),
           );
 
           final hayAlertas = await _tieneAlertas(widget.puenteId);
@@ -261,16 +301,7 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
         if (!snapshot.hasData || componentList.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-        final puenteData = snapshot.data!['puente'] as Map<String, dynamic>;
         final inspectorName = snapshot.data!['inspector'] as String;
-
-        // Populate initial Puente data
-        _formData['puente'] = {
-          'nombre': puenteData['nombre'],
-          'identificador': puenteData['identificador'],
-          'carretera': puenteData['carretera'],
-          'pr': puenteData['pr'],
-        };
 
         return FormTemplate(
           title: 'Formulario de Inspección',
@@ -295,16 +326,23 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                     onSave: (data) =>
                         setState(() => _formData['inspeccion']!.addAll(data)),
                   ),
-                  TextFormField(
-                    initialValue: inspectorName,
-                    decoration: const InputDecoration(labelText: 'Inspector'),
-                    readOnly: true,
+                  DynamicForm(
+                    fields: {
+                      'inspector': {
+                        'type': 'text',
+                        'label': 'Inspector',
+                        'readOnly': true,
+                      },
+                    },
+                    initialData: {'inspector': inspectorName},
+                    onSave: (_) {},
                   ),
                 ],
               ),
             ),
-            ...componentList.map((component) {
-              final componentKey = component['key']!;
+            ...componentList.asMap().entries.map((entry) {
+              final index = entry.key;
+              final component = entry.value;
               return FormSection(
                 title: component['title']!,
                 isCollapsible: true,
@@ -313,13 +351,17 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                   children: [
                     DynamicForm(
                       fields: Componente.formFields,
-                      initialData: _formData[componentKey],
-                      onSave: (data) =>
-                          setState(() => _formData[componentKey]!.addAll(data)),
+                      initialData: _formData['componentes'][index],
+                      onSave: (data) {
+                        setState(() {
+                          _formData['componentes'][index]
+                              .addAll(Map<String, String>.from(data));
+                        });
+                      },
                     ),
                     const SizedBox(height: 16.0),
                     const Text(
-                      'Reparaciones',
+                      'Reparación 1',
                       style: TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
@@ -327,10 +369,33 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                     ),
                     DynamicForm(
                       fields: Reparacion.formFields,
-                      initialData: _formData['reparaciones_$componentKey'],
-                      onSave: (data) => setState(() =>
-                          _formData['reparaciones_$componentKey']!
-                              .addAll(data)),
+                      initialData: _formData['componentes'][index]
+                          ['reparaciones'][0],
+                      onSave: (data) {
+                        setState(() {
+                          _formData['componentes'][index]['reparaciones'][0]
+                              .addAll(Map<String, String>.from(data));
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16.0),
+                    const Text(
+                      'Reparación 2',
+                      style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueGrey),
+                    ),
+                    DynamicForm(
+                      fields: Reparacion.formFields,
+                      initialData: _formData['componentes'][index]
+                          ['reparaciones'][1],
+                      onSave: (data) {
+                        setState(() {
+                          _formData['componentes'][index]['reparaciones'][1]
+                              .addAll(Map<String, String>.from(data));
+                        });
+                      },
                     ),
                   ],
                 ),
