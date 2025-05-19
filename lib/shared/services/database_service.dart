@@ -7,7 +7,7 @@ class DatabaseService {
   static Database? _database;
   static const String _dbName = 'form_app.db';
   static const String _imagesTable = 'images';
-  static const String _formsTable = 'forms';
+  static const String _formsTable = 'inspecciones';
   static const String _queueTable = 'queue';
 
   Future<Database> get database async {

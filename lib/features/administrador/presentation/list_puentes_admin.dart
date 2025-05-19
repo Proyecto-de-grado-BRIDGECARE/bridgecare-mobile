@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
 import '../../bridge_management/models/puente.dart';
-import '../../bridge_management/services/inventory_service.dart';
 import '../../search_bridge/presentation/pages/services/bridge_service.dart';
 
 class PuentesListAdminScreen extends StatefulWidget {
@@ -16,8 +15,8 @@ class PuentesListAdminScreen extends StatefulWidget {
 class _PuentesListAdminState extends State<PuentesListAdminScreen> {
   bool isFirstChecked = true;
   bool isSecondChecked = false;
-  final InventarioService _inventarioService =
-      InventarioService(); //para eliminar inventario
+  // final InventarioService _inventarioService =
+  //     InventarioService(); //para eliminar inventario
   final BridgeService _puenteService = BridgeService(); //litar puentes
   List<Puente> _puentes = [];
   List<Puente> _puentesFiltrados = [];
@@ -387,8 +386,6 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     InspectionFormScreen(
-                                                  usuarioId:
-                                                      1, // Reemplaza con el real
                                                   puenteId: puente.id!,
                                                 ),
                                               ),

@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_notification_channel/flutter_notification_channel.dart';
 import 'package:flutter_notification_channel/notification_importance.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'database_service.dart';
 import 'dart:async';
 
@@ -71,8 +72,7 @@ class QueueService with ChangeNotifier {
       } else {
         retryDelay = (retryDelay * 2).clamp(5, 60);
         await Utils.logToFile(
-          'No connectivity, retrying in $retryDelay seconds',
-        );
+            'No connectivity, retrying in $retryDelay seconds');
       }
       await Future.delayed(Duration(seconds: retryDelay));
     }
@@ -88,10 +88,8 @@ class QueueService with ChangeNotifier {
         _hasFailedTasks = failedTasks.isNotEmpty;
         await _updateQueueProgress();
         await Utils.logToFile(
-          'Processing queue: ${tasks.length} pending, ${failedTasks.length} failed',
-        );
+            'Processing queue: ${tasks.length} pending, ${failedTasks.length} failed');
 
-        // Convert tasks to mutable list and sort
         final mutableTasks = tasks.toList();
         mutableTasks.sort((a, b) {
           final taskTypeA = a['task_type'] as String;
@@ -131,24 +129,17 @@ class QueueService with ChangeNotifier {
 
           while (cycleRetries < 3 && !taskProcessed) {
             await Utils.logToFile(
-              'Attempting task $taskId ($taskType), retry $cycleRetries',
-            );
+                'Attempting task $taskId ($taskType), retry $cycleRetries');
             try {
               if (taskType == 'image_chunk') {
                 taskProcessed = await _processImageChunkTask(
-                  taskId,
-                  data,
-                  retryCount + cycleRetries,
-                );
+                    taskId, data, retryCount + cycleRetries);
               } else if (taskType == 'form_submit') {
                 taskProcessed = await _processFormSubmitTask(
-                  taskId,
-                  data,
-                  retryCount + cycleRetries,
-                );
+                    taskId, data, retryCount + cycleRetries);
               }
               if (taskProcessed) {
-                madeProgress = true; // Mark progress to retry skipped tasks
+                madeProgress = true;
               }
             } catch (e) {
               await Utils.logToFile('Error processing task $taskId: $e');
@@ -162,13 +153,10 @@ class QueueService with ChangeNotifier {
           if (!taskProcessed) {
             await _dbService.incrementRetryCount(taskId);
             await _dbService.updateTaskStatus(
-              taskId,
-              retryCount + cycleRetries >= 5 ? 'failed' : 'pending',
-            );
+                taskId, retryCount + cycleRetries >= 5 ? 'failed' : 'pending');
             notifyListeners();
             await Utils.logToFile(
-              'Task $taskId not processed, status: ${retryCount + cycleRetries >= 5 ? 'failed' : 'pending'}',
-            );
+                'Task $taskId not processed, status: ${retryCount + cycleRetries >= 5 ? 'failed' : 'pending'}');
           }
 
           await _updateQueueProgress();
@@ -176,7 +164,6 @@ class QueueService with ChangeNotifier {
         }
       }
 
-      // Final check for completion
       final remainingTasks = await _dbService.getPendingTasks();
       final remainingFailedTasks = await _dbService.getFailedTasks();
       _hasFailedTasks = remainingFailedTasks.isNotEmpty;
@@ -184,8 +171,7 @@ class QueueService with ChangeNotifier {
         _queueProgress = 1.0;
         notifyListeners();
         await Utils.logToFile(
-          'Queue processing complete: no pending or failed tasks',
-        );
+            'Queue processing complete: no pending or failed tasks');
       }
     } catch (e) {
       await Utils.logToFile('Error in processQueue: $e');
@@ -206,33 +192,27 @@ class QueueService with ChangeNotifier {
         whereArgs: imageUuids,
       ),
     );
-    final result = images.every(
-      (image) => image['upload_status'] == 'completed',
-    );
+    final result =
+        images.every((image) => image['upload_status'] == 'completed');
     await Utils.logToFile(
-      'Can process task with dependsOn=$dependsOn: $result',
-    );
+        'Can process task with dependsOn=$dependsOn: $result');
     return result;
   }
 
   Future<bool> _processImageChunkTask(
-    int taskId,
-    Map<String, dynamic> data,
-    int retryCount,
-  ) async {
+      int taskId, Map<String, dynamic> data, int retryCount) async {
     final imageUuid = data['image_uuid'] as String;
     final chunkIndex = data['chunk_index'] as int;
     final totalChunks = data['total_chunks'] as int;
     final localPath = data['local_path'] as String;
-    final puenteId = data['puente_uuid'] as String;
-    final inspeccionUuid = data['inspeccion_uuid'] as String;
-    final componenteUuid = data['componente_uuid'] as String;
+    final puenteId = data['parent_form_id'] as String;
+    final inspeccionUuid = data['form_uuid'] as String;
+    final componenteUuid = data['section_uuid'] as String;
 
     final file = File(localPath);
     if (!await file.exists()) {
       await Utils.logToFile(
-        'Image file not found: $localPath for task $taskId',
-      );
+          'Image file not found: $localPath for task $taskId');
       await _dbService.updateTaskStatus(taskId, 'failed');
       await _dbService.incrementRetryCount(taskId);
       return false;
@@ -242,19 +222,27 @@ class QueueService with ChangeNotifier {
     final chunkSize = Constants.chunkSize;
     final start = chunkIndex * chunkSize;
     final end = (start + chunkSize < fileSize) ? start + chunkSize : fileSize;
-    final chunk = await file.readAsBytes().then(
-          (bytes) => bytes.sublist(start, end),
-        );
+    final chunk =
+        await file.readAsBytes().then((bytes) => bytes.sublist(start, end));
 
     final url =
-        '${Constants.imageServiceUrl}/upload/$puenteId/$inspeccionUuid/$componenteUuid/$imageUuid?chunk=$chunkIndex&total=$totalChunks';
+        'http://192.168.20.24:8083/api/imagenes/upload/$puenteId/$inspeccionUuid/$componenteUuid/$imageUuid?chunk=$chunkIndex&total=$totalChunks';
 
     try {
       await _dbService.updateTaskStatus(taskId, 'processing');
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) {
+        throw Exception('No authentication token found');
+      }
+
       final response = await http.post(
         Uri.parse(url),
         body: chunk,
-        headers: {'Content-Type': 'application/octet-stream'},
+        headers: {
+          'Content-Type': 'application/octet-stream',
+          'Authorization': 'Bearer $token',
+        },
       ).timeout(Duration(seconds: 10));
 
       if (response.statusCode == 200) {
@@ -267,12 +255,13 @@ class QueueService with ChangeNotifier {
             where: 'image_uuid = ?',
             whereArgs: [imageUuid]).then((maps) => maps.first);
         await Utils.logToFile(
-          'Chunk $chunkIndex/$totalChunks for image $imageUuid, chunks_uploaded: ${image['chunks_uploaded']}/${image['chunk_count']}',
-        );
+            'Chunk $chunkIndex/$totalChunks for image $imageUuid, chunks_uploaded: ${image['chunks_uploaded']}/${image['chunk_count']}');
         if (image['chunks_uploaded'] == image['chunk_count']) {
           await db.update(
             'images',
-            {'upload_status': 'completed'},
+            {
+              'upload_status': 'completed',
+            },
             where: 'image_uuid = ?',
             whereArgs: [imageUuid],
           );
@@ -280,38 +269,32 @@ class QueueService with ChangeNotifier {
         }
         await _dbService.updateTaskStatus(taskId, 'completed');
         await Utils.logToFile(
-          'Uploaded chunk $chunkIndex/$totalChunks for image $imageUuid',
-        );
+            'Uploaded chunk $chunkIndex/$totalChunks for image $imageUuid');
         return true;
       } else if (response.statusCode == 503 || response.statusCode == 500) {
         await Utils.logToFile(
-          'Server error (${response.statusCode}) for chunk $chunkIndex of image $imageUuid',
-        );
+            'Server error (${response.statusCode}) for chunk $chunkIndex of image $imageUuid');
         return false;
       } else {
         throw HttpException('Chunk upload failed: ${response.statusCode}');
       }
     } catch (e) {
       await Utils.logToFile(
-        'Chunk $chunkIndex upload failed for image $imageUuid: $e',
-      );
+          'Chunk $chunkIndex upload failed for image $imageUuid: $e');
       return false;
     }
   }
 
   Future<bool> _processFormSubmitTask(
-    int taskId,
-    Map<String, dynamic> data,
-    int retryCount,
-  ) async {
+      int taskId, Map<String, dynamic> data, int retryCount) async {
     final inspeccionUuid = data['inspeccion_uuid'] as String;
 
     final forms = await _dbService.database.then(
-      (db) => db.query('forms',
+      (db) => db.query('inspecciones',
           where: 'inspeccion_uuid = ?', whereArgs: [inspeccionUuid]),
     );
     if (forms.isEmpty) {
-      await Utils.logToFile('Form not found: $inspeccionUuid');
+      await Utils.logToFile('Inspeccion not found: $inspeccionUuid');
       await _dbService.updateTaskStatus(taskId, 'failed');
       await _dbService.incrementRetryCount(taskId);
       return false;
@@ -322,40 +305,47 @@ class QueueService with ChangeNotifier {
 
     try {
       await _dbService.updateTaskStatus(taskId, 'processing');
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) {
+        throw Exception('No authentication token found');
+      }
+
       final response = await http
           .post(
-            Uri.parse('${Constants.inspectionServiceUrl}/submit'),
-            headers: {'Content-Type': 'application/json'},
+            Uri.parse('http://192.168.20.24:8083/api/inspeccion/add'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
             body: payload,
           )
           .timeout(Duration(seconds: 10));
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         await _dbService.updateFormStatus(inspeccionUuid, 'submitted');
         await _dbService.updateTaskStatus(taskId, 'completed');
-        await Utils.logToFile('Submitted form $inspeccionUuid');
+        await Utils.logToFile('Submitted inspeccion $inspeccionUuid');
         return true;
       } else if (response.statusCode == 503 || response.statusCode == 500) {
         await Utils.logToFile(
-          'Server error (${response.statusCode}) for form $inspeccionUuid',
-        );
+            'Server error (${response.statusCode}) for inspeccion $inspeccionUuid');
         return false;
       } else {
-        throw HttpException('Form submission failed: ${response.statusCode}');
+        throw HttpException(
+            'Inspeccion submission failed: ${response.statusCode}');
       }
     } catch (e) {
-      await Utils.logToFile('Form submission failed for $inspeccionUuid: $e');
+      await Utils.logToFile(
+          'Inspeccion submission failed for $inspeccionUuid: $e');
       return false;
     }
   }
 
   Future<void> _cleanupCompletedImages() async {
     final completedImages = await _dbService.database.then(
-      (db) => db.query(
-        'images',
-        where: 'upload_status = ?',
-        whereArgs: ['completed'],
-      ),
+      (db) => db.query('images',
+          where: 'upload_status = ?', whereArgs: ['completed']),
     );
     for (final image in completedImages) {
       final imageUuid = image['image_uuid'] as String;
@@ -366,31 +356,27 @@ class QueueService with ChangeNotifier {
           whereArgs: ['image_chunk', '%$imageUuid%'],
         ),
       );
-      final allCompleted = chunkTasks.every(
-        (task) => task['status'] == 'completed',
-      );
+      final allCompleted =
+          chunkTasks.every((task) => task['status'] == 'completed');
       if (allCompleted) {
         final localPath = image['local_path'] as String;
         final file = File(localPath);
         try {
           if (await file.exists()) {
-            await Future.delayed(Duration(seconds: 3)); // Increased delay
+            await Future.delayed(Duration(seconds: 3));
             if (await file.exists()) {
               await file.delete();
               await Utils.logToFile(
-                'Deleted temporary file: $localPath for image $imageUuid',
-              );
+                  'Deleted temporary file: $localPath for image $imageUuid');
             }
           }
         } catch (e) {
           await Utils.logToFile(
-            'Failed to delete temporary file $localPath for image $imageUuid: $e',
-          );
+              'Failed to delete temporary file $localPath for image $imageUuid: $e');
         }
       } else {
         await Utils.logToFile(
-          'Skipped cleanup for image $imageUuid: not all chunks completed',
-        );
+            'Skipped cleanup for image $imageUuid: not all chunks completed');
       }
     }
   }
@@ -420,8 +406,7 @@ class QueueService with ChangeNotifier {
     _queueProgress = totalTasks > 0 ? completedTasks.length / totalTasks : 1.0;
     notifyListeners();
     await Utils.logToFile(
-      'Queue progress: ${(_queueProgress * 100).toStringAsFixed(1)}%',
-    );
+        'Queue progress: ${(_queueProgress * 100).toStringAsFixed(1)}%');
   }
 
   void logTaskCompleted(String message) {

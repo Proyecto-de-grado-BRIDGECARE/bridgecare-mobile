@@ -159,7 +159,6 @@ class HomePage extends StatelessWidget {
                           MaterialPageRoute(
                               // TODO change to inventoryformscreen
                               builder: (_) => InspectionFormScreen(
-                                    usuarioId: 1,
                                     puenteId: 1,
                                   )),
                         );

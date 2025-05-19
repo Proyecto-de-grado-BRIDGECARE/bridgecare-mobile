@@ -21,8 +21,7 @@ class AppRoutes {
     '/updateUser': (context) => ModificarUsuario(),
     '/createUser': (context) => RegistroUsuario(),
     '/SearchBridge': (context) => BridgeListScreen(),
-    '/forminspeccion': (context) =>
-        InspectionFormScreen(usuarioId: 1, puenteId: 3),
+    '/forminspeccion': (context) => InspectionFormScreen(puenteId: 3),
     //Rutas administrador
     //'/Autorizacion' :(context) => AutorizacionUsuario(),
     '/det': (context) => DetallesUsuario(

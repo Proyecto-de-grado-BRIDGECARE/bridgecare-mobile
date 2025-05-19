@@ -26,15 +26,16 @@ class SplashToLoginTransitionState extends State<SplashToLoginTransition> {
   }
 
   void _startTransition() {
+    debugPrint('start_transition');
     // Check login status before transitioning
     AuthService().isLoggedIn().then((loggedIn) {
+      debugPrint('user is logged in');
       Future.delayed(Duration(milliseconds: 300), () {
         if (loggedIn) {
           themeProvider.setLightMode();
           setState(() {
             _opacity = 1.0; // Start fade-in
           });
-
         } else {
           setState(() {
             _opacity = 1.0; // Trigger fade-in to login

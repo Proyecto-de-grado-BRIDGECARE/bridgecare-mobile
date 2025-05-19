@@ -615,7 +615,6 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) => InspectionFormScreen(
-                  usuarioId: usuarioId,
                   puenteId: puenteId,
                 ),
               ),

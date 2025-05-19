@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:bridgecare/shared/services/image_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -24,6 +25,7 @@ class DynamicFormState extends State<DynamicForm>
     with AutomaticKeepAliveClientMixin {
   final Map<String, dynamic> _formData = {};
   final Map<String, TextEditingController> _controllers = {};
+  final ImageHandler _imageHandler = ImageHandler();
 
   @override
   bool get wantKeepAlive => true;
@@ -46,6 +48,8 @@ class DynamicFormState extends State<DynamicForm>
               : null;
           widget.onSave(_formData);
         });
+      } else if (fieldInfo['type'] == 'image') {
+        _formData[key] ??= <XFile>[];
       }
     });
   }
@@ -79,8 +83,7 @@ class DynamicFormState extends State<DynamicForm>
     if (missingFields.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              'Por favor completa todos los campos obligatorios (nombre, identificador, carretera, regional)'),
+          content: Text('Por favor completa todos los campos obligatorios'),
           backgroundColor: Colors.redAccent,
           duration: Duration(seconds: 5),
         ),
@@ -120,7 +123,7 @@ class DynamicFormState extends State<DynamicForm>
           controller: _controllers[fieldName],
           decoration:
               _getInputDecoration(fieldInfo['label'], readOnly: isReadOnly),
-          enabled: !isReadOnly, // <- simpler
+          enabled: !isReadOnly,
           readOnly: isReadOnly,
           enableInteractiveSelection: !isReadOnly,
           style: isReadOnly ? TextStyle(color: Colors.grey[700]) : null,
@@ -227,9 +230,7 @@ class DynamicFormState extends State<DynamicForm>
         );
         break;
       case 'image':
-        // Initialize as empty list if not set
-        _formData[fieldName] ??=
-            initialValue ?? <XFile>[]; // Start with XFiles, later URLs
+        _formData[fieldName] ??= initialValue ?? <XFile>[];
         final maxImages = fieldInfo['maxImages'] as int? ?? 5;
         final List<XFile> images = _formData[fieldName] as List<XFile>;
 
@@ -251,18 +252,15 @@ class DynamicFormState extends State<DynamicForm>
                         if (snapshot.hasData) {
                           return GestureDetector(
                             onTap: () {
-                              // Show larger image in a dialog
                               showDialog(
                                 context: context,
                                 builder: (context) => Dialog(
                                   backgroundColor: Colors.transparent,
                                   child: GestureDetector(
-                                    onTap: () =>
-                                        Navigator.pop(context), // Close on tap
+                                    onTap: () => Navigator.pop(context),
                                     child: Image.memory(
                                       snapshot.data!,
-                                      fit: BoxFit
-                                          .contain, // Fit within screen bounds
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
                                 ),
@@ -304,16 +302,23 @@ class DynamicFormState extends State<DynamicForm>
             if (images.length < maxImages)
               ElevatedButton.icon(
                 onPressed: () async {
-                  final picker = ImagePicker();
-                  final pickedFile = await picker.pickImage(
-                    source: ImageSource.camera,
-                    preferredCameraDevice: CameraDevice.rear,
+                  final imageData = await _imageHandler.captureAndUploadImage(
+                    widget.extraData?['inspeccionUuid'] ?? '',
+                    widget.extraData?['componenteUuid'] ?? '',
+                    widget.extraData?['puenteId'] ?? '',
                   );
-                  if (pickedFile != null) {
+                  if (imageData != null) {
                     setState(() {
-                      images.add(pickedFile);
+                      images.add(XFile(imageData.localPath));
                       widget.onSave(_formData);
                     });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Imagen añadida y en cola')),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Error al capturar imagen')),
+                    );
                   }
                 },
                 icon: Icon(Icons.add_a_photo),

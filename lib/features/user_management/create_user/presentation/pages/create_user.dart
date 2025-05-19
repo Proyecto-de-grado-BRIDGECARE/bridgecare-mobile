@@ -352,6 +352,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
     );
   }
 
+  /*
   Widget _buildDropdownField() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -394,4 +395,5 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
       ),
     );
   }
+  */
 }
