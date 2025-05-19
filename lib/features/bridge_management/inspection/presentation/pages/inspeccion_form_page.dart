@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bridgecare/features/bridge_management/alert/presentation/pages/alert_page.dart';
 import 'package:bridgecare/features/bridge_management/inspection/controllers/inspection_controller.dart';
 import 'package:bridgecare/features/bridge_management/inspection/models/componente.dart';
 import 'package:bridgecare/features/bridge_management/inspection/models/inspeccion.dart';
@@ -11,20 +12,20 @@ import 'package:bridgecare/shared/widgets/dynamic_form.dart';
 import 'package:bridgecare/shared/widgets/form_template.dart';
 import 'package:bridgecare/shared/widgets/queue_progress_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class InspectionFormScreen extends StatefulWidget {
   final int puenteId;
 
-  const InspectionFormScreen({Key? key, required this.puenteId})
-      : super(key: key);
+  const InspectionFormScreen({super.key, required this.puenteId});
 
   @override
-  _InspectionFormScreenState createState() => _InspectionFormScreenState();
+  InspectionFormScreenState createState() => InspectionFormScreenState();
 }
 
-class _InspectionFormScreenState extends State<InspectionFormScreen> {
+class InspectionFormScreenState extends State<InspectionFormScreen> {
   String? inspectorName;
   List<Map<String, String>> componentList = [];
   Map<String, dynamic>? puenteData;
@@ -51,16 +52,14 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
               })
           .toList();
 
-      if (mounted) {
-        setState(() {
-          inspectorName = name;
-          this.componentList = componentList;
-          this.puenteData = puenteData;
-          isDataLoaded = true;
-        });
-      }
+      setState(() {
+        inspectorName = name;
+        this.componentList = componentList;
+        this.puenteData = puenteData;
+        isDataLoaded = true;
+      });
     } catch (e) {
-      print('Error loading data: $e');
+      debugPrint('Error loading data: $e');
       if (mounted) {
         setState(() {
           isDataLoaded = true; // Allow rendering with error state
@@ -77,6 +76,38 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
       'pr': 'PR 45',
       'regional': 'Region Central',
     });
+  }
+
+  Future<bool> _tieneAlertas(int puenteId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('token');
+      if (token == null || token.isEmpty) {
+        debugPrint('Error: No token found in SharedPreferences');
+        return false;
+      }
+
+      final response = await http.get(
+        Uri.parse('http://192.168.20.24:8086/api/alerta/puente/$puenteId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      debugPrint('Alerta response status: ${response.statusCode}');
+      debugPrint('Alerta response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.isNotEmpty;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Error al verificar alertas: $e');
+      return false;
+    }
   }
 
   @override
@@ -106,7 +137,48 @@ class _InspectionFormScreenState extends State<InspectionFormScreen> {
                   title: 'Formulario de Inspección',
                   formKey: controller.formKey,
                   onSave: () async {
-                    await controller.submitForm();
+                    try {
+                      await controller.submitForm();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content:
+                                Text('Inspección en cola para sincronización')),
+                      );
+                      final hayAlertas = await _tieneAlertas(widget.puenteId);
+                      if (hayAlertas && mounted) {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('¡Atención!'),
+                            content: const Text(
+                                'Se han generado alertas para esta inspección. ¿Deseas revisarlas?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AlertScreen(
+                                          puenteId: widget.puenteId),
+                                    ),
+                                  );
+                                },
+                                child: const Text('Ver alertas'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cerrar'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: $e')),
+                      );
+                    }
                   },
                   sections: [
                     FormSection(
