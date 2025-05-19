@@ -39,7 +39,7 @@ class InspectionController with ChangeNotifier {
 
   void setPuenteData(Map<String, dynamic> data) {
     puenteData = data;
-    notifyListeners();
+    // Removed notifyListeners() to avoid build-time updates
   }
 
   void updatePuenteData(Map<String, dynamic> data) {
@@ -88,7 +88,7 @@ class InspectionController with ChangeNotifier {
           chunkCount: 0,
           chunksUploaded: 0,
         );
-        addImage(componente.componenteUuid, imageData); // Persist to DB
+        addImage(componente.componenteUuid, imageData);
         return imageData.imageUuid;
       }).toList();
     }
@@ -156,6 +156,7 @@ class InspectionController with ChangeNotifier {
                 'danio': c.danio,
                 'reparacion':
                     c.reparacion != null ? [c.reparacion!.toJson()] : [],
+                'imageUuids': c.imageUuids,
               })
           .toList(),
     };
@@ -174,7 +175,7 @@ class InspectionController with ChangeNotifier {
         .map((c) => c.imageUuids.join(','))
         .join(',');
     await databaseService.enqueueTask(
-      taskType: 'form_submit',
+      taskType: 'inspeccion_submit',
       data: taskData,
       dependsOn: dependsOn.isNotEmpty ? dependsOn : null,
     );

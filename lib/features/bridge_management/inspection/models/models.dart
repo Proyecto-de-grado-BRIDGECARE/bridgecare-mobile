@@ -109,10 +109,10 @@ class ImageData {
 
   Map<String, dynamic> toMap() => {
         'id': id,
-        'form_uuid': inspeccionUuid,
-        'section_uuid': componenteUuid,
+        'inspeccion_uuid': inspeccionUuid,
+        'componente_uuid': componenteUuid,
         'image_uuid': imageUuid,
-        'parent_form_id': puenteId,
+        'puente_id': puenteId,
         'upload_status': uploadStatus,
         'chunk_count': chunkCount,
         'chunks_uploaded': chunksUploaded,
@@ -122,10 +122,10 @@ class ImageData {
 
   factory ImageData.fromMap(Map<String, dynamic> map) => ImageData(
         id: map['id'],
-        inspeccionUuid: map['form_uuid'],
-        componenteUuid: map['section_uuid'],
+        inspeccionUuid: map['inspeccion_uuid'],
+        componenteUuid: map['componente_uuid'],
         imageUuid: map['image_uuid'],
-        puenteId: map['parent_form_id'],
+        puenteId: map['puente_id'],
         uploadStatus: map['upload_status'],
         chunkCount: map['chunk_count'],
         chunksUploaded: map['chunks_uploaded'],

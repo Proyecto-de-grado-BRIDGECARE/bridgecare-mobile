@@ -205,9 +205,9 @@ class QueueService with ChangeNotifier {
     final chunkIndex = data['chunk_index'] as int;
     final totalChunks = data['total_chunks'] as int;
     final localPath = data['local_path'] as String;
-    final puenteId = data['parent_form_id'] as String;
-    final inspeccionUuid = data['form_uuid'] as String;
-    final componenteUuid = data['section_uuid'] as String;
+    final puenteId = data['puente_id'] as String;
+    final inspeccionUuid = data['inspeccion_uuid'] as String;
+    final componenteUuid = data['componente_uuid'] as String;
 
     final file = File(localPath);
     if (!await file.exists()) {
@@ -226,7 +226,7 @@ class QueueService with ChangeNotifier {
         await file.readAsBytes().then((bytes) => bytes.sublist(start, end));
 
     final url =
-        'http://192.168.20.24:8083/api/imagenes/upload/$puenteId/$inspeccionUuid/$componenteUuid/$imageUuid?chunk=$chunkIndex&total=$totalChunks';
+        'https://api.bridgecare.com.co/inspecccion/images/upload/$puenteId/$inspeccionUuid/$componenteUuid/$imageUuid?chunk=$chunkIndex&total=$totalChunks';
 
     try {
       await _dbService.updateTaskStatus(taskId, 'processing');
