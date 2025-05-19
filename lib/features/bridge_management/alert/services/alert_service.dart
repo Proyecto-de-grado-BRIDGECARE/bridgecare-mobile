@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AlertService {
-  final String baseUrl = 'http://192.168.20.24:8086/api/alerta';
+  final String baseUrl = 'https://api.bridgecare.com.co/alerta';
 
   Future<List<Alerta>> getAlertasPorInspeccion(int idInspeccion) async {
     final response =

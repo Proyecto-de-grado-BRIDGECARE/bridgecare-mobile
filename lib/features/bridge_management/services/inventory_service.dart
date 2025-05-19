@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class InventarioService {
   static const String baseUrl =
-      "http://localhost:8082/api/inventario"; // Temporary backend URL
+      "https://api.bridgecare.com.co/inventario"; // Temporary backend URL
 
   //get all inventories
   Future<List<Inventario>> getInventarios() async {

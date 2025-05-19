@@ -15,9 +15,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(),
       themeMode:
           Provider.of<ThemeProvider>(context).themeMode, // Use theme provider
-      home: InspectionFormScreen(
-        puenteId: 1,
-      ),
+      initialRoute: '/login',
       routes: AppRoutes.routes,
     );
   }

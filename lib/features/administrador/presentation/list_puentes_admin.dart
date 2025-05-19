@@ -378,7 +378,7 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                       const SizedBox(height: 4),
                                       Text("Municipio: ${puente.regional}"),
                                       const SizedBox(height: 12),
-                                      Center(
+                                      /*Center(
                                         child: ElevatedButton.icon(
                                           onPressed: () {
                                             Navigator.push(
@@ -409,7 +409,7 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                                 const TextStyle(fontSize: 14),
                                           ),
                                         ),
-                                      ),
+                                      ),*/
                                     ],
                                   ),
                                 ),
