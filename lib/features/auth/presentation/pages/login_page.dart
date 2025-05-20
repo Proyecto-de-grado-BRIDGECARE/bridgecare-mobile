@@ -268,8 +268,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             validator: _validatePassword,
                           ),
-                          const SizedBox(height: 24),
-
+                          const SizedBox(height: 50),
                           // Login Button
                           FractionallySizedBox(
                             widthFactor: 0.8,
@@ -306,8 +305,8 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          Wrap(
+
+                          /*Wrap(
                             alignment: WrapAlignment.center,
                             children: [
                               const Text(
@@ -331,7 +330,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                             ],
-                          ),
+                          ),*/
                         ],
                       ),
                     ),

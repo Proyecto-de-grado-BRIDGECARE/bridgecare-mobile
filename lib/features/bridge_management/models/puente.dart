@@ -18,10 +18,7 @@ class Puente {
   static const Map<String, dynamic> formFields = {
     'nombre': {'type': 'text', 'label': 'Nombre', 'required': true},
     'identif': {'type': 'text', 'label': 'Identificador', 'required': true},
-    'carretera': {
-      'type': 'number',
-      'label': 'Carretera',
-      'maxLength': 10, // Max 10 digits enforced in UI
+    'carretera': {'type': 'number', 'label': 'Carretera', 'maxLength': 10, // Max 10 digits enforced in UI
       'required': true},
     'pr': {'type': 'text', 'label': 'PR', 'required': true},
     'regional': {'type': 'text', 'label': 'Regional', 'required': true},

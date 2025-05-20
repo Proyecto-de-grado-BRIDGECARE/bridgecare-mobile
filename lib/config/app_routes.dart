@@ -8,7 +8,10 @@ import 'package:bridgecare/features/user_management/create_user/presentation/pag
 import 'package:bridgecare/features/user_management/update_user/presentation/pages/update_user.dart';
 import 'package:flutter/material.dart';
 
+import '../features/administrador/presentation/list_puentes_admin.dart';
+import '../features/administrador/presentation/list_user_admin.dart';
 import '../features/bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
+import '../features/bridge_management/inventory/presentation/pages/inventario_form_page.dart';
 
 class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
@@ -22,6 +25,9 @@ class AppRoutes {
     '/createUser': (context) => RegistroUsuario(),
     '/SearchBridge': (context) => BridgeListScreen(),
     '/forminspeccion': (context) => InspectionFormScreen(puenteId: 3),
+    '/forminventario': (context) => InventoryFormScreen(usuarioId:1),
+    '/puenteslistAdmin': (context) => PuentesListAdminScreen(),
+    '/usuarioslistAdmin': (context) => UsuariosListAdminScreen(),
     //Rutas administrador
     //'/Autorizacion' :(context) => AutorizacionUsuario(),
     '/det': (context) => DetallesUsuario(

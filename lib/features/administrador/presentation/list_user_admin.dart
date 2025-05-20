@@ -18,6 +18,19 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
   final UserService _usuarioService = UserService();
   List<Usuario> _usuarios = [];
   List<Usuario> _usuariosFiltrados = [];
+  String obtenerTipoUsuarioTexto(int tipo) {
+    switch (tipo) {
+      case 0:
+        return 'Usuario Municipal';
+      case 1:
+        return 'Ingeniero';
+      case 2:
+        return 'Administrador';
+      default:
+        return 'Desconocido';
+    }
+  }
+
 
   @override
   void initState() {
@@ -213,7 +226,10 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                                                     "Apellidos: ${usuario.apellidos}"),
                                                 const SizedBox(height: 4),
                                                 Text(
-                                                    "Tipo Usuario: ${usuario.tipoUsuario}"),
+                                                    "Tipo Usuario: ${obtenerTipoUsuarioTexto(usuario.tipoUsuario)}",
+                                                    style: const TextStyle(
+                                                        fontSize: 13)),
+
                                               ],
                                             ),
                                           ),

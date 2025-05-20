@@ -52,7 +52,8 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
             key: _puenteFormKey,
             fields: Puente.formFields,
             initialData: _formData['puente'],
-            onSave: (data) => setState(() => _formData['puente']!.addAll(data)),
+            onSave: (data) =>
+                setState(() => _formData['puente']!.addAll(data)),
           ),
         ),
         FormSection(
@@ -99,9 +100,10 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
           content: DynamicForm(
             fields: DatosAdministrativos.formFields,
             initialData: _formData['datos_administrativos'],
-            onSave: (data) => setState(
-              () => _formData['datos_administrativos']!.addAll(data),
-            ),
+            onSave: (data) =>
+                setState(
+                      () => _formData['datos_administrativos']!.addAll(data),
+                ),
           ),
         ),
         FormSection(
@@ -131,9 +133,11 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               DynamicForm(
                 fields: Superestructura.formFields,
                 initialData: _formData['superestructuras'][0],
-                onSave: (data) => setState(
-                  () => _formData['superestructuras'][0]!.addAll(data),
-                ),
+                onSave: (data) =>
+                    setState(
+                          () =>
+                          _formData['superestructuras'][0]!.addAll(data),
+                    ),
               ),
               const SizedBox(height: 16.0),
               const Text(
@@ -147,9 +151,11 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               DynamicForm(
                 fields: Superestructura.formFields,
                 initialData: _formData['superestructuras'][1],
-                onSave: (data) => setState(
-                  () => _formData['superestructuras'][1]!.addAll(data),
-                ),
+                onSave: (data) =>
+                    setState(
+                          () =>
+                          _formData['superestructuras'][1]!.addAll(data),
+                    ),
               ),
             ],
           ),
@@ -171,9 +177,11 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               DynamicForm(
                 fields: Estribo.formFields,
                 initialData: _formData['subestructura']['estribos'],
-                onSave: (data) => setState(
-                  () => _formData['subestructura']['estribos'].addAll(data),
-                ),
+                onSave: (data) =>
+                    setState(
+                          () =>
+                          _formData['subestructura']['estribos'].addAll(data),
+                    ),
               ),
               const SizedBox(height: 16.0),
               const Text(
@@ -187,9 +195,11 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               DynamicForm(
                 fields: Detalle.formFields,
                 initialData: _formData['subestructura']['detalles'],
-                onSave: (data) => setState(
-                  () => _formData['subestructura']['detalles'].addAll(data),
-                ),
+                onSave: (data) =>
+                    setState(
+                          () =>
+                          _formData['subestructura']['detalles'].addAll(data),
+                    ),
               ),
               const SizedBox(height: 16.0),
               const Text(
@@ -203,9 +213,11 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               DynamicForm(
                 fields: Pila.formFields,
                 initialData: _formData['subestructura']['pilas'],
-                onSave: (data) => setState(
-                  () => _formData['subestructura']['pilas'].addAll(data),
-                ),
+                onSave: (data) =>
+                    setState(
+                          () =>
+                          _formData['subestructura']['pilas'].addAll(data),
+                    ),
               ),
               const SizedBox(height: 16.0),
               const Text(
@@ -219,9 +231,11 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               DynamicForm(
                 fields: Senial.formFields,
                 initialData: _formData['subestructura']['seniales'],
-                onSave: (data) => setState(
-                  () => _formData['subestructura']['seniales'].addAll(data),
-                ),
+                onSave: (data) =>
+                    setState(
+                          () =>
+                          _formData['subestructura']['seniales'].addAll(data),
+                    ),
               ),
             ],
           ),
@@ -232,7 +246,8 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
           content: DynamicForm(
             fields: Apoyo.formFields,
             initialData: _formData['apoyo'],
-            onSave: (data) => setState(() => _formData['apoyo']!.addAll(data)),
+            onSave: (data) =>
+                setState(() => _formData['apoyo']!.addAll(data)),
           ),
         ),
         FormSection(
@@ -241,9 +256,10 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
           content: DynamicForm(
             fields: MiembrosInteresados.formFields,
             initialData: _formData['miembros_interesados'],
-            onSave: (data) => setState(
-              () => _formData['miembros_interesados']!.addAll(data),
-            ),
+            onSave: (data) =>
+                setState(
+                      () => _formData['miembros_interesados']!.addAll(data),
+                ),
           ),
         ),
         FormSection(
@@ -252,9 +268,10 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
           content: DynamicForm(
             fields: PosicionGeografica.formFields,
             initialData: _formData['posicion_geografica'],
-            onSave: (data) => setState(
-              () => _formData['posicion_geografica']!.addAll(data),
-            ),
+            onSave: (data) =>
+                setState(
+                      () => _formData['posicion_geografica']!.addAll(data),
+                ),
           ),
         ),
         FormSection(
@@ -263,7 +280,8 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
           content: DynamicForm(
             fields: Carga.formFields,
             initialData: _formData['carga'],
-            onSave: (data) => setState(() => _formData['carga']!.addAll(data)),
+            onSave: (data) =>
+                setState(() => _formData['carga']!.addAll(data)),
           ),
         ),
         FormSection(
@@ -272,8 +290,10 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
           content: DynamicForm(
             fields: Inventario.formFields,
             initialData: {'observaciones': _formData['observaciones']},
-            onSave: (data) => setState(
-                () => _formData['observaciones'] = data['observaciones'] ?? ''),
+            onSave: (data) =>
+                setState(
+                        () =>
+                    _formData['observaciones'] = data['observaciones'] ?? ''),
           ),
         ),
         FormSection(
@@ -312,7 +332,6 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
       ],
     );
   }
-
   @override
   void initState() {
     super.initState();
@@ -324,20 +343,18 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
       _formData['puente'] = {'id': inventario.puente.id};
 
       _formData['pasos'] = inventario.pasos.map((p) => p.toJson()).toList();
-      _formData['datos_administrativos'] =
-          inventario.datosAdministrativos?.toJson() ?? {};
+      _formData['datos_administrativos'] = inventario.datosAdministrativos?.toJson() ?? {};
       _formData['datos_tecnicos'] = inventario.datosTecnicos?.toJson() ?? {};
-      _formData['superestructuras'] =
-          inventario.superestructuras.map((s) => s.toJson()).toList();
+      _formData['superestructuras'] = inventario.superestructuras.map((s) => s.toJson()).toList();
       _formData['subestructura'] = inventario.subestructura?.toJson() ?? {};
       _formData['apoyo'] = inventario.apoyo?.toJson() ?? {};
-      _formData['miembros_interesados'] =
-          inventario.miembrosInteresados?.toJson() ?? {};
-      _formData['posicion_geografica'] =
-          inventario.posicionGeografica?.toJson() ?? {};
+      _formData['miembros_interesados'] = inventario.miembrosInteresados?.toJson() ?? {};
+      _formData['posicion_geografica'] = inventario.posicionGeografica?.toJson() ?? {};
       _formData['carga'] = inventario.carga?.toJson() ?? {};
+
     }
   }
+
 
   final _formKey = GlobalKey<FormState>();
   final Map<String, dynamic> _formData = {
@@ -366,8 +383,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
     'carga': <String, dynamic>{},
   };
 
-  final GlobalKey<DynamicFormState> _puenteFormKey =
-      GlobalKey<DynamicFormState>();
+  final GlobalKey<DynamicFormState> _puenteFormKey = GlobalKey<DynamicFormState>();
 
   Future<void> _saveForm() async {
     //Validar campos requeridos del formulario del puente
@@ -402,7 +418,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
           return;
         }
 
-        Map<String, dynamic> cleanFormData(Map<String, dynamic> data) {
+        Map<String, dynamic> _cleanFormData(Map<String, dynamic> data) {
           final cleaned = Map<String, dynamic>.from(data);
 
           void convertYesNo(Map<String, dynamic> map, String field) {
@@ -410,8 +426,8 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               map[field] = map[field] == 'Sí'
                   ? true
                   : map[field] == 'No'
-                      ? false
-                      : map[field];
+                  ? false
+                  : map[field];
             }
           }
 
@@ -459,14 +475,14 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
             } else if (obj is List) {
               for (var i = 0; i < obj.length; i++) {
                 if (obj[i] is Map) {
-                  removeEmpty(obj[i] as Map<String, dynamic>,
-                      defaultKey: defaultKey);
+                  removeEmpty(
+                      obj[i] as Map<String, dynamic>, defaultKey: defaultKey);
                 } else {
                   removeEmpty(obj[i], defaultKey: defaultKey);
                 }
               }
               obj.removeWhere((item) =>
-                  item is Map &&
+              item is Map &&
                   (defaultKey != null
                       ? isMinimalMap(item as Map<String, dynamic>, defaultKey)
                       : item.isEmpty));
@@ -474,7 +490,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
           }
 
           trimStrings(cleaned);
-          void parseFields(Map<String, dynamic> data, List<String> fields) {
+          void _parseFields(Map<String, dynamic> data, List<String> fields) {
             for (var field in fields) {
               if (data[field] is String) {
                 if (data[field].contains(' - ')) {
@@ -485,7 +501,6 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               }
             }
           }
-
           if (cleaned['pasos'] != null && cleaned['pasos'].isNotEmpty) {
             cleaned['pasos'] = cleaned['pasos']
                 .where((paso) => !isMinimalMap(paso, 'numero'))
@@ -513,24 +528,26 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
                   'tipoEstructuracionLongitudinal',
                   'material',
                 ];
-                parseFields(sup, superestructuraFields);
+                _parseFields(sup, superestructuraFields);
                 convertYesNo(sup, 'disenioTipo');
               }
             }
           }
 
-          if (cleaned['posicion_geografica'].isNotEmpty) {
+          if (cleaned['posicion_geografica'] != null && cleaned['posicion_geografica'].isNotEmpty) {
             convertYesNo(cleaned['posicion_geografica'], 'pasoCauce');
             convertYesNo(cleaned['posicion_geografica'], 'existeVariante');
           }
-          if (cleaned['datos_tecnicos'].isNotEmpty) {
+
+          if (cleaned['datos_tecnicos'] != null && cleaned['datos_tecnicos'].isNotEmpty) {
             convertYesNo(cleaned['datos_tecnicos'], 'puenteTerraplen');
           }
-          if (cleaned['puente'].isNotEmpty) {
+
+          if (cleaned['puente'] != null && cleaned['puente'].isNotEmpty) {
             final puenteFields = ['regional'];
-            parseFields(cleaned['puente'], puenteFields);
+            _parseFields(cleaned['puente'], puenteFields);
           }
-          if (cleaned['apoyo'].isNotEmpty) {
+          if (cleaned['apoyo'] != null && cleaned['apoyo'].isNotEmpty){
             final apoyoFields = [
               'fijoSobreEstribo',
               'movilSobreEstribo',
@@ -541,23 +558,26 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               'vehiculoDiseno',
               'claseDistribucionCarga',
             ];
-            parseFields(cleaned['apoyo'], apoyoFields);
+            _parseFields(cleaned['apoyo'], apoyoFields);
           }
-          if (cleaned['subestructura']['estribos'].isNotEmpty) {
+          if (cleaned['subestructura']?['estribos'] != null &&
+              cleaned['subestructura']['estribos'].isNotEmpty) {
             final estriboFields = ['tipo', 'material', 'tipoCimentacion'];
-            parseFields(cleaned['subestructura']['estribos'], estriboFields);
+            _parseFields(cleaned['subestructura']['estribos'], estriboFields);
           }
-          if (cleaned['subestructura']['pilas'].isNotEmpty) {
+          if (cleaned['subestructura']?['pilas'] != null &&
+              cleaned['subestructura']['pilas'].isNotEmpty){
             final pilaFields = ['tipo', 'material', 'tipoCimentacion'];
-            parseFields(cleaned['subestructura']['pilas'], pilaFields);
+            _parseFields(cleaned['subestructura']['pilas'], pilaFields);
           }
-          if (cleaned['subestructura']['detalles'].isNotEmpty) {
+          if (cleaned['subestructura']?['detalles'] != null &&
+              cleaned['subestructura']['detalles'].isNotEmpty){
             final detalleFields = [
               'tipoBaranda',
               'superficieRodadura',
               'juntaExpansion'
             ];
-            parseFields(cleaned['subestructura']['detalles'], detalleFields);
+            _parseFields(cleaned['subestructura']['detalles'], detalleFields);
           }
 
           removeEmpty(cleaned);
@@ -566,7 +586,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         }
 
         // Clean up _formData
-        final cleanedData = cleanFormData(_formData);
+        final cleanedData = _cleanFormData(_formData);
         final jsonEncoder = JsonEncoder.withIndent('  ', (obj) {
           if (obj is DateTime) {
             return obj.toIso8601String();
@@ -590,7 +610,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         // }
 
         // Send to backend
-        final url = Uri.parse('https://api.bridgecare.com.co/inspeccion/add');
+        final url = Uri.parse('http://192.168.1.5:8082/api/inventario/add');
 
         final response = await http.post(
           url,
@@ -606,20 +626,17 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
           final puenteId = responseData['puente']['id'];
           final usuarioId = responseData['usuario']['id'];
 
-          debugPrint(
-              "✅ Inventario creado con puenteId: $puenteId y usuarioId: $usuarioId");
+          debugPrint("✅ Inventario creado con puenteId: $puenteId y usuarioId: $usuarioId");
 
-          if (mounted) {
-            // Redirigir al formulario de inspección
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => InspectionFormScreen(
-                  puenteId: puenteId,
-                ),
+          // Redirigir al formulario de inspección
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InspectionFormScreen(
+                puenteId: puenteId,
               ),
-            );
-          }
+            ),
+          );
         }
 
         debugPrint(
@@ -637,5 +654,8 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
     //final decoded = JwtDecoder.decode(token); // Asegúrate de importar jwt_decoder
     //return int.parse(decoded['sub']?? '1');
     //}
+
+
+
   }
 }

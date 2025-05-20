@@ -112,7 +112,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
             child: Padding(
               padding: const EdgeInsets.only(top: 70.0, left: 22),
               child: Text(
-                widget.usuario != null ? 'Editar usuario' : 'Crea tu cuenta',
+                widget.usuario != null ? 'Editar usuario' : 'Crear usuario',
                 style: const TextStyle(
                   fontSize: 30,
                   color: Colors.white,
@@ -222,23 +222,13 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             if (widget.usuario == null) ...[
-                              const Text(
-                                "¿Ya tienes una cuenta?",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey,
-                                ),
-                              ),
+
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => LoginPage()),
-                                  );
+                                  Navigator.pushNamed(context, '/homeAdmin');
                                 },
                                 child: const Text(
-                                  "Inicia sesión",
+                                  "← Volver",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 17,
