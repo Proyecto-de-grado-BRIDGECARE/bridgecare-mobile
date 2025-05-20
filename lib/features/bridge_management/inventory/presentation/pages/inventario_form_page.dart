@@ -20,7 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:bridgecare/features/bridge_management/services/location_service.dart';
 import '../../models/dtos/inventario_dto.dart';
 
 class InventoryFormScreen extends StatefulWidget {
@@ -38,6 +38,10 @@ class InventoryFormScreen extends StatefulWidget {
 }
 
 class InventoryFormScreenState extends State<InventoryFormScreen> {
+  final _latitudController = TextEditingController();
+  final _longitudController = TextEditingController();
+  final _altitudController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return FormTemplate(
@@ -265,15 +269,38 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         FormSection(
           title: 'Posición Geográfica',
           isCollapsible: true,
-          content: DynamicForm(
-            fields: PosicionGeografica.formFields,
-            initialData: _formData['posicion_geografica'],
-            onSave: (data) =>
-                setState(
-                      () => _formData['posicion_geografica']!.addAll(data),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.my_location),
+                  label: const Text('Obtener ubicación actual'),
+                  onPressed: _obtenerUbicacion,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xD040A4FF),
+                  ),
                 ),
+              ),
+              const SizedBox(height: 8.0),
+              DynamicForm(
+                key: ValueKey(_formData['posicion_geografica']),
+                fields: PosicionGeografica.formFields,
+                initialData: _formData['posicion_geografica'],
+                controllers: {
+                  'latitud': _latitudController,
+                  'longitud': _longitudController,
+                  'altitud': _altitudController,
+                },
+                onSave: (data) =>
+                    setState(() => _formData['posicion_geografica']!.addAll(data)),
+              ),
+
+            ],
           ),
         ),
+
         FormSection(
           title: 'Carga',
           isCollapsible: true,
@@ -610,7 +637,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         // }
 
         // Send to backend
-        final url = Uri.parse('http://192.168.1.5:8082/api/inventario/add');
+        final url = Uri.parse('http://192.168.1.9:8082/api/inventario/add');
 
         final response = await http.post(
           url,
@@ -658,4 +685,30 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
 
 
   }
+  Future<void> _obtenerUbicacion() async {
+    final posicion = await LocationService.obtenerPosicion();
+    if (posicion != null) {
+      setState(() {
+        _latitudController.text = posicion.latitude.toStringAsFixed(6);
+        _longitudController.text = posicion.longitude.toStringAsFixed(6);
+        _altitudController.text = posicion.altitude.toStringAsFixed(2);
+
+        _formData['posicion_geografica'] ??= {};
+        _formData['posicion_geografica']['latitud'] = posicion.latitude;
+        _formData['posicion_geografica']['longitud'] = posicion.longitude;
+        _formData['posicion_geografica']['altitud'] = posicion.altitude;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ubicación obtenida correctamente')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo obtener la ubicación')),
+      );
+    }
+  }
+
+
+
 }

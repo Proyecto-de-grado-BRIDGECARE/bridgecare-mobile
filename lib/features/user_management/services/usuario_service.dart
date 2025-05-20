@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserService {
   final String baseUrl =
-      "http://192.168.1.5:8084/api/usuarios";
+      "http://192.168.1.9:8084/api/usuarios";
       //"https://api.bridgecare.com.co/usuarios";
 
   Future<List<Usuario>> getAllUsuarios() async {
@@ -44,7 +44,7 @@ class UserService {
   }
 
   Future<void> registerUsuario(Usuario nuevoUsuario) async {
-    final url = Uri.parse("http://192.168.1.5:8084/api/usuarios/register");
+    final url = Uri.parse("http://192.168.1.9:8084/api/usuarios/register");
 
     final response = await http.post(
       url,

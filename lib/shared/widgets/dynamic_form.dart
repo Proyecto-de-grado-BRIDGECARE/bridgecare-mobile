@@ -8,6 +8,7 @@ class DynamicForm extends StatefulWidget {
   final Map<String, dynamic>? initialData;
   final Function(Map<String, dynamic>) onSave;
   final Map<String, dynamic>? extraData;
+  final Map<String, TextEditingController>? controllers;
 
   const DynamicForm({
     super.key,
@@ -15,6 +16,7 @@ class DynamicForm extends StatefulWidget {
     required this.initialData,
     required this.onSave,
     this.extraData,
+    this.controllers,
   });
 
   @override
@@ -38,8 +40,16 @@ class DynamicFormState extends State<DynamicForm>
     }
     widget.fields.forEach((key, fieldInfo) {
       if (fieldInfo['type'] == 'text' || fieldInfo['type'] == 'number') {
-        _controllers[key] =
-            TextEditingController(text: _formData[key]?.toString());
+        if (widget.controllers != null && widget.controllers![key] != null) {
+          _controllers[key] = widget.controllers![key]!;
+          if (_controllers[key]!.text.isEmpty && _formData[key] != null) {
+            _controllers[key]!.text = _formData[key]!.toString();
+          }
+        } else {
+          _controllers[key] =
+              TextEditingController(text: _formData[key]?.toString());
+        }
+
         _controllers[key]!.addListener(() {
           _formData[key] = _controllers[key]!.text.isNotEmpty
               ? (fieldInfo['type'] == 'number'
@@ -56,7 +66,11 @@ class DynamicFormState extends State<DynamicForm>
 
   @override
   void dispose() {
-    _controllers.forEach((_, controller) => controller.dispose());
+    _controllers.forEach((key, controller) {
+      if (widget.controllers == null || widget.controllers![key] == null) {
+        controller.dispose(); // ✅ solo si el controlador es interno
+      }
+    });
     super.dispose();
   }
 

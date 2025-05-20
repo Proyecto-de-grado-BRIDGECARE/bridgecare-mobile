@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class BridgeService {
   final String baseUrl =
-      "http://192.168.1.5:8081/api/puentes";
+      "http://192.168.1.9:8081/api/puentes";
       //"https://api.bridgecare.com.co/puentes";
 
   Future<List<Puente>> getAllPuentes() async {
