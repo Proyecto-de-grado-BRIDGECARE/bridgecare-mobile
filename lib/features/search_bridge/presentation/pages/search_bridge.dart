@@ -87,12 +87,7 @@ class _BridgeListState extends State<BridgeListScreen> {
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomePage()),
-                          (Route<dynamic> route) => false,
-                        );
+                        Navigator.pushNamed(context, '/home');
                       },
                     ),
                     const SizedBox(width: 8),

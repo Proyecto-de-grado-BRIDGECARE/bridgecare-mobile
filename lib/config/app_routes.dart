@@ -1,4 +1,3 @@
-import 'package:bridgecare/features/administrador/presentation/home_admin.dart';
 import 'package:bridgecare/features/administrador/presentation/user_auth.dart';
 import 'package:bridgecare/features/auth/presentation/pages/login_page.dart';
 import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
@@ -16,7 +15,7 @@ import '../features/bridge_management/inventory/presentation/pages/inventario_fo
 class AppRoutes {
   static Map<String, WidgetBuilder> routes = {
     '/login': (context) => const LoginPage(),
-    '/home': (context) => const HomePage(),
+    '/home': (context) => const HomePage(usuarioId: 1, tipoUsuario: 1,),
     //'/registro': (context) => RegistroUsuario(),
     '/modificarUsuario': (context) => ModificarUsuario(),
     '/inspecciones': (context) => InspeccionesPage(),
@@ -33,6 +32,6 @@ class AppRoutes {
     '/det': (context) => DetallesUsuario(
           user: {},
         ), //no sirve aun
-    '/homeAdmin': (context) => const HomeAdmin(),
+    //'/homeAdmin': (context) => const HomeAdmin(),
   };
 }

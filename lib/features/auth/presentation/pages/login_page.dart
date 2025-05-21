@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:bridgecare/core/providers/theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../home/presentation/pages/home_page.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -73,21 +75,16 @@ class _LoginPageState extends State<LoginPage> {
               user.id!); // Usa ! porque ya validaste que no es null
 
           themeProvider.setLightMode();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => HomePage(
+                usuarioId: user.id!,
+                tipoUsuario: user.tipoUsuario ?? 0,
+              ),
+            ),
+          );
 
-          switch (user.tipoUsuario) {
-            case 0:
-              if (mounted) {
-                Navigator.pushReplacementNamed(context, '/homeMunicipal');
-              }
-              break;
-            case 2:
-              if (mounted) {
-                Navigator.pushReplacementNamed(context, '/homeAdmin');
-              }
-              break;
-            default:
-              Navigator.pushReplacementNamed(context, '/home');
-          }
         } else {
           _showError("Error obteniendo datos del usuario.");
         }

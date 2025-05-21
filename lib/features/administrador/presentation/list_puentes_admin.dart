@@ -1,4 +1,3 @@
-import 'package:bridgecare/features/administrador/presentation/home_admin.dart';
 import 'package:flutter/material.dart';
 
 import '../../bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
@@ -90,12 +89,7 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomeAdmin()),
-                          (Route<dynamic> route) => false,
-                        );
+                        Navigator.pop(context);
                       },
                     ),
                     const SizedBox(width: 8),

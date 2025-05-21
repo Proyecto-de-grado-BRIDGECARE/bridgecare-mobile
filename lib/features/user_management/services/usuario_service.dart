@@ -6,8 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserService {
   final String baseUrl =
-      "http://192.168.1.9:8084/api/usuarios";
-      //"https://api.bridgecare.com.co/usuarios";
+      //"http://192.168.1.9:8084/api/usuarios";
+      "https://api.bridgecare.com.co/usuarios";
 
   Future<List<Usuario>> getAllUsuarios() async {
     final prefs = await SharedPreferences.getInstance();

@@ -92,11 +92,7 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () {
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          '/homeAdmin',
-                          (Route<dynamic> route) => false,
-                        );
+                        Navigator.pop(context);
                       },
                     ),
                     const SizedBox(width: 8),

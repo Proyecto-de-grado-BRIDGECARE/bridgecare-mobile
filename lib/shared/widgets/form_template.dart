@@ -29,16 +29,39 @@ class FormTemplate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: Color(0xff1780cc),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save, color: Colors.white),
-            onPressed: onSave,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: const Color(0xff1780cc),
+          centerTitle: true,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 16, top: 20), // top controla la altura
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, size: 28, color: Colors.black),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
-        ],
+
+          title: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.05,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+
+        ),
       ),
+
+
+
       body: Form(
         key: formKey,
         child: SingleChildScrollView(
@@ -52,15 +75,18 @@ class FormTemplate extends StatelessWidget {
               final content = section.content;
 
               if (section.isCollapsible) {
+                final screenWidth = MediaQuery.of(context).size.width;
+
                 return Column(
                   children: [
                     ExpansionTile(
                       title: Text(
                         section.title,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Colors.blueGrey[800],
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.045, // 🔁 entre 16 y 20 aprox según el ancho
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueGrey[800],
+                        ),
                       ),
                       collapsedBackgroundColor: Colors.white,
                       backgroundColor: Colors.white,
