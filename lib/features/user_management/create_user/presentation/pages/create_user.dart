@@ -1,8 +1,7 @@
+import 'package:bridgecare/features/administrador/presentation/list_user_admin.dart';
 import 'package:bridgecare/features/user_management/models/usuario.dart';
 import 'package:bridgecare/features/user_management/services/usuario_service.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../administrador/presentation/list_user_admin.dart';
 
 class RegistroUsuario extends StatefulWidget {
   final Usuario? usuario;
@@ -221,7 +220,6 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             if (widget.usuario == null) ...[
-
                               GestureDetector(
                                 onTap: () {
                                   Navigator.pushNamed(context, '/homeAdmin');

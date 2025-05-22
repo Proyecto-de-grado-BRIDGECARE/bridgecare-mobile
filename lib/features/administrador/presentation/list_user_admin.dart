@@ -1,9 +1,7 @@
 import 'package:bridgecare/features/user_management/create_user/presentation/pages/create_user.dart';
+import 'package:bridgecare/features/user_management/services/usuario_service.dart';
 import 'package:flutter/material.dart';
-
 import 'package:bridgecare/features/user_management/models/usuario.dart';
-
-import '../../user_management/services/usuario_service.dart';
 
 class UsuariosListAdminScreen extends StatefulWidget {
   const UsuariosListAdminScreen({super.key});
@@ -30,7 +28,6 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
         return 'Desconocido';
     }
   }
-
 
   @override
   void initState() {
@@ -225,7 +222,6 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                                                     "Tipo Usuario: ${obtenerTipoUsuarioTexto(usuario.tipoUsuario)}",
                                                     style: const TextStyle(
                                                         fontSize: 13)),
-
                                               ],
                                             ),
                                           ),

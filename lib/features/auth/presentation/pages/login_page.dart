@@ -1,11 +1,10 @@
 import 'package:bridgecare/features/auth/domain/models/auth_model.dart';
 import 'package:bridgecare/features/auth/services/auth_service.dart';
+import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bridgecare/core/providers/theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../home/presentation/pages/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -75,16 +74,17 @@ class _LoginPageState extends State<LoginPage> {
               user.id!); // Usa ! porque ya validaste que no es null
 
           themeProvider.setLightMode();
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => HomePage(
-                usuarioId: user.id!,
-                tipoUsuario: user.tipoUsuario ?? 0,
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => HomePage(
+                  usuarioId: user.id!,
+                  tipoUsuario: user.tipoUsuario,
+                ),
               ),
-            ),
-          );
-
+            );
+          }
         } else {
           _showError("Error obteniendo datos del usuario.");
         }

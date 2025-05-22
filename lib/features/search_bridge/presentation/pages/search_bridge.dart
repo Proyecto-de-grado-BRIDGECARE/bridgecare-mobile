@@ -1,7 +1,6 @@
+import 'package:bridgecare/features/bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
 import 'package:flutter/material.dart';
-import '../../../bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
-import 'package:bridgecare/features/home/presentation/pages/home_page.dart';
-import 'package:bridgecare/features/search_bridge/presentation/pages/services/bridge_service.dart';
+import 'package:bridgecare/features/search_bridge/services/bridge_service.dart';
 import 'package:bridgecare/features/bridge_management/models/puente.dart';
 
 class BridgeListScreen extends StatefulWidget {
