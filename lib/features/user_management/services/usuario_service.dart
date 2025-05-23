@@ -44,7 +44,8 @@ class UserService {
   }
 
   Future<void> registerUsuario(Usuario nuevoUsuario) async {
-    final url = Uri.parse("http://192.168.1.9:8084/api/usuarios/register");
+    final url = Uri.parse("https://api.bridgecare.com.co/usuarios/register");
+    //("http://192.168.1.9:8084/api/usuarios/register");
 
     final response = await http.post(
       url,

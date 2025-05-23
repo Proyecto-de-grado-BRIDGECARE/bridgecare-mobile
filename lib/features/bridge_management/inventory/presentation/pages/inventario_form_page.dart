@@ -623,7 +623,8 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         // }
 
         // Send to backend
-        final url = Uri.parse('http://192.168.1.9:8082/api/inventario/add');
+        final url = Uri.parse ('https://api.bridgecare.com.co/inventario/add');
+        //('http://192.168.1.9:8082/api/inventario/add');
 
         final response = await http.post(
           url,

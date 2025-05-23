@@ -222,8 +222,11 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                             if (widget.usuario == null) ...[
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.pushNamed(context, '/homeAdmin');
+                                  Navigator.of(
+                                      context)
+                                      .pop(true);
                                 },
+
                                 child: const Text(
                                   "← Volver",
                                   style: TextStyle(
