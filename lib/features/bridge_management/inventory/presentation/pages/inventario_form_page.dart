@@ -1,5 +1,4 @@
 import 'package:bridgecare/features/bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
-import 'package:bridgecare/features/bridge_management/inventory/models/dtos/inventario_dto.dart';
 import 'package:bridgecare/features/bridge_management/inventory/models/entities/detalle.dart';
 import 'package:bridgecare/features/bridge_management/inventory/models/entities/estribo.dart';
 import 'package:bridgecare/features/bridge_management/inventory/models/entities/pila.dart';
@@ -22,6 +21,10 @@ import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bridgecare/features/bridge_management/services/location_service.dart';
+import '../../../../../shared/help_loader.dart';
+import '../../../../../shared/widgets/help_dialog.dart';
+import '../../../../../shared/widgets/help_icon_button.dart';
+import '../../models/dtos/inventario_dto.dart';
 
 class InventoryFormScreen extends StatefulWidget {
   final int usuarioId;
@@ -41,329 +44,344 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
   final _latitudController = TextEditingController();
   final _longitudController = TextEditingController();
   final _altitudController = TextEditingController();
+  Future<Map<String, HelpInfo>>? helpSectionsFuture;
+  Map<String, HelpInfo> helpSections = {};
 
   @override
   Widget build(BuildContext context) {
-    return FormTemplate(
-      title: 'Creación de Inventario',
-      formKey: _formKey,
-      onSave: _saveForm,
-      sections: [
-        FormSection(
-          title: 'Información Básica',
-          isCollapsible: true,
-          content: DynamicForm(
-            key: _puenteFormKey,
-            fields: Puente.formFields,
-            initialData: _formData['puente'],
-            onSave: (data) => setState(() => _formData['puente']!.addAll(data)),
-          ),
-        ),
-        FormSection(
-          title: 'Pasos',
-          isCollapsible: true,
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Paso 1',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              DynamicForm(
-                fields: Paso.formFields,
-                initialData: _formData['pasos'][0], // First Paso
-                onSave: (data) =>
-                    setState(() => _formData['pasos'][0].addAll(data)),
-              ),
-              const SizedBox(height: 16.0),
-              const Text(
-                'Paso 2',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              DynamicForm(
-                fields: Paso.formFields,
-                initialData: _formData['pasos'][1], // Second Paso
-                onSave: (data) =>
-                    setState(() => _formData['pasos'][1].addAll(data)),
-              ),
-            ],
-          ),
-        ),
-        FormSection(
-          title: 'Datos Administrativos',
-          isCollapsible: true,
-          content: DynamicForm(
-            fields: DatosAdministrativos.formFields,
-            initialData: _formData['datos_administrativos'],
-            onSave: (data) => setState(
-              () => _formData['datos_administrativos']!.addAll(data),
-            ),
-          ),
-        ),
-        FormSection(
-          title: 'Datos Técnicos',
-          isCollapsible: true,
-          content: DynamicForm(
-            fields: DatosTecnicos.formFields,
-            initialData: _formData['datos_tecnicos'],
-            onSave: (data) =>
-                setState(() => _formData['datos_tecnicos']!.addAll(data)),
-          ),
-        ),
-        FormSection(
-          title: 'Superestructura',
-          isCollapsible: true,
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Principal',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              DynamicForm(
-                fields: Superestructura.formFields,
-                initialData: _formData['superestructuras'][0],
-                onSave: (data) => setState(
-                  () => _formData['superestructuras'][0]!.addAll(data),
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              const Text(
-                'Secundario',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              DynamicForm(
-                fields: Superestructura.formFields,
-                initialData: _formData['superestructuras'][1],
-                onSave: (data) => setState(
-                  () => _formData['superestructuras'][1]!.addAll(data),
-                ),
-              ),
-            ],
-          ),
-        ),
-        FormSection(
-          title: 'Subestructura',
-          isCollapsible: true,
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Estribos',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              DynamicForm(
-                fields: Estribo.formFields,
-                initialData: _formData['subestructura']['estribos'],
-                onSave: (data) => setState(
-                  () => _formData['subestructura']['estribos'].addAll(data),
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              const Text(
-                'Detalles',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              DynamicForm(
-                fields: Detalle.formFields,
-                initialData: _formData['subestructura']['detalles'],
-                onSave: (data) => setState(
-                  () => _formData['subestructura']['detalles'].addAll(data),
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              const Text(
-                'Pilas',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              DynamicForm(
-                fields: Pila.formFields,
-                initialData: _formData['subestructura']['pilas'],
-                onSave: (data) => setState(
-                  () => _formData['subestructura']['pilas'].addAll(data),
-                ),
-              ),
-              const SizedBox(height: 16.0),
-              const Text(
-                'Señales',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              DynamicForm(
-                fields: Senial.formFields,
-                initialData: _formData['subestructura']['seniales'],
-                onSave: (data) => setState(
-                  () => _formData['subestructura']['seniales'].addAll(data),
-                ),
-              ),
-            ],
-          ),
-        ),
-        FormSection(
-          title: 'Apoyo',
-          isCollapsible: true,
-          content: DynamicForm(
-            fields: Apoyo.formFields,
-            initialData: _formData['apoyo'],
-            onSave: (data) => setState(() => _formData['apoyo']!.addAll(data)),
-          ),
-        ),
-        FormSection(
-          title: 'Miembros Interesados',
-          isCollapsible: true,
-          content: DynamicForm(
-            fields: MiembrosInteresados.formFields,
-            initialData: _formData['miembros_interesados'],
-            onSave: (data) => setState(
-              () => _formData['miembros_interesados']!.addAll(data),
-            ),
-          ),
-        ),
-        FormSection(
-          title: 'Posición Geográfica',
-          isCollapsible: true,
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.my_location),
-                  label: const Text('Obtener ubicación actual'),
-                  onPressed: _obtenerUbicacion,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xD040A4FF),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8.0),
-              DynamicForm(
-                key: ValueKey(_formData['posicion_geografica']),
-                fields: PosicionGeografica.formFields,
-                initialData: _formData['posicion_geografica'],
-                controllers: {
-                  'latitud': _latitudController,
-                  'longitud': _longitudController,
-                  'altitud': _altitudController,
-                },
-                onSave: (data) => setState(
-                    () => _formData['posicion_geografica']!.addAll(data)),
-              ),
-            ],
-          ),
-        ),
-        FormSection(
-          title: 'Carga',
-          isCollapsible: true,
-          content: DynamicForm(
-            fields: Carga.formFields,
-            initialData: _formData['carga'],
-            onSave: (data) => setState(() => _formData['carga']!.addAll(data)),
-          ),
-        ),
-        FormSection(
-          title: 'Observaciones',
-          isCollapsible: false,
-          content: DynamicForm(
-            fields: Inventario.formFields,
-            initialData: {'observaciones': _formData['observaciones']},
-            onSave: (data) => setState(
-                () => _formData['observaciones'] = data['observaciones'] ?? ''),
-          ),
-        ),
-        FormSection(
-          title: '',
-          isCollapsible: false,
-          content: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0),
-            child: Center(
-              child: SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: ElevatedButton(
-                    onPressed: _saveForm,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF003366),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'GUARDAR',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
+    return FutureBuilder<Map<String, HelpInfo>>(
+      future: helpSectionsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error cargando ayuda'));
+        } else {
+          helpSections = snapshot.data!;
+          return FormTemplate(
+            title: 'Creación de Inventario',
+            formKey: _formKey,
+            onSave: _saveForm,
+            sections: _buildFormSections(), // lo vemos en el siguiente paso
+          );
+        }
+      },
     );
-  }
 
+  }
   @override
   void initState() {
     super.initState();
+    helpSectionsFuture = loadHelpSections();
+    helpSectionsFuture!.then((loadedSections) {
+      setState(() {
+        helpSections = loadedSections;
+      });
+    });
 
     if (widget.inventario != null) {
       final inventario = widget.inventario!;
-
       _formData['observaciones'] = inventario.observaciones;
       _formData['puente'] = {'id': inventario.puente.id};
-
       _formData['pasos'] = inventario.pasos.map((p) => p.toJson()).toList();
-      _formData['datos_administrativos'] =
-          inventario.datosAdministrativos?.toJson() ?? {};
+      _formData['datos_administrativos'] = inventario.datosAdministrativos?.toJson() ?? {};
       _formData['datos_tecnicos'] = inventario.datosTecnicos?.toJson() ?? {};
-      _formData['superestructuras'] =
-          inventario.superestructuras.map((s) => s.toJson()).toList();
+      _formData['superestructuras'] = inventario.superestructuras.map((s) => s.toJson()).toList();
       _formData['subestructura'] = inventario.subestructura?.toJson() ?? {};
       _formData['apoyo'] = inventario.apoyo?.toJson() ?? {};
-      _formData['miembros_interesados'] =
-          inventario.miembrosInteresados?.toJson() ?? {};
-      _formData['posicion_geografica'] =
-          inventario.posicionGeografica?.toJson() ?? {};
+      _formData['miembros_interesados'] = inventario.miembrosInteresados?.toJson() ?? {};
+      _formData['posicion_geografica'] = inventario.posicionGeografica?.toJson() ?? {};
       _formData['carga'] = inventario.carga?.toJson() ?? {};
     }
   }
+
+  List<FormSection> _buildFormSections() {
+    return [
+      FormSection(
+        titleWidget: DefaultSectionTitle(
+          text: 'Información Básica',
+          trailing: HelpIconButton(
+            helpKey: 'informacionBasica',
+            helpSections: helpSections,
+          ),
+        ),
+        isCollapsible: true,
+        content: DynamicForm(
+          key: _puenteFormKey,
+          fields: Puente.formFields,
+          initialData: _formData['puente'],
+          onSave: (data) => setState(() => _formData['puente']!.addAll(data)),
+        ),
+      ),
+
+      FormSection(
+        titleWidget: DefaultSectionTitle(
+          text: 'Pasos',
+          trailing: HelpIconButton(
+            helpKey: 'pasos',
+            helpSections: helpSections,
+          ),
+        ),
+        isCollapsible: true,
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Paso 1', style: TextStyle(fontWeight: FontWeight.bold)),
+            DynamicForm(
+              fields: Paso.formFields,
+              initialData: _formData['pasos'][0],
+              onSave: (data) => setState(() => _formData['pasos'][0].addAll(data)),
+            ),
+            const SizedBox(height: 16),
+            const Text('Paso 2', style: TextStyle(fontWeight: FontWeight.bold)),
+            DynamicForm(
+              fields: Paso.formFields,
+              initialData: _formData['pasos'][1],
+              onSave: (data) => setState(() => _formData['pasos'][1].addAll(data)),
+            ),
+          ],
+        ),
+      ),
+
+      FormSection(
+        titleWidget: DefaultSectionTitle(
+          text: 'Datos Administrativos',
+          trailing: HelpIconButton(
+            helpKey: 'datosAdministrativos',
+            helpSections: helpSections,
+          ),
+        ),
+        isCollapsible: true,
+        content: DynamicForm(
+          fields: DatosAdministrativos.formFields,
+          initialData: _formData['datos_administrativos'],
+          onSave: (data) => setState(() => _formData['datos_administrativos']!.addAll(data)),
+        ),
+      ),
+
+      FormSection(
+        titleWidget: DefaultSectionTitle(
+          text: 'Datos Técnicos',
+          trailing: HelpIconButton(
+            helpKey: 'datosTecnicos',
+            helpSections: helpSections,
+          ),
+        ),
+        isCollapsible: true,
+        content: DynamicForm(
+          fields: DatosTecnicos.formFields,
+          initialData: _formData['datos_tecnicos'],
+          onSave: (data) => setState(() => _formData['datos_tecnicos']!.addAll(data)),
+        ),
+      ),
+
+      FormSection(
+        titleWidget: DefaultSectionTitle(
+          text: 'Superestructura',
+          trailing: HelpIconButton(
+            helpKey: 'superestructura',
+            helpSections: helpSections,
+          ),
+        ),
+        isCollapsible: true,
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Principal', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+            DynamicForm(
+              fields: Superestructura.formFields,
+              initialData: _formData['superestructuras'][0],
+              onSave: (data) => setState(() => _formData['superestructuras'][0].addAll(data)),
+            ),
+            const SizedBox(height: 16.0),
+            const Text('Secundario', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+            DynamicForm(
+              fields: Superestructura.formFields,
+              initialData: _formData['superestructuras'][1],
+              onSave: (data) => setState(() => _formData['superestructuras'][1].addAll(data)),
+            ),
+          ],
+        ),
+      ),
+
+      FormSection(
+        titleWidget: DefaultSectionTitle(
+          text: 'Subestructura',
+          trailing: HelpIconButton(
+            helpKey: 'subestructura',
+            helpSections: helpSections,
+          ),
+        ),
+        isCollapsible: true,
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Estribos', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+            DynamicForm(
+              fields: Estribo.formFields,
+              initialData: _formData['subestructura']['estribos'],
+              onSave: (data) => setState(() => _formData['subestructura']['estribos'].addAll(data)),
+            ),
+            const SizedBox(height: 16.0),
+            const Text('Detalles', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+            DynamicForm(
+              fields: Detalle.formFields,
+              initialData: _formData['subestructura']['detalles'],
+              onSave: (data) => setState(() => _formData['subestructura']['detalles'].addAll(data)),
+            ),
+            const SizedBox(height: 16.0),
+            const Text('Pilas', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+            DynamicForm(
+              fields: Pila.formFields,
+              initialData: _formData['subestructura']['pilas'],
+              onSave: (data) => setState(() => _formData['subestructura']['pilas'].addAll(data)),
+            ),
+            const SizedBox(height: 16.0),
+            const Text('Señales', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+            DynamicForm(
+              fields: Senial.formFields,
+              initialData: _formData['subestructura']['seniales'],
+              onSave: (data) => setState(() => _formData['subestructura']['seniales'].addAll(data)),
+            ),
+          ],
+        ),
+      ),
+
+      FormSection(
+        titleWidget: DefaultSectionTitle(
+          text: 'Apoyo',
+          trailing: HelpIconButton(
+            helpKey: 'apoyo',
+            helpSections: helpSections,
+          ),
+        ),
+        isCollapsible: true,
+        content: DynamicForm(
+          fields: Apoyo.formFields,
+          initialData: _formData['apoyo'],
+          onSave: (data) => setState(() => _formData['apoyo']!.addAll(data)),
+        ),
+      ),
+
+      FormSection(
+        titleWidget: DefaultSectionTitle(
+          text: 'Miembros Interesados',
+          trailing: HelpIconButton(
+            helpKey: 'miembrosInteresados',
+            helpSections: helpSections,
+          ),
+        ),
+        isCollapsible: true,
+        content: DynamicForm(
+          fields: MiembrosInteresados.formFields,
+          initialData: _formData['miembros_interesados'],
+          onSave: (data) => setState(() => _formData['miembros_interesados']!.addAll(data)),
+        ),
+      ),
+
+      FormSection(
+        titleWidget: DefaultSectionTitle(
+          text: 'Posición Geográfica',
+          trailing: HelpIconButton(
+            helpKey: 'posicionGeografica',
+            helpSections: helpSections,
+          ),
+        ),
+        isCollapsible: true,
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.my_location),
+                label: const Text('Obtener ubicación actual'),
+                onPressed: _obtenerUbicacion,
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xD040A4FF)),
+              ),
+            ),
+            const SizedBox(height: 8.0),
+            DynamicForm(
+              key: ValueKey(_formData['posicion_geografica']),
+              fields: PosicionGeografica.formFields,
+              initialData: _formData['posicion_geografica'],
+              controllers: {
+                'latitud': _latitudController,
+                'longitud': _longitudController,
+                'altitud': _altitudController,
+              },
+              onSave: (data) => setState(() => _formData['posicion_geografica']!.addAll(data)),
+            ),
+          ],
+        ),
+      ),
+
+      FormSection(
+        titleWidget: DefaultSectionTitle(
+          text: 'Carga',
+          trailing: HelpIconButton(
+            helpKey: 'carga',
+            helpSections: helpSections,
+          ),
+        ),
+        isCollapsible: true,
+        content: DynamicForm(
+          fields: Carga.formFields,
+          initialData: _formData['carga'],
+          onSave: (data) => setState(() => _formData['carga']!.addAll(data)),
+        ),
+      ),
+
+      FormSection(
+        titleWidget: DefaultSectionTitle(
+          text: 'Observaciones',
+        ),
+        isCollapsible: false,
+        content: DynamicForm(
+          fields: Inventario.formFields,
+          initialData: {'observaciones': _formData['observaciones']},
+          onSave: (data) => setState(() => _formData['observaciones'] = data['observaciones'] ?? ''),
+        ),
+      ),
+
+      FormSection(
+        titleWidget: const SizedBox.shrink(),
+        isCollapsible: false,
+        content: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5.0),
+          child: Center(
+            child: SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                child: ElevatedButton(
+                  onPressed: _saveForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF003366),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'GUARDAR',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      )
+
+
+    ];
+  }
+
 
   final _formKey = GlobalKey<FormState>();
   final Map<String, dynamic> _formData = {
@@ -392,8 +410,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
     'carga': <String, dynamic>{},
   };
 
-  final GlobalKey<DynamicFormState> _puenteFormKey =
-      GlobalKey<DynamicFormState>();
+  final GlobalKey<DynamicFormState> _puenteFormKey = GlobalKey<DynamicFormState>();
 
   Future<void> _saveForm() async {
     //Validar campos requeridos del formulario del puente
@@ -436,8 +453,8 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               map[field] = map[field] == 'Sí'
                   ? true
                   : map[field] == 'No'
-                      ? false
-                      : map[field];
+                  ? false
+                  : map[field];
             }
           }
 
@@ -485,14 +502,14 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
             } else if (obj is List) {
               for (var i = 0; i < obj.length; i++) {
                 if (obj[i] is Map) {
-                  removeEmpty(obj[i] as Map<String, dynamic>,
-                      defaultKey: defaultKey);
+                  removeEmpty(
+                      obj[i] as Map<String, dynamic>, defaultKey: defaultKey);
                 } else {
                   removeEmpty(obj[i], defaultKey: defaultKey);
                 }
               }
               obj.removeWhere((item) =>
-                  item is Map &&
+              item is Map &&
                   (defaultKey != null
                       ? isMinimalMap(item as Map<String, dynamic>, defaultKey)
                       : item.isEmpty));
@@ -511,7 +528,6 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               }
             }
           }
-
           if (cleaned['pasos'] != null && cleaned['pasos'].isNotEmpty) {
             cleaned['pasos'] = cleaned['pasos']
                 .where((paso) => !isMinimalMap(paso, 'numero'))
@@ -545,14 +561,12 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
             }
           }
 
-          if (cleaned['posicion_geografica'] != null &&
-              cleaned['posicion_geografica'].isNotEmpty) {
+          if (cleaned['posicion_geografica'] != null && cleaned['posicion_geografica'].isNotEmpty) {
             convertYesNo(cleaned['posicion_geografica'], 'pasoCauce');
             convertYesNo(cleaned['posicion_geografica'], 'existeVariante');
           }
 
-          if (cleaned['datos_tecnicos'] != null &&
-              cleaned['datos_tecnicos'].isNotEmpty) {
+          if (cleaned['datos_tecnicos'] != null && cleaned['datos_tecnicos'].isNotEmpty) {
             convertYesNo(cleaned['datos_tecnicos'], 'puenteTerraplen');
           }
 
@@ -560,7 +574,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
             final puenteFields = ['regional'];
             _parseFields(cleaned['puente'], puenteFields);
           }
-          if (cleaned['apoyo'] != null && cleaned['apoyo'].isNotEmpty) {
+          if (cleaned['apoyo'] != null && cleaned['apoyo'].isNotEmpty){
             final apoyoFields = [
               'fijoSobreEstribo',
               'movilSobreEstribo',
@@ -579,12 +593,12 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
             _parseFields(cleaned['subestructura']['estribos'], estriboFields);
           }
           if (cleaned['subestructura']?['pilas'] != null &&
-              cleaned['subestructura']['pilas'].isNotEmpty) {
+              cleaned['subestructura']['pilas'].isNotEmpty){
             final pilaFields = ['tipo', 'material', 'tipoCimentacion'];
             _parseFields(cleaned['subestructura']['pilas'], pilaFields);
           }
           if (cleaned['subestructura']?['detalles'] != null &&
-              cleaned['subestructura']['detalles'].isNotEmpty) {
+              cleaned['subestructura']['detalles'].isNotEmpty){
             final detalleFields = [
               'tipoBaranda',
               'superficieRodadura',
@@ -610,22 +624,10 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
 
         debugPrint(jsonString);
 
-        // Save cleanedData to a JSON file for debugging
-        // try {
-        //   final directory = await getApplicationDocumentsDirectory();
-        //   final file = File(
-        //     '${directory.path}/inventario_payload_${DateTime.now().millisecondsSinceEpoch}.json',
-        //   );
-        //   await file.writeAsString(jsonString, flush: true);
-        //   debugPrint('JSON saved to: ${file.path}');
-        // } catch (e) {
-        //   debugPrint('Error saving JSON file: $e');
-        // }
 
         // Send to backend
-        final url = Uri.parse ('https://api.bridgecare.com.co/inventario/add');
+        final url = Uri.parse('https://api.bridgecare.com.co/inventario/add');
         //('http://192.168.1.9:8082/api/inventario/add');
-
         final response = await http.post(
           url,
           headers: {
@@ -660,7 +662,6 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
             );
           }
         }
-
         debugPrint(
           response.statusCode == 200
               ? 'Success: ${response.body}'
@@ -669,15 +670,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
       }
     }
 
-    // Placeholder for token extraction (adjust based on your JWT structure)
-    //int _extractUserIdFromToken(String token) {
-    //import 'package:jwt_decoder/jwt_decoder.dart';
-    //Example: Decode JWT (requires jwt_decoder package)
-    //final decoded = JwtDecoder.decode(token); // Asegúrate de importar jwt_decoder
-    //return int.parse(decoded['sub']?? '1');
-    //}
   }
-
   Future<void> _obtenerUbicacion() async {
     final posicion = await LocationService.obtenerPosicion();
     if (posicion != null) {

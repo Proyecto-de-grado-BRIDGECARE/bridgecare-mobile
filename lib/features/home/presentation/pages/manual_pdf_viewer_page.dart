@@ -21,9 +21,9 @@ class _ManualPdfViewerPageState extends State<ManualPdfViewerPage> {
   }
 
   Future<void> _loadPdfFromAssets() async {
-    final byteData = await rootBundle.load('assets/pdfs/manual.pdf');
+    final byteData = await rootBundle.load('assets/pdfs/manual.help');
     final tempDir = await getTemporaryDirectory();
-    final file = File('${tempDir.path}/manual.pdf');
+    final file = File('${tempDir.path}/manual.help');
     await file.writeAsBytes(byteData.buffer.asUint8List());
     setState(() {
       localPath = file.path;
