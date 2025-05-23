@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:bridgecare/features/bridge_management/inventory/models/entities/inventario.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../inventory/models/dtos/inventario_dto.dart';
 
 class InventarioService {
   static const String baseUrl =
@@ -33,6 +36,29 @@ class InventarioService {
       return null; // backend devuelve 404 si no existe
     } else {
       throw Exception('Error al obtener inventario del puente');
+    }
+  }
+  Future<InventarioDTO?> getInventarioDTOporPuente(int puenteId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access_token') ?? '';
+
+    final response = await http.get(
+      Uri.parse("$baseUrl/puente/$puenteId"),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    debugPrint('🔁 Status code: ${response.statusCode}');
+    debugPrint('🔁 Body: ${response.body}');
+
+    if (response.statusCode == 200 && response.body.isNotEmpty) {
+      return InventarioDTO.fromJson(jsonDecode(response.body));
+    } else if (response.statusCode == 404) {
+      return null; // Inventario no encontrado
+    } else {
+      throw Exception('Error al obtener inventario del puente: ${response.statusCode}');
     }
   }
 

@@ -1,4 +1,5 @@
 class InventarioDTO {
+  int? id;
   String? observaciones;
   PuenteDTO puente;
   ApoyoDTO? apoyo;
@@ -12,6 +13,7 @@ class InventarioDTO {
   List<SuperestructuraDTO> superestructuras;
 
   InventarioDTO({
+    required id,
     this.observaciones,
     required this.puente,
     this.apoyo,
@@ -31,6 +33,36 @@ class InventarioDTO {
         'datosTecnicos': datosTecnicos?.toJson(),
         'subestructura': subestructura?.toJson(),
       };
+  factory InventarioDTO.fromJson(Map<String, dynamic> json) {
+    return InventarioDTO(
+      id: json['id'],
+      observaciones: json['observaciones'],
+      puente: PuenteDTO.fromJson(json['puente']),
+      apoyo: json['apoyo'] != null ? ApoyoDTO.fromJson(json['apoyo']) : null,
+      carga: json['carga'] != null ? CargaDTO.fromJson(json['carga']) : null,
+      datosAdministrativos: json['datos_administrativos'] != null
+          ? DatosAdministrativosDTO.fromJson(json['datos_administrativos'])
+          : null,
+      datosTecnicos: json['datos_tecnicos'] != null
+          ? DatosTecnicosDTO.fromJson(json['datos_tecnicos'])
+          : null,
+      miembrosInteresados: json['miembros_interesados'] != null
+          ? MiembrosInteresadosDTO.fromJson(json['miembros_interesados'])
+          : null,
+      pasos: (json['pasos'] as List<dynamic>)
+          .map((p) => PasoDTO.fromJson(p))
+          .toList(),
+      posicionGeografica: json['posicion_geografica'] != null
+          ? PosicionGeograficaDTO.fromJson(json['posicion_geografica'])
+          : null,
+      subestructura: json['subestructura'] != null
+          ? SubestructuraDTO.fromJson(json['subestructura'])
+          : null,
+      superestructuras: (json['superestructuras'] as List<dynamic>)
+          .map((s) => SuperestructuraDTO.fromJson(s))
+          .toList(),
+    );
+  }
 }
 
 class ApoyoDTO {
@@ -64,6 +96,18 @@ class ApoyoDTO {
         'vehiculoDiseno': vehiculoDiseno,
         'claseDistribucionCarga': claseDistribucionCarga,
       };
+  factory ApoyoDTO.fromJson(Map<String, dynamic> json) {
+    return ApoyoDTO(
+      fijoSobreEstribo: json['fijoSobreEstribo'],
+      movilSobreEstribo: json['movilSobreEstribo'],
+      fijoEnPila: json['fijoEnPila'],
+      movilEnPila: json['movilEnPila'],
+      fijoEnViga: json['fijoEnViga'],
+      movilEnViga: json['movilEnViga'],
+      vehiculoDiseno: json['vehiculoDiseno'],
+      claseDistribucionCarga: json['claseDistribucionCarga'],
+    );
+  }
 }
 
 class CargaDTO {
@@ -88,6 +132,14 @@ class CargaDTO {
         'momento': momento,
         'lineaCargaPorRueda': lineaCargaPorRueda,
       };
+  factory CargaDTO.fromJson(Map<String, dynamic> json) {
+    return CargaDTO(
+        longitudLuzCritica: json['longitudLuzCritica'],
+        factorClasificacion: json['factorClasificacion'],
+        fuerzaCortante: json['fuerzaCortante'],
+        momento: json['momento'],
+        lineaCargaPorRueda: json['lineaCargaPorRueda']);
+  }
 }
 
 class DatosAdministrativosDTO {
@@ -118,6 +170,19 @@ class DatosAdministrativosDTO {
         'estacionConteo': estacionConteo,
         'fechaRecoleccionDatos': fechaRecoleccionDatos?.toIso8601String(),
       };
+  factory DatosAdministrativosDTO.fromJson(Map<String, dynamic> json) {
+    return DatosAdministrativosDTO(
+      anioConstruccion: json['anioConstruccion'],
+      anioReconstruccion: json['anioReconstruccion'],
+      direccionAbscCarretera: json['direccionAbscCarretera'],
+      requisitosInspeccion: json['requisitosInspeccion'],
+      numeroSeccionesInspeccion: json['numeroSeccionesInspeccion'],
+      estacionConteo: json['estacionConteo'],
+      fechaRecoleccionDatos: json['fechaRecoleccionDatos'] != null
+          ? DateTime.parse(json['fechaRecoleccionDatos'])
+          : null,
+    );
+  }
 }
 
 class DatosTecnicosDTO {
@@ -139,6 +204,14 @@ class DatosTecnicosDTO {
         'longitudTotal': longitudTotal,
         'anchoTablero': anchoTablero,
       };
+  factory DatosTecnicosDTO.fromJson(Map<String, dynamic> json) {
+    return DatosTecnicosDTO(
+      longitudLuzMenor: (json['longitudLuzMenor'] as num?)?.toDouble(),
+      longitudLuzMayor: (json['longitudLuzMayor'] as num?)?.toDouble(),
+      longitudTotal: (json['longitudTotal'] as num?)?.toDouble(),
+      anchoTablero: (json['anchoTablero'] as num?)?.toDouble(),
+    );
+  }
 }
 
 class DetalleDTO {
@@ -157,6 +230,12 @@ class DetalleDTO {
         'superficieRodadura': superficieRodadura,
         'juntaExpansion': juntaExpansion,
       };
+  factory DetalleDTO.fromJson(Map<String, dynamic> json) {
+    return DetalleDTO(
+        tipoBaranda: json['tipoBaranda'],
+        superficieRodadura: json['superficieRodadura'],
+        juntaExpansion: json['juntaExpansion']);
+  }
 }
 
 class EstriboDTO {
@@ -175,6 +254,12 @@ class EstriboDTO {
         'material': material,
         'tipoCimentacion': tipoCimentacion,
       };
+  factory EstriboDTO.fromJson(Map<String, dynamic> json) {
+    return EstriboDTO(
+        tipo: json['tipo'],
+        material: json['material'],
+        tipoCimentacion: json['tipoCimentacion']);
+  }
 }
 
 class MiembrosInteresadosDTO {
@@ -199,6 +284,16 @@ class MiembrosInteresadosDTO {
         'proyectista': proyectista,
         'municipio': municipio,
       };
+  factory MiembrosInteresadosDTO.fromJson(Map<String, dynamic> json) {
+    return MiembrosInteresadosDTO(
+      propietario: json['propietario'],
+      departamento: json['departamento'],
+      administradorVial: json['administradorVial'],
+      proyectista: json['proyectista'],
+      municipio: json['municipio'],
+    );
+  }
+
 }
 
 class PasoDTO {
@@ -232,6 +327,18 @@ class PasoDTO {
         'galiboDm': galiboDm,
         'galiboD': galiboD,
       };
+  factory PasoDTO.fromJson(Map<String, dynamic> json) {
+    return PasoDTO(
+      numero: json['numero'],
+      tipoPaso: json['tipoPaso'],
+      primero: json['primero'],
+      supInf: json['supInf'],
+      galiboI: (json['galiboI'] as num?)?.toDouble(),
+      galiboIm: (json['galiboIm'] as num?)?.toDouble(),
+      galiboDm: (json['galiboDm'] as num?)?.toDouble(),
+      galiboD: (json['galiboD'] as num?)?.toDouble(),
+    );
+  }
 }
 
 class PilaDTO {
@@ -250,6 +357,12 @@ class PilaDTO {
         'material': material,
         'tipoCimentacion': tipoCimentacion,
       };
+  factory PilaDTO.fromJson(Map<String, dynamic> json) {
+    return PilaDTO(
+        tipo: json['tipo'],
+        material: json['material'],
+        tipoCimentacion: json['tipoCimentacion']);
+  }
 }
 
 class PosicionGeograficaDTO {
@@ -283,6 +396,18 @@ class PosicionGeograficaDTO {
         'longitudVariante': longitudVariante,
         'estado': estado,
       };
+  factory PosicionGeograficaDTO.fromJson(Map<String, dynamic> json) {
+    return PosicionGeograficaDTO(
+      latitud: (json['latitud'] as num?)?.toDouble(),
+      longitud: (json['longitud'] as num?)?.toDouble(),
+      altitud: (json['altitud'] as num?)?.toDouble(),
+      coeficienteAceleracionSismica: json['coeficienteAceleracionSismica'],
+      pasoCauce: json['pasoCauce'],
+      existeVariante: json['existeVariante'],
+      longitudVariante: (json['longitudVariante'] as num?)?.toDouble(),
+      estado: json['estado'],
+    );
+  }
 }
 
 class PuenteDTO {
@@ -310,6 +435,16 @@ class PuenteDTO {
         'pr': pr,
         'regional': regional,
       };
+  factory PuenteDTO.fromJson(Map<String, dynamic> json) {
+    return PuenteDTO(
+      id: json['id'],
+      nombre: json['nombre'],
+      identif: json['identif'],
+      carretera: json['carretera'],
+      pr: json['pr'],
+      regional: json['regional'],
+    );
+  }
 }
 
 class SenialDTO {
@@ -324,6 +459,12 @@ class SenialDTO {
         'velocidadMaxima': velocidadMaxima,
         'otra': otra,
       };
+  factory SenialDTO.fromJson(Map<String, dynamic> json) {
+    return SenialDTO(
+        cargaMaxima: json['cargaMaxima'],
+        velocidadMaxima: json['velocidadMaxima'],
+        otra: json['otra']);
+  }
 }
 
 class SubestructuraDTO {
@@ -340,6 +481,17 @@ class SubestructuraDTO {
         'senial': senial?.toJson(),
         'pila': pila?.toJson(),
       };
+  factory SubestructuraDTO.fromJson(Map<String, dynamic> json) {
+    return SubestructuraDTO(
+      estribo:
+      json['estribo'] != null ? EstriboDTO.fromJson(json['estribo']) : null,
+      detalle:
+      json['detalle'] != null ? DetalleDTO.fromJson(json['detalle']) : null,
+      senial:
+      json['senial'] != null ? SenialDTO.fromJson(json['senial']) : null,
+      pila: json['pila'] != null ? PilaDTO.fromJson(json['pila']) : null,
+    );
+  }
 }
 
 class SuperestructuraDTO {
@@ -364,4 +516,37 @@ class SuperestructuraDTO {
         'tipoEstructuracionLongitudinal': tipoEstructuracionLongitudinal,
         'material': material,
       };
+  factory SuperestructuraDTO.fromJson(Map<String, dynamic> json) {
+    return SuperestructuraDTO(
+      tipo: json['tipo'],
+      disenioTipo: json['disenioTipo'],
+      tipoEstructuracionTransversal: json['tipoEstructuracionTransversal'],
+      tipoEstructuracionLongitudinal: json['tipoEstructuracionLongitudinal'],
+      material: json['material'],
+    );
+  }
 }
+extension InventarioDTODebugExtension on InventarioDTO {
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'observaciones': observaciones,
+      'puente': puente.toJson(),
+      'apoyo': apoyo?.toJson(),
+      'carga': carga?.toJson(),
+      'datos_administrativos': datosAdministrativos?.toJson(),
+      'datos_tecnicos': datosTecnicos?.toJson(),
+      'miembros_interesados': miembrosInteresados?.toJson(),
+      'pasos': pasos.map((p) => p.toJson()).toList(),
+      'posicion_geografica': posicionGeografica?.toJson(),
+      'subestructura': {
+        'estribos': subestructura?.estribo?.toJson() ?? {},
+        'detalles': subestructura?.detalle?.toJson() ?? {},
+        'pilas': subestructura?.pila?.toJson() ?? {},
+        'seniales': subestructura?.senial?.toJson() ?? {},
+      },
+      'superestructuras': superestructuras.map((s) => s.toJson()).toList(),
+    };
+  }
+}
+

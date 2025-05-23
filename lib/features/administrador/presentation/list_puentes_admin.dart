@@ -1,10 +1,15 @@
 import 'package:bridgecare/features/bridge_management/inspection/presentation/pages/inspeccion_form_page.dart';
+import 'package:bridgecare/features/bridge_management/inventory/models/dtos/inventario_dto.dart';
 import 'package:bridgecare/features/bridge_management/models/puente.dart';
 import 'package:bridgecare/features/search_bridge/services/bridge_service.dart';
 import 'package:flutter/material.dart';
 
+import '../../bridge_management/inventory/presentation/pages/inventario_form_page.dart';
+import '../../bridge_management/services/inventory_service.dart';
+
 class PuentesListAdminScreen extends StatefulWidget {
-  const PuentesListAdminScreen({super.key});
+  final int usuarioId;
+  const PuentesListAdminScreen({required this.usuarioId, super.key});
 
   @override
   State<PuentesListAdminScreen> createState() => _PuentesListAdminState();
@@ -323,16 +328,41 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                                 icon: const Icon(Icons.edit,
                                                     color: Colors.blueAccent),
                                                 tooltip: 'Editar puente',
-                                                onPressed: () {
-                                                  /*Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) => InventoryFormScreen(
-                                                        puenteId: puente.id!,
-                                                        modoEdicion: true, // Asegúrate de usar este flag si aplica
-                                                      ),
-                                                    ),
-                                                  );*/
+                                                onPressed: () async {
+                                                  try {
+                                                    final inventario =
+                                                    await InventarioService().getInventarioDTOporPuente(puente.id!);
+                                                    debugPrint("🧪 Inventario obtenido: ${inventario?.toMap()}");
+                                                    if (inventario != null) {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              InventoryFormScreen(
+                                                                usuarioId:
+                                                                widget.usuarioId,
+                                                                inventario: inventario,
+                                                              ),
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      ScaffoldMessenger.of(context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                            content: Text(
+                                                                'Este puente no tiene inventario.')),
+                                                      );
+                                                    }
+                                                  } catch (e) {
+                                                    debugPrint(
+                                                        "❌ Error al obtener inventario: $e");
+                                                    ScaffoldMessenger.of(context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                          content: Text(
+                                                              'Error al cargar el inventario')),
+                                                    );
+                                                  }
                                                 },
                                               ),
                                               IconButton(

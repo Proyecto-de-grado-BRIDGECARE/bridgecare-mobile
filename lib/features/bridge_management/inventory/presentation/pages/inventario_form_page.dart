@@ -22,7 +22,6 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bridgecare/features/bridge_management/services/location_service.dart';
 import '../../../../../shared/help_loader.dart';
-import '../../../../../shared/widgets/help_dialog.dart';
 import '../../../../../shared/widgets/help_icon_button.dart';
 import '../../models/dtos/inventario_dto.dart';
 
@@ -46,6 +45,8 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
   final _altitudController = TextEditingController();
   Future<Map<String, HelpInfo>>? helpSectionsFuture;
   Map<String, HelpInfo> helpSections = {};
+  bool get esEdicion => widget.inventario != null;
+
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +73,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
   @override
   void initState() {
     super.initState();
+    debugPrint("📥 InventoryFormScreen iniciado con inventario: ${widget.inventario?.toMap()}");
     helpSectionsFuture = loadHelpSections();
     helpSectionsFuture!.then((loadedSections) {
       setState(() {
@@ -626,47 +628,68 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
 
 
         // Send to backend
-        final url = Uri.parse('https://api.bridgecare.com.co/inventario/add');
-        //('http://192.168.1.9:8082/api/inventario/add');
-        final response = await http.post(
+        final url = esEdicion
+            ? Uri.parse('http://192.168.1.9:8082/api/inventario/update/${widget.inventario!.id}')
+            : Uri.parse('https://api.bridgecare.com.co/inventario/add');
+
+        final response = await (esEdicion
+            ? http.put(
           url,
           headers: {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json',
           },
           body: jsonString,
-        );
+        )
+            : http.post(
+          url,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: jsonString,
+        ));
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           final responseData = jsonDecode(response.body);
           int? puenteId;
           int? usuarioId;
 
-          if (responseData is Map && responseData.containsKey('puente')) {
+          if (responseData is Map) {
             puenteId = responseData['puente']?['id'];
             usuarioId = responseData['usuario']?['id'];
           } else if (responseData is int) {
             puenteId = responseData;
           }
 
-          debugPrint("✅ Inventario creado con puenteId: $puenteId y usuarioId: $usuarioId");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(esEdicion
+                  ? 'Inventario actualizado'
+                  : 'Inventario creado'),
+            ),
+          );
 
           if (puenteId != null) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => InspectionFormScreen(
-                  puenteId: puenteId!,
-                ),
+                builder: (context) => InspectionFormScreen(puenteId: puenteId!),
               ),
             );
           }
+
+          debugPrint("✅ Inventario procesado con puenteId: $puenteId y usuarioId: $usuarioId");
+        } else {
+          debugPrint("❌ Error al guardar inventario: ${response.statusCode}");
         }
+
         debugPrint(
-          response.statusCode == 200
+          response.statusCode == 200 || response.statusCode == 201
               ? 'Success: ${response.body}'
               : 'Failed: ${response.statusCode} - ${response.body}',
         );
+
       }
     }
 

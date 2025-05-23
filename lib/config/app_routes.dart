@@ -27,7 +27,7 @@ class AppRoutes {
     '/SearchBridge': (context) => BridgeListScreen(),
     '/forminspeccion': (context) => InspectionFormScreen(puenteId: 3),
     '/forminventario': (context) => InventoryFormScreen(usuarioId: 1),
-    '/puenteslistAdmin': (context) => PuentesListAdminScreen(),
+    '/puenteslistAdmin': (context) => PuentesListAdminScreen(usuarioId: 1,),
     '/usuarioslistAdmin': (context) => UsuariosListAdminScreen(),
     //Rutas administrador
     //'/Autorizacion' :(context) => AutorizacionUsuario(),
