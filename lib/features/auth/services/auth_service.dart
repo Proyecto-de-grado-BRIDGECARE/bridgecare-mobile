@@ -20,6 +20,7 @@ class AuthService {
         url,
         headers: {
           "Content-Type": "application/json",
+
           "Authorization": basicAuth,
         },
         body: jsonEncode(request.toJson()),

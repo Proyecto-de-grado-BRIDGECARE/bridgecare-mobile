@@ -637,21 +637,28 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           final responseData = jsonDecode(response.body);
-          final puenteId = responseData['puente']['id'];
-          final usuarioId = responseData['usuario']['id'];
+          int? puenteId;
+          int? usuarioId;
 
-          debugPrint(
-              "✅ Inventario creado con puenteId: $puenteId y usuarioId: $usuarioId");
+          if (responseData is Map && responseData.containsKey('puente')) {
+            puenteId = responseData['puente']?['id'];
+            usuarioId = responseData['usuario']?['id'];
+          } else if (responseData is int) {
+            puenteId = responseData;
+          }
 
-          // Redirigir al formulario de inspección
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => InspectionFormScreen(
-                puenteId: puenteId,
+          debugPrint("✅ Inventario creado con puenteId: $puenteId y usuarioId: $usuarioId");
+
+          if (puenteId != null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => InspectionFormScreen(
+                  puenteId: puenteId!,
+                ),
               ),
-            ),
-          );
+            );
+          }
         }
 
         debugPrint(
