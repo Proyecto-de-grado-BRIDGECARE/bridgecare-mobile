@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:bridgecare/features/bridge_management/alert/presentation/pages/alert_page.dart';
 import 'package:bridgecare/features/bridge_management/inspection/controllers/inspection_controller.dart';
 import 'package:bridgecare/features/bridge_management/inspection/models/componente.dart';
@@ -16,6 +15,9 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../../shared/help_loader.dart';
+import '../../../../../shared/widgets/help_icon_button.dart';
+
 class InspectionFormScreen extends StatefulWidget {
   final int puenteId;
 
@@ -30,6 +32,9 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
   List<Map<String, String>> componentList = [];
   Map<String, dynamic>? puenteData;
   bool isDataLoaded = false;
+
+  Map<String, HelpInfo> helpSections = {};
+
 
   @override
   void initState() {
@@ -181,8 +186,18 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                     }
                   },
                   sections: [
+
+                    // Asume que ya tienes el widget DefaultSectionTitle definido dentro de form_template.dart
+// Si no, te lo puedo volver a pasar
+
                     FormSection(
-                      title: 'Información Básica',
+                      titleWidget: DefaultSectionTitle(
+                        text: 'Información Básica',
+                        trailing: HelpIconButton(
+                          helpKey: 'informacionBasica',
+                          helpSections: helpSections,
+                        ),
+                      ),
                       isCollapsible: true,
                       content: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,65 +210,62 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                           DynamicForm(
                             fields: Inspeccion.formFields,
                             initialData: controller.inspeccion.toJson(),
-                            onSave: (data) =>
-                                controller.updateInspeccionData(data),
+                            onSave: (data) => controller.updateInspeccionData(data),
                           ),
                           TextFormField(
                             initialValue: inspectorName,
-                            decoration:
-                                const InputDecoration(labelText: 'Inspector'),
+                            decoration: const InputDecoration(labelText: 'Inspector'),
                             readOnly: true,
                           ),
                         ],
                       ),
                     ),
+
                     ...componentList.asMap().entries.map((entry) {
                       final index = entry.key;
                       final component = entry.value;
                       return FormSection(
-                        title: component['title']!,
+                        titleWidget: DefaultSectionTitle(
+                          text: component['title']!,
+                          trailing: HelpIconButton(
+                            helpKey: 'componente_${component['title']}',
+                            helpSections: helpSections,
+                          ),
+                        ),
                         isCollapsible: true,
                         content: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             DynamicForm(
-                              fields: {
-                                ...Componente.formFields,
-                              },
-                              initialData: controller
-                                  .inspeccion.componentes[index]
-                                  .toJson(),
-                              onSave: (data) =>
-                                  controller.updateComponenteData(index, data),
+                              fields: {...Componente.formFields},
+                              initialData: controller.inspeccion.componentes[index].toJson(),
+                              onSave: (data) => controller.updateComponenteData(index, data),
                               extraData: {
                                 'puenteId': widget.puenteId.toString(),
-                                'inspeccionUuid':
-                                    controller.inspeccion.inspeccionUuid,
-                                'componenteUuid': controller.inspeccion
-                                    .componentes[index].componenteUuid,
+                                'inspeccionUuid': controller.inspeccion.inspeccionUuid,
+                                'componenteUuid': controller.inspeccion.componentes[index].componenteUuid,
                               },
                             ),
                             const SizedBox(height: 16.0),
                             const Text(
                               'Reparaciones',
                               style: TextStyle(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blueGrey),
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueGrey,
+                              ),
                             ),
                             DynamicForm(
                               fields: Reparacion.formFields,
-                              initialData: controller
-                                      .inspeccion.componentes[index].reparacion
-                                      ?.toJson() ??
-                                  {},
-                              onSave: (data) =>
-                                  controller.updateReparacionData(index, data),
+                              initialData: controller.inspeccion.componentes[index].reparacion?.toJson() ?? {},
+                              onSave: (data) => controller.updateReparacionData(index, data),
                             ),
                           ],
                         ),
                       );
                     }),
+
+
                   ],
                 ),
               ),

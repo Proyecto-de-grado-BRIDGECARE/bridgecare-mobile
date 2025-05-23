@@ -1,0 +1,17 @@
+{
+  "pasos": {
+    "title": "Paso superior / inferior",
+    "content": "Indican por medio de una 'S' o una 'I', respectivamente, si el puente es un paso superior o un paso inferior.\n\n- Si la vía principal está sobre el puente, el puente es un **paso superior**.\n- Si la carretera principal está bajo el puente, es un **paso inferior**.",
+    "imageAsset": "assets/images/pspi.png"
+  },
+  "datosAdministrativos": {
+    "title": "Datos Administrativos",
+    "content": "- **Año de construcción**: Año en que se terminó la construcción del puente.\n- **Año de reconstrucción**: Año de la última rehabilitación mayor.\n- **Dirección del abscisado**: N, S, E u O según la dirección de la carretera.\n  - Troncales: S → N\n  - Transversales: O → E",
+    "imageAsset": null
+  },
+  "datosTecnicos": {
+    "title": "Datos Técnicos",
+    "content": "- **Número de luces**: Total de luces del puente.\n- **Longitud mínima/máxima de luz**: Medida entre centros de pila o extremos.\n- **Longitud total**: Superestructura, sin aletas ni losas de aproximación.\n- **Anchos**: tablero, separador, andenes, calzada, entre bordillos, acceso.\n- **Alturas**: de pilas y estribos (estimadas si no hay planos).\n- **Longitud de apoyos**: en pilas y estribos.\n- **Terraplén**: S/N según si los accesos están en terraplén.\n- **Curva/Tangente**: C o T según la curvatura horizontal.\n- **Esviajamiento**: Ángulo entre pilas y eje del puente (0–90°).",
+    "imageAsset": null
+  }
+}
