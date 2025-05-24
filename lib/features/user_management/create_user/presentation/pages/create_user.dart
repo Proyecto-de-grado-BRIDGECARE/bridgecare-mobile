@@ -62,7 +62,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
     try {
       if (widget.usuario != null) {
         await UserService()
-            .updateUsuario(usuario); // deberías tener este método
+            .updateUsuario(usuario);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Usuario actualizado con éxito")),
@@ -77,7 +77,9 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
         }
       }
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/homeAdmin');
+        Navigator.of(
+            context)
+            .pop(true);
       }
     } catch (e) {
       if (mounted) {

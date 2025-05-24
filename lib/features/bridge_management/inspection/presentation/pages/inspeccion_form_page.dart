@@ -138,137 +138,146 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
           return Stack(
             children: [
               Scaffold(
-                body: FormTemplate(
-                  title: 'Formulario de Inspección',
-                  formKey: controller.formKey,
-                  onSave: () async {
-                    try {
-                      await controller.submitForm();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content:
-                                Text('Inspección en cola para sincronización')),
-                      );
-                      final hayAlertas = await _tieneAlertas(widget.puenteId);
-                      if (hayAlertas && mounted) {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('¡Atención!'),
-                            content: const Text(
-                                'Se han generado alertas para esta inspección. ¿Deseas revisarlas?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AlertScreen(
-                                          puenteId: widget.puenteId),
+                body: Column(
+                  children: [
+                    Expanded(
+                      child: FormTemplate(
+                        title: 'Formulario de Inspección',
+                        formKey: controller.formKey,
+                        onSave: () async {
+                          try {
+                            await controller.submitForm();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Inspección en cola para sincronización')),
+                            );
+                            final hayAlertas = await _tieneAlertas(widget.puenteId);
+                            if (hayAlertas && mounted) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('¡Atención!'),
+                                  content: const Text('Se han generado alertas para esta inspección. ¿Deseas revisarlas?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => AlertScreen(puenteId: widget.puenteId),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text('Ver alertas'),
                                     ),
-                                  );
-                                },
-                                child: const Text('Ver alertas'),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('Cerrar'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error: $e')),
+                            );
+                          }
+                        },
+                        sections: [
+                          FormSection(
+                            titleWidget: DefaultSectionTitle(
+                              text: 'Información Básica',
+                              trailing: HelpIconButton(
+                                helpKey: 'informacionBasica',
+                                helpSections: helpSections,
                               ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Cerrar'),
+                            ),
+                            isCollapsible: true,
+                            content: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                DynamicForm(
+                                  fields: Puente.formFields,
+                                  initialData: puenteData!,
+                                  onSave: (data) => controller.updatePuenteData(data),
+                                ),
+                                DynamicForm(
+                                  fields: Inspeccion.formFields,
+                                  initialData: controller.inspeccion.toJson(),
+                                  onSave: (data) => controller.updateInspeccionData(data),
+                                ),
+                                TextFormField(
+                                  initialValue: inspectorName,
+                                  decoration: const InputDecoration(labelText: 'Inspector'),
+                                  readOnly: true,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          ...componentList.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final component = entry.value;
+                            return FormSection(
+                              titleWidget: DefaultSectionTitle(
+                                text: component['title']!,
+                                trailing: HelpIconButton(
+                                  helpKey: 'componente_${component['title']}',
+                                  helpSections: helpSections,
+                                ),
                               ),
-                            ],
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: $e')),
-                      );
-                    }
-                  },
-                  sections: [
-
-                    // Asume que ya tienes el widget DefaultSectionTitle definido dentro de form_template.dart
-// Si no, te lo puedo volver a pasar
-
-                    FormSection(
-                      titleWidget: DefaultSectionTitle(
-                        text: 'Información Básica',
-                        trailing: HelpIconButton(
-                          helpKey: 'informacionBasica',
-                          helpSections: helpSections,
-                        ),
-                      ),
-                      isCollapsible: true,
-                      content: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          DynamicForm(
-                            fields: Puente.formFields,
-                            initialData: puenteData!,
-                            onSave: (data) => controller.updatePuenteData(data),
-                          ),
-                          DynamicForm(
-                            fields: Inspeccion.formFields,
-                            initialData: controller.inspeccion.toJson(),
-                            onSave: (data) => controller.updateInspeccionData(data),
-                          ),
-                          TextFormField(
-                            initialValue: inspectorName,
-                            decoration: const InputDecoration(labelText: 'Inspector'),
-                            readOnly: true,
-                          ),
+                              isCollapsible: true,
+                              content: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  DynamicForm(
+                                    fields: {...Componente.formFields},
+                                    initialData: controller.inspeccion.componentes[index].toJson(),
+                                    onSave: (data) => controller.updateComponenteData(index, data),
+                                    extraData: {
+                                      'puenteId': widget.puenteId.toString(),
+                                      'inspeccionUuid': controller.inspeccion.inspeccionUuid,
+                                      'componenteUuid': controller.inspeccion.componentes[index].componenteUuid,
+                                    },
+                                  ),
+                                  const SizedBox(height: 16.0),
+                                  const Text(
+                                    'Reparaciones',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blueGrey,
+                                    ),
+                                  ),
+                                  DynamicForm(
+                                    fields: Reparacion.formFields,
+                                    initialData: controller.inspeccion.componentes[index].reparacion?.toJson() ?? {},
+                                    onSave: (data) => controller.updateReparacionData(index, data),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
                         ],
                       ),
                     ),
-
-                    ...componentList.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final component = entry.value;
-                      return FormSection(
-                        titleWidget: DefaultSectionTitle(
-                          text: component['title']!,
-                          trailing: HelpIconButton(
-                            helpKey: 'componente_${component['title']}',
-                            helpSections: helpSections,
-                          ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: ElevatedButton.icon(
+                        onPressed: () => controller.submitForm(),
+                        label: const Text('GUARDAR'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xff01579a),
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 50),
                         ),
-                        isCollapsible: true,
-                        content: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            DynamicForm(
-                              fields: {...Componente.formFields},
-                              initialData: controller.inspeccion.componentes[index].toJson(),
-                              onSave: (data) => controller.updateComponenteData(index, data),
-                              extraData: {
-                                'puenteId': widget.puenteId.toString(),
-                                'inspeccionUuid': controller.inspeccion.inspeccionUuid,
-                                'componenteUuid': controller.inspeccion.componentes[index].componenteUuid,
-                              },
-                            ),
-                            const SizedBox(height: 16.0),
-                            const Text(
-                              'Reparaciones',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blueGrey,
-                              ),
-                            ),
-                            DynamicForm(
-                              fields: Reparacion.formFields,
-                              initialData: controller.inspeccion.componentes[index].reparacion?.toJson() ?? {},
-                              onSave: (data) => controller.updateReparacionData(index, data),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-
-
+                      ),
+                    ),
                   ],
                 ),
               ),
+
               if (controller.isWidgetVisible)
                 QueueProgressWidget(
                   queueService: controller.queueService,

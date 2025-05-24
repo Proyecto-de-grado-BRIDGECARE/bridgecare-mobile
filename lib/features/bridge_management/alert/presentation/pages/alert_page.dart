@@ -66,20 +66,22 @@ class _AlertScreenState extends State<AlertScreen> {
                       onPressed: () => Navigator.pop(context),
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Alertas del puente',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
+                    const Expanded(
+                      child: Text(
+                        'Alertas del puente',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+
                   ],
                 ),
               ),
-
               const SizedBox(height: 16),
-
               // Contenido de alertas
               Expanded(
                 child: Padding(

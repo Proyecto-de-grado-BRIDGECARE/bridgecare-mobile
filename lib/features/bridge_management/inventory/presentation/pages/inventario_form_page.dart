@@ -59,12 +59,35 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
           return Center(child: Text('Error cargando ayuda'));
         } else {
           helpSections = snapshot.data!;
-          return FormTemplate(
-            title: 'Creación de Inventario',
-            formKey: _formKey,
-            onSave: _saveForm,
-            sections: _buildFormSections(), // lo vemos en el siguiente paso
+
+          return Scaffold(
+            backgroundColor: Colors.white, // o el color de fondo que uses en la app
+            body: Column(
+              children: [
+                Expanded(
+                  child: FormTemplate(
+                    title: 'Creación de Inventario',
+                    formKey: _formKey,
+                    onSave: _saveForm,
+                    sections: _buildFormSections(),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: ElevatedButton.icon(
+                    onPressed: _saveForm,
+                    label: const Text('GUARDAR'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff01579a),
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
+
         }
       },
     );
@@ -346,40 +369,6 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         ),
       ),
 
-      FormSection(
-        titleWidget: const SizedBox.shrink(),
-        isCollapsible: false,
-        content: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5.0),
-          child: Center(
-            child: SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: ElevatedButton(
-                  onPressed: _saveForm,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF003366),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'GUARDAR',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      )
-
 
     ];
   }
@@ -629,7 +618,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
 
         // Send to backend
         final url = esEdicion
-            ? Uri.parse('http://192.168.1.9:8082/api/inventario/update/${widget.inventario!.id}')
+            ? Uri.parse('https://api.bridgecare.com.co/inventario/update/${widget.inventario!.id}')
             : Uri.parse('https://api.bridgecare.com.co/inventario/add');
 
         final response = await (esEdicion

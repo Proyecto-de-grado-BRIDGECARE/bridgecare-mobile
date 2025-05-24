@@ -34,6 +34,5 @@ class AppRoutes {
     '/det': (context) => DetallesUsuario(
           user: {},
         ), //no sirve aun
-    //'/homeAdmin': (context) => const HomeAdmin(),
   };
 }
