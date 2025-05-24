@@ -12,7 +12,7 @@ class BridgeListScreen extends StatefulWidget {
 
 class _BridgeListState extends State<BridgeListScreen> {
   bool isSecondChecked = false;
-  bool isFirstChecked = false;
+  bool isFirstChecked = true;
   final BridgeService _puenteService = BridgeService();
   List<Puente> _puentes = [];
   List<Puente> _puentesFiltrados = [];

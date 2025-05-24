@@ -5,7 +5,9 @@ import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ManualPdfViewerPage extends StatefulWidget {
-  const ManualPdfViewerPage({super.key});
+  final int tipoUsuario; // 0, 1: Ingeniero; 2: Administrador
+
+  const ManualPdfViewerPage({super.key, required this.tipoUsuario});
 
   @override
   State<ManualPdfViewerPage> createState() => _ManualPdfViewerPageState();
@@ -21,14 +23,20 @@ class _ManualPdfViewerPageState extends State<ManualPdfViewerPage> {
   }
 
   Future<void> _loadPdfFromAssets() async {
-    final byteData = await rootBundle.load('assets/pdfs/manual.help');
+    final manualPath = widget.tipoUsuario == 2
+        ? 'assets/help/ManualAdministrador.pdf'
+        : 'assets/help/ManualIngeniero.pdf';
+
+    final byteData = await rootBundle.load(manualPath);
     final tempDir = await getTemporaryDirectory();
-    final file = File('${tempDir.path}/manual.help');
+    final file = File('${tempDir.path}/manual_temp.pdf');
     await file.writeAsBytes(byteData.buffer.asUint8List());
+
     setState(() {
       localPath = file.path;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {

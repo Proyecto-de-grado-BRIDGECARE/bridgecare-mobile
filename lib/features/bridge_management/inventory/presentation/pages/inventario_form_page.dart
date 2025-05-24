@@ -125,10 +125,6 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
       FormSection(
         titleWidget: DefaultSectionTitle(
           text: 'Información Básica',
-          trailing: HelpIconButton(
-            helpKey: 'informacionBasica',
-            helpSections: helpSections,
-          ),
         ),
         isCollapsible: true,
         content: DynamicForm(
