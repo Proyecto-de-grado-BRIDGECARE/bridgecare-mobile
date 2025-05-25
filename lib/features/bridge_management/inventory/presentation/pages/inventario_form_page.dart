@@ -96,6 +96,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
   @override
   void initState() {
     super.initState();
+    debugPrint("📥 Inventario recibido en edición: ${widget.inventario}");
     debugPrint("📥 InventoryFormScreen iniciado con inventario: ${widget.inventario?.toMap()}");
     helpSectionsFuture = loadHelpSections(); // ✅ Solo una vez
 
@@ -660,6 +661,10 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         debugPrint(jsonString);
 
         debugPrint("🧪 esEdicion = $esEdicion");
+        if (esEdicion && widget.inventario == null) {
+          debugPrint("❌ No se puede editar: widget.inventario es null");
+          return;
+        }
         // Send to backend
         final url = esEdicion
             ? Uri.parse
@@ -731,7 +736,6 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
 
       }
     }
-
   }
   Future<void> _obtenerUbicacion() async {
     final posicion = await LocationService.obtenerPosicion();

@@ -145,6 +145,20 @@ class DynamicFormState extends State<DynamicForm>
         );
         break;
 
+      case 'textarea':
+        final isReadOnly = fieldInfo['readOnly'] == true;
+        field = TextFormField(
+          controller: _controllers[fieldName],
+          decoration: _getInputDecoration(fieldInfo['label'], readOnly: isReadOnly),
+          readOnly: isReadOnly,
+          enabled: !isReadOnly,
+          maxLines: 5, // <-- Hace que sea un textarea visible
+          minLines: 3,
+          keyboardType: TextInputType.multiline,
+          onSaved: (value) => _formData[fieldName] = value,
+        );
+        break;
+
       case 'number':
         field = TextFormField(
           controller: _controllers[fieldName],
@@ -243,6 +257,7 @@ class DynamicFormState extends State<DynamicForm>
           onSaved: (value) => _formData[fieldName] = _formData[fieldName],
         );
         break;
+
       case 'image':
         _formData[fieldName] ??= initialValue ?? <XFile>[];
         final maxImages = fieldInfo['maxImages'] as int? ?? 5;

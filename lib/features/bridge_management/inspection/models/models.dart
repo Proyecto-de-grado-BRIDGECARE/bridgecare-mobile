@@ -13,7 +13,7 @@ class Inspeccion {
     required this.componentes,
   }) : inspeccionUuid = inspeccionUuid ?? const Uuid().v4();
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson({required int puenteId, required int usuarioId}) => {
         'inspeccionUuid': inspeccionUuid,
         'fecha': fecha,
         'observacionesGenerales': observacionesGenerales,

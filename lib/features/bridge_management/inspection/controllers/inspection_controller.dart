@@ -2,6 +2,7 @@ import 'package:bridgecare/features/bridge_management/inspection/models/models.d
 import 'package:bridgecare/shared/services/database_service.dart';
 import 'package:bridgecare/shared/services/queue_service.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
@@ -127,60 +128,37 @@ class InspectionController with ChangeNotifier {
   }
 
   Future<void> submitForm() async {
-    if (!formKey.currentState!.validate()) {
-      return;
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final usuarioId = prefs.getInt('usuario_id');
+
+    if (token == null || token.isEmpty || usuarioId == null) {
+      throw Exception("Token o usuario_id no disponible");
     }
+
+    if (!formKey.currentState!.validate()) return;
+
     formKey.currentState!.save();
 
-    final prefs = await SharedPreferences.getInstance();
-    final usuarioId = prefs.getInt('usuario_id');
-    if (usuarioId == null) {
-      throw Exception('No se pudo obtener el usuario autenticado');
+    final inspeccionJson = inspeccion.toJson(
+      puenteId: puenteId,
+      usuarioId: usuarioId,
+    );
+
+    final response = await http.post(
+      Uri.parse('https://api.bridgecare.com.co/inspeccion/add'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(inspeccionJson),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception("Error al guardar inspección: ${response.statusCode}");
     }
 
-    final payload = {
-      'inspeccionUuid': inspeccion.inspeccionUuid,
-      'fecha': inspeccion.fecha,
-      'observacionesGenerales': inspeccion.observacionesGenerales,
-      'usuario': {'id': usuarioId},
-      'puente': {'id': puenteId},
-      'componentes': inspeccion.componentes
-          .map((c) => {
-                'componenteUuid': c.componenteUuid,
-                'nomb': c.name,
-                'calificacion': c.calificacion,
-                'mantenimiento': c.mantenimiento,
-                'inspEesp': c.inspEesp,
-                'numeroFfotos': c.numeroFfotos,
-                'tipoDanio': c.tipoDanio,
-                'danio': c.danio,
-                'reparacion':
-                    c.reparacion != null ? [c.reparacion!.toJson()] : [],
-                'imageUuids': c.imageUuids,
-              })
-          .toList(),
-    };
-
-    await databaseService.insertForm(
-      inspeccion.inspeccionUuid,
-      jsonEncode(payload),
-      puenteId.toString(),
-    );
-
-    final taskData = jsonEncode({
-      'inspeccion_uuid': inspeccion.inspeccionUuid,
-    });
-    final dependsOn = inspeccion.componentes
-        .where((c) => c.imageUuids.isNotEmpty)
-        .map((c) => c.imageUuids.join(','))
-        .join(',');
-    await databaseService.enqueueTask(
-      taskType: 'inspeccion_submit',
-      data: taskData,
-      dependsOn: dependsOn.isNotEmpty ? dependsOn : null,
-    );
-
-    _isWidgetVisible = true;
-    notifyListeners();
+    debugPrint("✅ Inspección enviada correctamente: ${response.body}");
   }
+
 }

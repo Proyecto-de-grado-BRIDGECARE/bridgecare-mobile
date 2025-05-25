@@ -188,23 +188,19 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                           FormSection(
                             titleWidget: DefaultSectionTitle(
                               text: 'Información Básica',
-                              trailing: HelpIconButton(
-                                helpKey: 'informacionBasica',
-                                helpSections: helpSections,
-                              ),
                             ),
                             isCollapsible: true,
                             content: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                DynamicForm(
+                                /*DynamicForm(
                                   fields: Puente.formFields,
                                   initialData: puenteData!,
                                   onSave: (data) => controller.updatePuenteData(data),
-                                ),
+                                ),*/
                                 DynamicForm(
                                   fields: Inspeccion.formFields,
-                                  initialData: controller.inspeccion.toJson(),
+                                  initialData: controller.inspeccion.toJson(puenteId: 1, usuarioId: 1),
                                   onSave: (data) => controller.updateInspeccionData(data),
                                 ),
                                 TextFormField(
@@ -259,6 +255,25 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                               ),
                             );
                           }),
+                          FormSection(
+                            titleWidget: const DefaultSectionTitle(
+                              text: 'Observaciones',
+                            ),
+                            isCollapsible: false,
+                            content: DynamicForm(
+                              fields: {
+                                'observacionesGenerales': {
+                                  'type': 'text',
+                                  'label': 'Observaciones',
+                                },
+                              },
+                              initialData: {
+                                'observacionesGenerales': controller.inspeccion.observacionesGenerales,
+                              },
+                              onSave: (data) => controller.updateInspeccionData(data),
+                            ),
+                          ),
+
                         ],
                       ),
                     ),
