@@ -44,18 +44,18 @@
     "content": "- **Vehículo de diseño**: Tipo de vehículo usado para diseñar la estructura.\n- **Clase de carga**: Clasificación según normas (CL-600, HL-93, etc.).\n- **Restricciones**: Límites de carga actuales en toneladas.",
     "imageAsset": null
   },
-  "superficiePuente": {
+  "superficie_puente": {
     "title": "Superficie del Puente",
     "content": "- **Tipo de pavimento**: concreto, asfalto, adoquines, etc.\n- **Condición**: presencia de baches, grietas, deformaciones.\n- **Drenaje**: existencia y funcionalidad de sistemas de escorrentía.",
     "imageAsset": null
   },
-  "juntasExpansion": {
+  "juntas_expansion": {
     "title": "Juntas de Expansión",
     "content": "- **Tipo**: metálicas, de goma, de compresión, etc.\n- **Ubicación**: entre segmentos de la superestructura.\n- **Estado**: desgaste, separación, obstrucciones.",
     "imageAsset": null
   },
-  "andenesBordillos": {
-    "title": "Andenes/Bordillos",
+  "anden_bordillos": {
+    "title": "Andenes / Bordillos",
     "content": "- **Dimensiones**: ancho disponible para peatones.\n- **Seguridad**: separación física del tráfico vehicular.\n- **Estado**: agrietamientos, invasión vegetal, uso adecuado.",
     "imageAsset": null
   },
@@ -64,8 +64,8 @@
     "content": "- **Tipo**: metálicas, de concreto, mixtas.\n- **Función**: contención de vehículos o peatones.\n- **Condición**: continuidad, oxidación, impacto, deformación.",
     "imageAsset": null
   },
-  "conosTaludes": {
-    "title": "Conos/Taludes",
+  "conos_taludes": {
+    "title": "Conos / Taludes",
     "content": "- **Material**: tierra, roca, concreto u otro.\n- **Estabilidad**: evidencia de deslizamientos, erosión o socavación.\n- **Cobertura vegetal**: natural o artificial.",
     "imageAsset": null
   },
@@ -73,8 +73,65 @@
     "title": "Aletas",
     "content": "- **Función**: retención del terraplén en los extremos.\n- **Material**: concreto, mampostería, piedra.\n- **Condición**: grietas, desplazamiento, filtraciones.",
     "imageAsset": null
+  },
+  "estribos": {
+    "title": "Estribos",
+    "content": "- **Ubicación**: en los extremos del puente.\n- **Material**: concreto, mampostería.\n- **Condición**: presencia de grietas, humedad, deterioro.",
+    "imageAsset": null
+  },
+  "pilas": {
+    "title": "Pilas",
+    "content": "- **Función**: soporte intermedio del puente.\n- **Condición**: alineación, presencia de fisuras, socavación o erosión.\n- **Material**: concreto, acero, etc.",
+    "imageAsset": null
+  },
+  "apoyos": {
+    "title": "Apoyos",
+    "content": "- **Tipo**: fijo o móvil (neopreno, metálico, etc.).\n- **Función**: permitir movimientos y transferir cargas.\n- **Condición**: alineación, oxidación, deterioro.",
+    "imageAsset": null
+  },
+  "losa": {
+    "title": "Losa",
+    "content": "- **Ubicación**: parte superior de la superestructura.\n- **Material**: concreto.\n- **Condición**: fisuras, filtraciones, desgaste por tránsito.",
+    "imageAsset": null
+  },
+  "vigas_largueros_diafragmas": {
+    "title": "Vigas / Largueros / Diafragmas",
+    "content": "- **Función**: soporte principal de cargas.\n- **Material**: acero, concreto.\n- **Condición**: corrosión, grietas, deformaciones, conexiones sueltas.",
+    "imageAsset": null
+  },
+  "elementos_arco": {
+    "title": "Elementos de Arco",
+    "content": "- **Estructura**: típicos en puentes tipo arco.\n- **Condición**: fisuras, desplomes, deformaciones.\n- **Revisión**: nudos, puntos de apoyo y conexiones.",
+    "imageAsset": null
+  },
+  "cables_pendolones_torres_macizos": {
+    "title": "Cables / Pendolones / Torres / Macizos",
+    "content": "- **Función**: soporte y transmisión de cargas en puentes colgantes o atirantados.\n- **Condición**: corrosión, tensión, conexiones flojas.\n- **Seguridad**: revisión de anclajes y torres.",
+    "imageAsset": null
+  },
+  "elementos_armadura": {
+    "title": "Elementos de Armadura",
+    "content": "- **Componentes**: refuerzos metálicos internos o externos.\n- **Condición**: oxidación, pérdidas de sección, fallos por fatiga.\n- **Importancia**: revisiones periódicas críticas.",
+    "imageAsset": null
+  },
+  "cauce": {
+    "title": "Cauce",
+    "content": "- **Ubicación**: debajo del puente (si aplica).\n- **Condición**: erosión, obstrucciones, socavaciones.\n- **Control**: limpieza y canalización apropiada.",
+    "imageAsset": null
+  },
+  "otros_elementos": {
+    "title": "Otros Elementos",
+    "content": "- **Ejemplos**: señalización, iluminación, dispositivos sísmicos.\n- **Condición**: operatividad, visibilidad, mantenimiento adecuado.",
+    "imageAsset": null
+  },
+  "puente_general": {
+    "title": "Puente en General",
+    "content": "- **Visión integral** del estado del puente.\n- **Consideraciones**: combinación de daños, envejecimiento, desempeño estructural.\n- **Recomendación**: priorizar inspección global y mantenimiento general.",
+    "imageAsset": null
   }
 }
+
+
 
 
 

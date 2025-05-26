@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../shared/help_loader.dart';
+import '../../../../../shared/widgets/help_icon_button.dart';
 import '../../../alert/presentation/pages/alert_page.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -268,10 +269,13 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
             ),
             ...componentList.map((component) {
               final componentKey = component['key']!;
-              return  FormSection(
-                titleWidget: Text(
-                  component['title']!,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              return FormSection(
+                titleWidget: DefaultSectionTitle(
+                  text: component['title']!,
+                  trailing: HelpIconButton(
+                    helpKey: componentKey, // Usa el mismo key de la sección para buscar ayuda contextual
+                    helpSections: helpSections,
+                  ),
                 ),
                 isCollapsible: true,
                 content: Column(
@@ -287,20 +291,21 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                     const Text(
                       'Reparaciones',
                       style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blueGrey),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueGrey,
+                      ),
                     ),
                     DynamicForm(
                       fields: Reparacion.formFields,
                       initialData: _formData['reparaciones_$componentKey'],
-                      onSave: (data) => setState(() =>
-                          _formData['reparaciones_$componentKey']!
-                              .addAll(data)),
+                      onSave: (data) =>
+                          setState(() => _formData['reparaciones_$componentKey']!.addAll(data)),
                     ),
                   ],
                 ),
               );
+
             }),
             FormSection(
               titleWidget: const Text('Observaciones Generales', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
