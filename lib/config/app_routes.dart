@@ -25,7 +25,7 @@ class AppRoutes {
     '/updateUser': (context) => ModificarUsuario(),
     '/createUser': (context) => RegistroUsuario(),
     '/SearchBridge': (context) => BridgeListScreen(),
-    '/forminspeccion': (context) => InspectionFormScreen(puenteId: 3),
+    '/forminspeccion': (context) => InspectionFormScreen(puenteId: 3,),
     '/forminventario': (context) => InventoryFormScreen(usuarioId: 1),
     '/puenteslistAdmin': (context) => PuentesListAdminScreen(usuarioId: 1,),
     '/usuarioslistAdmin': (context) => UsuariosListAdminScreen(),
@@ -34,6 +34,5 @@ class AppRoutes {
     '/det': (context) => DetallesUsuario(
           user: {},
         ), //no sirve aun
-    //'/homeAdmin': (context) => const HomeAdmin(),
   };
 }

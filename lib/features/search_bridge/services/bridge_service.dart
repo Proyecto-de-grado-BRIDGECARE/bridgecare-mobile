@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class BridgeService {
   final String baseUrl =
-      //"http://192.168.1.9:8081/api/puentes";
+      //"http://192.168.1.14:8081/api/puentes";
       "https://api.bridgecare.com.co/puentes";
 
   Future<List<Puente>> getAllPuentes() async {
@@ -43,33 +43,21 @@ class BridgeService {
   }
 
   Future<void> deletePuente(int id) async {
-    final url =
-        Uri.parse('$baseUrl/$id'); // ✅ concuerda con tu @DeleteMapping("/{id}")
-    final response = await http.delete(url);
-
-    if (response.statusCode != 200) {
-      throw Exception('Error al eliminar el puente: ${response.body}');
-    }
-  }
-
-  Future<void> deletePuenteCascada(int puenteId) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-
     if (token == null) {
       throw Exception("Token no encontrado");
     }
-
     final response = await http.delete(
-      Uri.parse('$baseUrl/cascada/$puenteId'),
+      Uri.parse('$baseUrl/$id'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
     );
-
     if (response.statusCode != 200) {
-      throw Exception("Error al eliminar el puente: ${response.body}");
+      throw Exception('Error al eliminar el puente: ${response.body}');
     }
   }
+
 }

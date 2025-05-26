@@ -145,6 +145,20 @@ class DynamicFormState extends State<DynamicForm>
         );
         break;
 
+      case 'textarea':
+        final isReadOnly = fieldInfo['readOnly'] == true;
+        field = TextFormField(
+          controller: _controllers[fieldName],
+          decoration: _getInputDecoration(fieldInfo['label'], readOnly: isReadOnly),
+          readOnly: isReadOnly,
+          enabled: !isReadOnly,
+          maxLines: 5, // <-- Hace que sea un textarea visible
+          minLines: 3,
+          keyboardType: TextInputType.multiline,
+          onSaved: (value) => _formData[fieldName] = value,
+        );
+        break;
+
       case 'number':
         field = TextFormField(
           controller: _controllers[fieldName],
@@ -209,13 +223,27 @@ class DynamicFormState extends State<DynamicForm>
       case 'date':
         if (_formData[fieldName] != null &&
             _controllers[fieldName]!.text.isEmpty) {
-          _controllers[fieldName]!.text = (_formData[fieldName] as DateTime)
-              .toIso8601String()
-              .split('T')[0];
+          final value = _formData[fieldName];
+          if (value is DateTime) {
+            _controllers[fieldName]!.text = value.toIso8601String().split('T')[0];
+          } else if (value is String) {
+            final parsed = DateTime.tryParse(value);
+            if (parsed != null) {
+              _formData[fieldName] = parsed; // Corrige el tipo en runtime
+              _controllers[fieldName]!.text = parsed.toIso8601String().split('T')[0];
+            }
+          }
         } else if (initialValue != null &&
             _controllers[fieldName]!.text.isEmpty) {
-          _controllers[fieldName]!.text =
-              (initialValue as DateTime).toIso8601String().split('T')[0];
+          if (initialValue is DateTime) {
+            _controllers[fieldName]!.text = initialValue.toIso8601String().split('T')[0];
+          } else if (initialValue is String) {
+            final parsedDate = DateTime.tryParse(initialValue);
+            if (parsedDate != null) {
+              _controllers[fieldName]!.text = parsedDate.toIso8601String().split('T')[0];
+              _formData[fieldName] = parsedDate;
+            }
+          }
         }
         field = TextFormField(
           controller: _controllers[fieldName],
@@ -243,6 +271,7 @@ class DynamicFormState extends State<DynamicForm>
           onSaved: (value) => _formData[fieldName] = _formData[fieldName],
         );
         break;
+
       case 'image':
         _formData[fieldName] ??= initialValue ?? <XFile>[];
         final maxImages = fieldInfo['maxImages'] as int? ?? 5;

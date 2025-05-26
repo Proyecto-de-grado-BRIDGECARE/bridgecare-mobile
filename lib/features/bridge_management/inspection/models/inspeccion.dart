@@ -4,8 +4,9 @@ class Inspeccion {
   final int temperatura;
   final String administrador;
   final int anioProximaInspeccion;
-  final String observacionesGenerales;
+  final String? observacionesGenerales;
   final DateTime fecha;
+
 
   Inspeccion({
     this.id,
@@ -13,7 +14,7 @@ class Inspeccion {
     required this.temperatura,
     required this.administrador,
     required this.anioProximaInspeccion,
-    required this.observacionesGenerales,
+    this.observacionesGenerales,
     required this.fecha,
   });
 
@@ -27,4 +28,24 @@ class Inspeccion {
     },
     'fecha': {'type': 'date', 'label': 'Fecha'},
   };
+
+  Map<String, dynamic> toJson({required int puenteId, required int usuarioId}) {
+    return {
+      if (id != null) 'id': id,
+      'tiempo': tiempo,
+      'temperatura': temperatura,
+      'administrador': administrador,
+      'anioProximaInspeccion': anioProximaInspeccion,
+      'observacionesGenerales': observacionesGenerales,
+      'fecha': fecha.toIso8601String(),
+      'puente': {
+        'id': puenteId,
+      },
+      'usuario': {
+        'id': usuarioId,
+      },
+    };
+  }
+
+
 }

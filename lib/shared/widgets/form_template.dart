@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 class FormSection {
@@ -126,18 +127,19 @@ class DefaultSectionTitle extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: screenWidth * 0.045,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueGrey[800],
-              ),
-              overflow: TextOverflow.ellipsis,
+          child: AutoSizeText(
+            text,
+            maxLines: 2,
+            style: TextStyle(
+              fontSize: screenWidth * 0.045,
+              fontWeight: FontWeight.bold,
+              color: Colors.blueGrey[800],
             ),
+            overflow: TextOverflow.ellipsis,
+            softWrap: true,
+            minFontSize: 12, // evita que el texto se vuelva ilegible
+            stepGranularity: 0.5, // precisión del ajuste
+            textAlign: TextAlign.start,
           ),
         ),
         if (trailing != null) trailing!,

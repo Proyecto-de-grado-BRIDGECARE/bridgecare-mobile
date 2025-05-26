@@ -8,7 +8,7 @@ import '../inventory/models/dtos/inventario_dto.dart';
 
 class InventarioService {
   static const String baseUrl =
-        //"http://192.168.1.9:8082/api/inventario";
+        //"http://192.168.0.105:8082/api/inventario";
       "https://api.bridgecare.com.co/inventario"; // Temporary backend URL
 
   //get all inventories
@@ -40,7 +40,8 @@ class InventarioService {
   }
   Future<InventarioDTO?> getInventarioDTOporPuente(int puenteId) async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('access_token') ?? '';
+    final token = prefs.getString('token') ?? '';
+    debugPrint("📥 Token para GET inventario por puente: $token");
 
     final response = await http.get(
       Uri.parse("$baseUrl/puente/$puenteId"),

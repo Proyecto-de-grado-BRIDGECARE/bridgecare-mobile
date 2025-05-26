@@ -2,23 +2,52 @@ import 'package:uuid/uuid.dart';
 
 class Inspeccion {
   String inspeccionUuid;
-  String? fecha;
+  int tiempo;
+  int temperatura;
+  String administrador;
+  int anioProximaInspeccion;
+  DateTime fecha;
   String? observacionesGenerales;
   List<Componente> componentes;
 
   Inspeccion({
     String? inspeccionUuid,
-    this.fecha,
+    required this.tiempo,
+    required this.temperatura,
+    required this.administrador,
+    required this.anioProximaInspeccion,
+    required this.fecha,
     this.observacionesGenerales,
     required this.componentes,
   }) : inspeccionUuid = inspeccionUuid ?? const Uuid().v4();
 
-  Map<String, dynamic> toJson() => {
-        'inspeccionUuid': inspeccionUuid,
-        'fecha': fecha,
-        'observacionesGenerales': observacionesGenerales,
-        'componentes': componentes.map((c) => c.toJson()).toList(),
-      };
+  Map<String, dynamic> toJson({required int puenteId, required int usuarioId}) => {
+    'inspeccionUuid': inspeccionUuid,
+    'fecha': fecha.toIso8601String(),
+    'componentes': componentes.map((c) => c.toJson()).toList(),
+    'tiempo': tiempo,
+    'temperatura': temperatura,
+    'administrador': administrador,
+    'anioProximaInspeccion': anioProximaInspeccion,
+    'observacionesGenerales': observacionesGenerales,
+    'puente': {
+      'id': puenteId,
+    },
+    'usuario': {
+      'id': usuarioId,
+    },
+  };
+  static const Map<String, dynamic> formFields = {
+    'tiempo': {'type': 'number', 'label': 'Tiempo'},
+    'temperatura': {'type': 'number', 'label': 'Temperatura'},
+    'administrador': {'type': 'text', 'label': 'Administrador'},
+    'anioProximaInspeccion': {
+      'type': 'number',
+      'label': 'Año Próxima Inspección'
+    },
+    'fecha': {'type': 'date', 'label': 'Fecha'},
+  };
+
 }
 
 class Componente {
@@ -47,16 +76,16 @@ class Componente {
   }) : componenteUuid = componenteUuid ?? const Uuid().v4();
 
   Map<String, dynamic> toJson() => {
-        'componenteUuid': componenteUuid,
-        'nomb': name,
-        'calificacion': calificacion,
-        'mantenimiento': mantenimiento,
-        'inspEesp': inspEesp,
-        'numeroFfotos': numeroFfotos,
-        'tipoDanio': tipoDanio,
-        'danio': danio,
-        'reparacion': reparacion?.toJson(),
-      };
+    'componenteUuid': componenteUuid,
+    'nomb': name,
+    'calificacion': calificacion,
+    'mantenimiento': mantenimiento,
+    'inspEesp': inspEesp,
+    'numeroFfotos': numeroFfotos,
+    'tipoDanio': tipoDanio,
+    'danio': danio,
+    'reparacion': reparacion?.toJson(),
+  };
 }
 
 class Reparacion {
@@ -73,11 +102,11 @@ class Reparacion {
   });
 
   Map<String, dynamic> toJson() => {
-        'tipo': tipo,
-        'cantidad': cantidad,
-        'anio': anio,
-        'costo': costo,
-      };
+    'tipo': tipo,
+    'cantidad': cantidad,
+    'anio': anio,
+    'costo': costo,
+  };
 }
 
 class ImageData {
@@ -108,29 +137,29 @@ class ImageData {
   });
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'inspeccion_uuid': inspeccionUuid,
-        'componente_uuid': componenteUuid,
-        'image_uuid': imageUuid,
-        'puente_id': puenteId,
-        'upload_status': uploadStatus,
-        'chunk_count': chunkCount,
-        'chunks_uploaded': chunksUploaded,
-        'local_path': localPath,
-        'created_at': createdAt,
-      };
+    'id': id,
+    'inspeccion_uuid': inspeccionUuid,
+    'componente_uuid': componenteUuid,
+    'image_uuid': imageUuid,
+    'puente_id': puenteId,
+    'upload_status': uploadStatus,
+    'chunk_count': chunkCount,
+    'chunks_uploaded': chunksUploaded,
+    'local_path': localPath,
+    'created_at': createdAt,
+  };
 
   factory ImageData.fromMap(Map<String, dynamic> map) => ImageData(
-        id: map['id'],
-        inspeccionUuid: map['inspeccion_uuid'],
-        componenteUuid: map['componente_uuid'],
-        imageUuid: map['image_uuid'],
-        puenteId: map['puente_id'],
-        uploadStatus: map['upload_status'],
-        chunkCount: map['chunk_count'],
-        chunksUploaded: map['chunks_uploaded'],
-        localPath: map['local_path'],
-        createdAt: map['created_at'],
-        remoteUrl: map['remote_url'],
-      );
+    id: map['id'],
+    inspeccionUuid: map['inspeccion_uuid'],
+    componenteUuid: map['componente_uuid'],
+    imageUuid: map['image_uuid'],
+    puenteId: map['puente_id'],
+    uploadStatus: map['upload_status'],
+    chunkCount: map['chunk_count'],
+    chunksUploaded: map['chunks_uploaded'],
+    localPath: map['local_path'],
+    createdAt: map['created_at'],
+    remoteUrl: map['remote_url'],
+  );
 }

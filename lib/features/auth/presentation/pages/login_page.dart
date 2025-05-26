@@ -70,9 +70,8 @@ class _LoginPageState extends State<LoginPage> {
 
         if (user != null && user.id != null) {
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setInt('usuario_id',
-              user.id!); // Usa ! porque ya validaste que no es null
-
+          await prefs.setInt('usuario_id', user.id!); // Usa ! porque ya validaste que no es null
+          await prefs.setInt('tipo_usuario', user.tipoUsuario);
           themeProvider.setLightMode();
           if (mounted) {
             Navigator.pushReplacement(
@@ -81,6 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                 builder: (_) => HomePage(
                   usuarioId: user.id!,
                   tipoUsuario: user.tipoUsuario,
+
                 ),
               ),
             );
@@ -91,6 +91,7 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         _showError("Credenciales inválidas.");
       }
+
     }
   }
 

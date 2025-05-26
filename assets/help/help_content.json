@@ -13,5 +13,68 @@
     "title": "Datos Técnicos",
     "content": "- **Número de luces**: Total de luces del puente.\n- **Longitud mínima/máxima de luz**: Medida entre centros de pila o extremos.\n- **Longitud total**: Superestructura, sin aletas ni losas de aproximación.\n- **Anchos**: tablero, separador, andenes, calzada, entre bordillos, acceso.\n- **Alturas**: de pilas y estribos (estimadas si no hay planos).\n- **Longitud de apoyos**: en pilas y estribos.\n- **Terraplén**: S/N según si los accesos están en terraplén.\n- **Curva/Tangente**: C o T según la curvatura horizontal.\n- **Esviajamiento**: Ángulo entre pilas y eje del puente (0–90°).",
     "imageAsset": null
+  },
+  "superestructura": {
+    "title": "Superestructura",
+    "content": "- **Tipo estructural**: viga, arco, losa, atirantado, colgante, etc.\n- **Material**: concreto, acero, madera u otro.\n- **Sistema constructivo**: prefabricado, postensado, in situ.\n- **Estado visible**: observaciones generales de su condición.",
+    "imageAsset": null
+  },
+  "subestructura": {
+    "title": "Subestructura",
+    "content": "- **Componentes**: estribos, pilas, cimentaciones.\n- **Material**: concreto, mampostería, metálico, etc.\n- **Condiciones**: signos de socavación, agrietamiento o erosión.\n- **Relación con cauce**: si hay paso de agua bajo el puente.",
+    "imageAsset": null
+  },
+  "apoyo": {
+    "title": "Apoyo",
+    "content": "- **Tipo**: fijo o móvil (neopreno, metálico, rodillo, etc.).\n- **Ubicación**: en estribos y pilas.\n- **Condición**: desgaste, desalineación, bloqueo.\n- **Función**: transferencia de cargas, permitir movimiento estructural.",
+    "imageAsset": null
+  },
+  "miembrosInteresados": {
+    "title": "Miembros Interesados",
+    "content": "- **Municipio**: Entidad territorial donde se ubica el puente.\n- **Propietario**: Entidad responsable legal del puente.\n- **Entidad ejecutora**: Encargada de la construcción.\n- **Entidad encargada del mantenimiento**: Responsable de su conservación.",
+    "imageAsset": null
+  },
+  "posicionGeografica": {
+    "title": "Posición Geográfica",
+    "content": "- **Latitud y Longitud**: Coordenadas GPS del punto central del puente.\n- **Altitud**: Elevación sobre el nivel del mar.\n- **Aceleración sísmica**: Parámetro de amenaza sísmica local.\n- **Paso por cauce**: S/N según si cruza un cuerpo de agua.\n- **Variante**: existencia, longitud y estado de desvíos.",
+    "imageAsset": null
+  },
+  "carga": {
+    "title": "Carga",
+    "content": "- **Vehículo de diseño**: Tipo de vehículo usado para diseñar la estructura.\n- **Clase de carga**: Clasificación según normas (CL-600, HL-93, etc.).\n- **Restricciones**: Límites de carga actuales en toneladas.",
+    "imageAsset": null
+  },
+  "superficiePuente": {
+    "title": "Superficie del Puente",
+    "content": "- **Tipo de pavimento**: concreto, asfalto, adoquines, etc.\n- **Condición**: presencia de baches, grietas, deformaciones.\n- **Drenaje**: existencia y funcionalidad de sistemas de escorrentía.",
+    "imageAsset": null
+  },
+  "juntasExpansion": {
+    "title": "Juntas de Expansión",
+    "content": "- **Tipo**: metálicas, de goma, de compresión, etc.\n- **Ubicación**: entre segmentos de la superestructura.\n- **Estado**: desgaste, separación, obstrucciones.",
+    "imageAsset": null
+  },
+  "andenesBordillos": {
+    "title": "Andenes/Bordillos",
+    "content": "- **Dimensiones**: ancho disponible para peatones.\n- **Seguridad**: separación física del tráfico vehicular.\n- **Estado**: agrietamientos, invasión vegetal, uso adecuado.",
+    "imageAsset": null
+  },
+  "barandas": {
+    "title": "Barandas",
+    "content": "- **Tipo**: metálicas, de concreto, mixtas.\n- **Función**: contención de vehículos o peatones.\n- **Condición**: continuidad, oxidación, impacto, deformación.",
+    "imageAsset": null
+  },
+  "conosTaludes": {
+    "title": "Conos/Taludes",
+    "content": "- **Material**: tierra, roca, concreto u otro.\n- **Estabilidad**: evidencia de deslizamientos, erosión o socavación.\n- **Cobertura vegetal**: natural o artificial.",
+    "imageAsset": null
+  },
+  "aletas": {
+    "title": "Aletas",
+    "content": "- **Función**: retención del terraplén en los extremos.\n- **Material**: concreto, mampostería, piedra.\n- **Condición**: grietas, desplazamiento, filtraciones.",
+    "imageAsset": null
   }
 }
+
+
+

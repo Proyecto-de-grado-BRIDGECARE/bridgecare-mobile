@@ -49,18 +49,18 @@ class InventarioDTO {
       miembrosInteresados: json['miembros_interesados'] != null
           ? MiembrosInteresadosDTO.fromJson(json['miembros_interesados'])
           : null,
-      pasos: (json['pasos'] as List<dynamic>)
-          .map((p) => PasoDTO.fromJson(p))
-          .toList(),
+      pasos: json['pasos'] != null
+          ? (json['pasos'] as List<dynamic>).map((p) => PasoDTO.fromJson(p)).toList()
+          : [],
       posicionGeografica: json['posicion_geografica'] != null
           ? PosicionGeograficaDTO.fromJson(json['posicion_geografica'])
           : null,
       subestructura: json['subestructura'] != null
           ? SubestructuraDTO.fromJson(json['subestructura'])
           : null,
-      superestructuras: (json['superestructuras'] as List<dynamic>)
-          .map((s) => SuperestructuraDTO.fromJson(s))
-          .toList(),
+      superestructuras: json['superestructuras'] != null
+          ? (json['superestructuras'] as List<dynamic>).map((s) => SuperestructuraDTO.fromJson(s)).toList()
+          : [],
     );
   }
 }

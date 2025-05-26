@@ -2,6 +2,8 @@ import 'package:bridgecare/features/bridge_management/inspection/models/models.d
 import 'package:bridgecare/shared/services/database_service.dart';
 import 'package:bridgecare/shared/services/queue_service.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
@@ -22,18 +24,24 @@ class InspectionController with ChangeNotifier {
     required this.databaseService,
     required this.queueService,
   }) : inspeccion = Inspeccion(
-          inspeccionUuid: const Uuid().v4(),
-          componentes: componentList
-              .asMap()
-              .entries
-              .map((entry) => Componente(
-                    componenteUuid: const Uuid().v4(),
-                    name: entry.value['title']!
-                        .replaceAll('/', ' ')
-                        .toUpperCase(),
-                  ))
-              .toList(),
-        );
+    inspeccionUuid: const Uuid().v4(),
+    tiempo: 0,
+    temperatura: 0,
+    administrador: '',
+    anioProximaInspeccion: 0,
+    fecha: DateTime.now(),
+    componentes: componentList
+        .asMap()
+        .entries
+        .map((entry) => Componente(
+      componenteUuid: const Uuid().v4(),
+      name: entry.value['title']!
+          .replaceAll('/', ' ')
+          .toUpperCase(),
+    ))
+        .toList(),
+  );
+
 
   bool get isWidgetVisible => _isWidgetVisible;
 
@@ -48,12 +56,22 @@ class InspectionController with ChangeNotifier {
   }
 
   void updateInspeccionData(Map<String, dynamic> data) {
-    if (data['fecha'] is String) {
-      inspeccion.fecha = data['fecha'];
+    if (data['fecha'] != null) {
+      final parsed = DateTime.tryParse(data['fecha'].toString());
+      if (parsed != null) {
+        inspeccion.fecha = parsed;
+        debugPrint("📅 Fecha asignada correctamente: ${parsed.toIso8601String()}");
+      } else {
+        debugPrint("❌ No se pudo parsear la fecha: ${data['fecha']}");
+      }
     }
+
     if (data['observacionesGenerales'] is String) {
       inspeccion.observacionesGenerales = data['observacionesGenerales'];
     }
+
+    // Otros campos si los agregas más adelante como tiempo, temperatura, etc.
+
     notifyListeners();
   }
 
@@ -127,60 +145,62 @@ class InspectionController with ChangeNotifier {
   }
 
   Future<void> submitForm() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token')??'';
+    final usuarioId = prefs.getInt('usuario_id');
+
+    if (token == null || token.isEmpty || usuarioId == null) {
+      debugPrint("❌ Token o usuario_id no disponible");
+      throw Exception("Token o usuario_id no disponible");
+    }
+    final decoded = JwtDecoder.decode(token);
+    debugPrint("🔍 Token decodificado: $decoded");
+
     if (!formKey.currentState!.validate()) {
+      debugPrint("❌ Formulario no válido");
       return;
     }
+    debugPrint("🧾 usuarioId = $usuarioId");
+    debugPrint("🌉 puenteId = $puenteId");
     formKey.currentState!.save();
+    if (usuarioId == null || puenteId == null) {
+      throw Exception("usuarioId o puenteId no están definidos");
+    }
+    final inspeccionJson = inspeccion.toJson(
+      puenteId: puenteId,
+      usuarioId: usuarioId,
+    );
 
-    final prefs = await SharedPreferences.getInstance();
-    final usuarioId = prefs.getInt('usuario_id');
-    if (usuarioId == null) {
-      throw Exception('No se pudo obtener el usuario autenticado');
+    final encodedJson = jsonEncode(inspeccionJson);
+    debugPrint("📤 JSON de inspección a enviar:\n$encodedJson");
+
+    final url = Uri.parse('https://api.bridgecare.com.co/inspeccion/add');
+
+
+    debugPrint("📤 Enviando POST a: $url");
+    debugPrint("🔐 Token (cortado): ${token.substring(0, 20)}...");
+    final encoded = const JsonEncoder.withIndent('  ').convert(inspeccionJson);
+    debugPrint("📦 Payload inspección (legible):\n$encoded");
+
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: encodedJson,
+    );
+
+    debugPrint("📥 Respuesta: statusCode = ${response.statusCode}");
+    debugPrint("📥 Body: ${response.body}");
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception("Error al guardar inspección: ${response.statusCode}");
     }
 
-    final payload = {
-      'inspeccionUuid': inspeccion.inspeccionUuid,
-      'fecha': inspeccion.fecha,
-      'observacionesGenerales': inspeccion.observacionesGenerales,
-      'usuario': {'id': usuarioId},
-      'puente': {'id': puenteId},
-      'componentes': inspeccion.componentes
-          .map((c) => {
-                'componenteUuid': c.componenteUuid,
-                'nomb': c.name,
-                'calificacion': c.calificacion,
-                'mantenimiento': c.mantenimiento,
-                'inspEesp': c.inspEesp,
-                'numeroFfotos': c.numeroFfotos,
-                'tipoDanio': c.tipoDanio,
-                'danio': c.danio,
-                'reparacion':
-                    c.reparacion != null ? [c.reparacion!.toJson()] : [],
-                'imageUuids': c.imageUuids,
-              })
-          .toList(),
-    };
-
-    await databaseService.insertForm(
-      inspeccion.inspeccionUuid,
-      jsonEncode(payload),
-      puenteId.toString(),
-    );
-
-    final taskData = jsonEncode({
-      'inspeccion_uuid': inspeccion.inspeccionUuid,
-    });
-    final dependsOn = inspeccion.componentes
-        .where((c) => c.imageUuids.isNotEmpty)
-        .map((c) => c.imageUuids.join(','))
-        .join(',');
-    await databaseService.enqueueTask(
-      taskType: 'inspeccion_submit',
-      data: taskData,
-      dependsOn: dependsOn.isNotEmpty ? dependsOn : null,
-    );
-
-    _isWidgetVisible = true;
-    notifyListeners();
+    debugPrint("✅ Inspección enviada correctamente");
   }
+
+
 }

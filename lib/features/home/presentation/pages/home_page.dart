@@ -1,3 +1,4 @@
+import 'package:bridgecare/features/home/presentation/pages/manual_pdf_viewer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:bridgecare/features/bridge_management/inventory/presentation/pages/inventario_form_page.dart';
@@ -56,14 +57,26 @@ class _HomePageState extends State<HomePage>{
                 },
               ),
             ),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.menu_book, color: Colors.white, size: 25),
                 SizedBox(width: 7),
-                Text('Manual', style: TextStyle(fontSize: 17, color: Colors.white)),
+                GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ManualPdfViewerPage(tipoUsuario: widget.tipoUsuario),
+                    ),
+                  ),
+                  child: Text(
+                    'Manual',
+                    style: TextStyle(fontSize: 17, color: Colors.white, decoration: TextDecoration.underline),
+                  ),
+                ),
               ],
             ),
+
             const SizedBox(height: 40),
           ],
         ),
