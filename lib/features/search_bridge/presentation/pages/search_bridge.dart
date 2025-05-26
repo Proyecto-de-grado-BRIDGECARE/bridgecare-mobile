@@ -313,7 +313,7 @@ class _BridgeListState extends State<BridgeListScreen> {
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) => InspectionFormScreen(
-                                                  puenteId: puente.id!, usuarioId: usuarioId,
+                                                  puenteId: puente.id!,
                                                 ),
                                               ),
                                             );

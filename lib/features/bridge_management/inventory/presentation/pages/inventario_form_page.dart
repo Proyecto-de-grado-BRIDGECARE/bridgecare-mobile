@@ -718,7 +718,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) => InspectionFormScreen(puenteId: puenteId, usuarioId: widget.usuarioId,),
+                builder: (context) => InspectionFormScreen(puenteId: puenteId),
             ),
           );
 

@@ -25,7 +25,7 @@ class AppRoutes {
     '/updateUser': (context) => ModificarUsuario(),
     '/createUser': (context) => RegistroUsuario(),
     '/SearchBridge': (context) => BridgeListScreen(),
-    '/forminspeccion': (context) => InspectionFormScreen(puenteId: 3, usuarioId: 1,),
+    '/forminspeccion': (context) => InspectionFormScreen(puenteId: 3,),
     '/forminventario': (context) => InventoryFormScreen(usuarioId: 1),
     '/puenteslistAdmin': (context) => PuentesListAdminScreen(usuarioId: 1,),
     '/usuarioslistAdmin': (context) => UsuariosListAdminScreen(),

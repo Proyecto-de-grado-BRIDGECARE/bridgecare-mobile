@@ -10,6 +10,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../../shared/help_loader.dart';
 import '../../../alert/presentation/pages/alert_page.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -18,7 +19,7 @@ class InspectionFormScreen extends StatefulWidget {
   final int puenteId;
 
   const InspectionFormScreen(
-      { required this.puenteId, super.key, required int usuarioId});
+      { required this.puenteId, super.key});
 
   @override
   InspectionFormScreenState createState() => InspectionFormScreenState();
@@ -26,18 +27,25 @@ class InspectionFormScreen extends StatefulWidget {
 
 class InspectionFormScreenState extends State<InspectionFormScreen> {
   final _formKey = GlobalKey<FormState>();
+  late Future<Map<String, HelpInfo>> helpSectionsFuture;
+  Map<String, HelpInfo> helpSections = {};
   final Map<String, Map<String, dynamic>> _formData = {
     'puente': {},
     'inspeccion': {},
   };
   List<Map<String, String>> componentList = [];
   int? usuarioId;
+  late Future<void> _initFuture;
 
   @override
   void initState() {
     super.initState();
-    _loadComponents();
-    _loadUserIdFromToken();
+    helpSectionsFuture = loadHelpSections();
+    _initFuture = _initialize();
+  }
+  Future<void> _initialize() async {
+    await _loadComponents();
+    await _loadUserIdFromToken();
   }
 
   Future<void> _loadComponents() async {
@@ -70,32 +78,6 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
     if (value == null) return null;
     final match = RegExp(r'^(\d+)\s*-').firstMatch(value);
     return match != null ? int.parse(match.group(1)!) : null;
-  }
-
-  /*Future<Map<String, dynamic>> _fetchPuenteData(int puenteId) async {
-    // final response =
-    //     await http.get(Uri.parse('https://your-api.com/puentes/$puenteId'));
-    // if (response.statusCode == 200) {
-    //   return jsonDecode(response.body);
-    // }
-    // throw Exception('Failed to fetch Puente data');
-    return Future.value({
-      'nombre': 'Puente Ejemplo',
-      'identificador': 'P001',
-      'carretera': 'Carretera 123',
-      'pr': 'PR 45',
-    });
-  }*/
-
-  Future<String> _fetchInspectorName(int usuarioId) async {
-    // final response =
-    //     await http.get(Uri.parse('https://your-api.com/usuarios/$usuarioId'));
-    // if (response.statusCode == 200) {
-    //   final data = jsonDecode(response.body);
-    //   return data['nombre'] ?? 'Desconocido';
-    // }
-    // return 'Desconocido';
-    return Future.value('Inspector Prueba');
   }
 
   Future<void> _saveForm() async {
@@ -252,24 +234,17 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map<String, dynamic>>(
-      future: Future.wait([
-        _fetchInspectorName(usuarioId ?? 0),
-      ]).then((results) => {'puente': results[0], 'inspector': results[1]}),
+    return FutureBuilder<Map<String, HelpInfo>>(
+      future: helpSectionsFuture,
       builder: (context, snapshot) {
-        if (!snapshot.hasData || componentList.isEmpty) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return const Center(child: Text('Error cargando ayuda contextual'));
+        } else if (!snapshot.hasData || snapshot.data == null) {
+          return const Center(child: Text('No hay datos de ayuda disponibles'));
         }
-        //final puenteData = snapshot.data!['puente'] as Map<String, dynamic>;
-        final inspectorName = snapshot.data!['inspector'] as String;
-
-        // Populate initial Puente data
-        /*_formData['puente'] = {
-          'nombre': puenteData['nombre'],
-          'identificador': puenteData['identificador'],
-          'carretera': puenteData['carretera'],
-          'pr': puenteData['pr'],
-        };*/
+        helpSections = snapshot.data!;
 
         return FormTemplate(
           title: 'Formulario de Inspección',
@@ -283,19 +258,12 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   DynamicForm(
-                    fields: Puente.formFields,
-                    initialData: _formData['puente'],
-                    onSave: (data) =>
-                        setState(() => _formData['puente']!.addAll(data)),
-                  ),
-                  DynamicForm(
                     fields: Inspeccion.formFields,
                     initialData: _formData['inspeccion'],
                     onSave: (data) =>
                         setState(() => _formData['inspeccion']!.addAll(data)),
                   ),
                   TextFormField(
-                    initialValue: inspectorName,
                     decoration: const InputDecoration(labelText: 'Inspector'),
                     readOnly: true,
                   ),

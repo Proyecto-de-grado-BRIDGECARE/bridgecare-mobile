@@ -445,7 +445,7 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     InspectionFormScreen(
-                                                      puenteId: puente.id!, usuarioId: widget.usuarioId,
+                                                      puenteId: puente.id!,
                                                     ),
                                               ),
                                             );
