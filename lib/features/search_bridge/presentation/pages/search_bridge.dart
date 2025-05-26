@@ -4,6 +4,8 @@ import 'package:bridgecare/features/search_bridge/services/bridge_service.dart';
 import 'package:bridgecare/features/bridge_management/models/puente.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../bridge_management/alert/presentation/pages/alert_page.dart';
+
 class BridgeListScreen extends StatefulWidget {
   const BridgeListScreen({super.key});
 
@@ -286,62 +288,89 @@ class _BridgeListState extends State<BridgeListScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(12),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text("Nombre: ${puente.nombre}",
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold)),
-                                      const SizedBox(height: 4),
-                                      Text("Municipio: ${puente.regional}"),
-                                      const SizedBox(height: 12),
-                                      Align(
-                                        alignment: Alignment.centerRight,
-                                        child: ElevatedButton.icon(
-                                          onPressed: () async {
-                                            final prefs = await SharedPreferences.getInstance();
-                                            final usuarioId = prefs.getInt('usuario_id');
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              "Nombre: ${puente.nombre}",
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                              softWrap: true,
+                                              overflow: TextOverflow.visible,
+                                            ),
+                                          ),
+                                          PopupMenuButton<String>(
+                                            onSelected: (value) async {
+                                              if (value == 'inspeccion') {
+                                                final prefs = await SharedPreferences.getInstance();
+                                                final usuarioId = prefs.getInt('usuario_id');
 
-                                            if (usuarioId == null) {
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                const SnackBar(content: Text("Error: usuario no identificado")),
-                                              );
-                                              return;
-                                            }
+                                                if (usuarioId == null) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    const SnackBar(
+                                                        content:
+                                                        Text("Error: usuario no identificado")),
+                                                  );
+                                                  return;
+                                                }
 
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => InspectionFormScreen(
-                                                  puenteId: puente.id!,
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => InspectionFormScreen(
+                                                      puenteId: puente.id!,
+                                                    ),
+                                                  ),
+                                                );
+                                              } else if (value == 'alertas') {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        AlertScreen(puenteId: puente.id!),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            icon: const Icon(Icons.more_vert, color: Color(0xff01579a)),
+                                            itemBuilder: (context) => [
+                                              const PopupMenuItem(
+                                                value: 'inspeccion',
+                                                child: Row(
+                                                  children: [
+                                                    Icon(Icons.add, color: Colors.blue),
+                                                    SizedBox(width: 8),
+                                                    Text("Nueva inspección"),
+                                                  ],
                                                 ),
                                               ),
-                                            );
-                                          },
-
-                                          icon: const Icon(Icons.add,
-                                              size: 20,
-                                              color: Color(0xff281537)),
-                                          label: const Text("Inspección"),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                const Color(0xff01579a),
-                                            foregroundColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(70),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 16, vertical: 8),
-                                            textStyle:
-                                                const TextStyle(fontSize: 14),
+                                              const PopupMenuItem(
+                                                value: 'alertas',
+                                                child: Row(
+                                                  children: [
+                                                    Icon(Icons.warning_amber_rounded,
+                                                        color: Colors.orange),
+                                                    SizedBox(width: 8),
+                                                    Text("Ver alertas"),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                      )
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text("Municipio: ${puente.regional}"),
                                     ],
                                   ),
                                 ),
                               );
+
                             },
                           ),
                         ),

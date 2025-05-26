@@ -383,16 +383,24 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                                   );
                                                   if (confirm == true) {
                                                     try {
-                                                      await _puenteService.deletePuenteCascada(puente.id!);
+                                                      await _puenteService.deletePuente(puente.id!);
                                                       _cargarPuentes();
                                                       ScaffoldMessenger.of(context).showSnackBar(
                                                         const SnackBar(content: Text('Puente eliminado exitosamente')),
                                                       );
                                                     } catch (e) {
+                                                      print('❌ Error al eliminar puente: $e');
                                                       ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(content: Text('Error al eliminar: $e')),
+                                                        SnackBar(
+                                                          content: Text(
+                                                            e.toString().contains('403')
+                                                                ? 'No tienes permiso para eliminar este puente.'
+                                                                : 'Ocurrió un error al eliminar el puente.',
+                                                          ),
+                                                        ),
                                                       );
                                                     }
+
                                                   }
                                                   break;
                                               }

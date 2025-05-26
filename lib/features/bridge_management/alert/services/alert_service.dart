@@ -20,6 +20,7 @@ class AlertService {
 
   Future<List<Alerta>> getAlertasPorPuente(int puenteId) async {
     final prefs = await SharedPreferences.getInstance();
+
     var token = prefs.getString('token');
     debugPrint('Token: $token');
 

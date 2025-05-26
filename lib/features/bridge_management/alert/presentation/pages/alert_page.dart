@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:bridgecare/features/bridge_management/alert/models/alerta.dart';
 import 'package:bridgecare/features/bridge_management/alert/services/alert_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../../home/presentation/pages/home_page.dart';
 
 class AlertScreen extends StatefulWidget {
   final int puenteId;
+
 
   const AlertScreen({super.key, required this.puenteId});
 
@@ -63,8 +67,32 @@ class _AlertScreenState extends State<AlertScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.black),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () async {
+                        final prefs = await SharedPreferences.getInstance();
+                        final usuarioId = prefs.getInt('usuario_id');
+                        final tipoUsuario = prefs.getInt('tipo_usuario');
+                        print('🧪 usuario_id en prefs: $usuarioId');
+                        print('🧪 tipo_usuario en prefs: $tipoUsuario');
+                        if (usuarioId != null && tipoUsuario != null) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => HomePage(
+                                usuarioId: usuarioId,
+                                tipoUsuario: tipoUsuario,
+                              ),
+                            ),
+                          );
+                        } else {
+                          // Manejo de error si no se encuentran los datos
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('No se pudo obtener la información del usuario')),
+                          );
+                        }
+                      },
                     ),
+
+
                     const SizedBox(width: 8),
                     const Expanded(
                       child: Text(
@@ -77,7 +105,6 @@ class _AlertScreenState extends State<AlertScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-
                   ],
                 ),
               ),

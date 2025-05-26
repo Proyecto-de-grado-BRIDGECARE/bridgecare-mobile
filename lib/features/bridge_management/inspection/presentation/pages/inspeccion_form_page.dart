@@ -263,10 +263,6 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                     onSave: (data) =>
                         setState(() => _formData['inspeccion']!.addAll(data)),
                   ),
-                  TextFormField(
-                    decoration: const InputDecoration(labelText: 'Inspector'),
-                    readOnly: true,
-                  ),
                 ],
               ),
             ),
