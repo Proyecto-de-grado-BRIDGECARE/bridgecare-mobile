@@ -23,24 +23,31 @@ class HelpInfo {
 }
 
 Future<Map<String, HelpInfo>> loadHelpSections() async {
-  final String jsonString = await rootBundle.loadString('assets/help/help_content.json');
+  try {
+    final String jsonString = await rootBundle.loadString('assets/help/help_content.json');
+    final Map<String, dynamic> rawMap = Map<String, dynamic>.from(json.decode(jsonString));
 
-  // ✅ Cast correcto y explícito al principio
-  final Map<String, dynamic> rawMap = Map<String, dynamic>.from(json.decode(jsonString));
+    final Map<String, HelpInfo> helpMap = {};
+    rawMap.forEach((key, value) {
+      try {
+        if (value is Map<String, dynamic>) {
+          helpMap[key] = HelpInfo.fromJson(value);
+        } else if (value is Map) {
+          helpMap[key] = HelpInfo.fromJson(Map<String, dynamic>.from(value));
+        } else {
+          debugPrint("⚠️ Entrada inválida ignorada: $key");
+        }
+      } catch (e) {
+        debugPrint("❌ Error al procesar clave '$key': $e");
+      }
+    });
 
-  final Map<String, HelpInfo> helpMap = {};
-  rawMap.forEach((key, value) {
-    // ⚠️ Asegurar que cada value también es Map<String, dynamic>
-    if (value is Map<String, dynamic>) {
-      helpMap[key] = HelpInfo.fromJson(value);
-    } else if (value is Map) {
-      helpMap[key] = HelpInfo.fromJson(Map<String, dynamic>.from(value));
-    } else {
-      debugPrint("⚠️ Entrada inválida ignorada: $key");
-    }
-  });
-
-  return helpMap;
+    debugPrint("✅ Ayuda cargada: ${helpMap.length} claves");
+    return helpMap;
+  } catch (e) {
+    debugPrint("❌ Error al cargar ayuda contextual: $e");
+    return {}; // ✅ Retornar un mapa vacío para evitar crashes
+  }
 }
 
 

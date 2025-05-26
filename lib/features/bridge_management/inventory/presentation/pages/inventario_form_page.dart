@@ -52,16 +52,20 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, HelpInfo>>(
       future: helpSectionsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error cargando ayuda'));
-        } else {
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Error cargando ayuda contextual'));
+          } else if (!snapshot.hasData || snapshot.data == null) {
+            return const Center(child: Text('No hay datos de ayuda disponibles'));
+          }
+
+          // ✅ snapshot.data está garantizado como no null aquí
           helpSections = snapshot.data!;
 
           return Scaffold(
-            backgroundColor: Colors.white, // o el color de fondo que uses en la app
+            backgroundColor: Colors.white,
             body: Column(
               children: [
                 Expanded(
@@ -87,9 +91,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
               ],
             ),
           );
-
         }
-      },
     );
 
   }
@@ -282,28 +284,28 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
             const Text('Estribos', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
             DynamicForm(
               fields: Estribo.formFields,
-              initialData: Map<String, dynamic>.from(_formData['subestructura']['estribos']),
+              initialData: Map<String, dynamic>.from(_formData['subestructura']['estribos']?? {}),
               onSave: (data) => setState(() => _formData['subestructura']['estribos'].addAll(data)),
             ),
             const SizedBox(height: 16.0),
             const Text('Detalles', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
             DynamicForm(
               fields: Detalle.formFields,
-              initialData: Map<String, dynamic>.from(_formData['subestructura']['detalles']),
+              initialData: Map<String, dynamic>.from(_formData['subestructura']['detalles']?? {}),
               onSave: (data) => setState(() => _formData['subestructura']['detalles'].addAll(data)),
             ),
             const SizedBox(height: 16.0),
             const Text('Pilas', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
             DynamicForm(
               fields: Pila.formFields,
-              initialData: Map<String, dynamic>.from(_formData['subestructura']['pilas']),
+              initialData: Map<String, dynamic>.from(_formData['subestructura']['pilas']?? {}),
               onSave: (data) => setState(() => _formData['subestructura']['pilas'].addAll(data)),
             ),
             const SizedBox(height: 16.0),
             const Text('Señales', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
             DynamicForm(
               fields: Senial.formFields,
-              initialData: Map<String, dynamic>.from(_formData['subestructura']['seniales']),
+              initialData: Map<String, dynamic>.from(_formData['subestructura']['seniales']?? {}),
               onSave: (data) => setState(() => _formData['subestructura']['seniales'].addAll(data)),
             ),
           ],
@@ -321,7 +323,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         isCollapsible: true,
         content: DynamicForm(
           fields: Apoyo.formFields,
-          initialData: Map<String, dynamic>.from(_formData['apoyo']),
+          initialData: Map<String, dynamic>.from(_formData['apoyo']?? {}),
           onSave: (data) => setState(() => _formData['apoyo']!.addAll(data)),
         ),
       ),
@@ -337,7 +339,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         isCollapsible: true,
         content: DynamicForm(
           fields: MiembrosInteresados.formFields,
-          initialData: Map<String, dynamic>.from(_formData['miembros_interesados']),
+          initialData: Map<String, dynamic>.from(_formData['miembros_interesados']?? {}),
           onSave: (data) => setState(() => _formData['miembros_interesados']!.addAll(data)),
         ),
       ),
@@ -367,7 +369,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
             DynamicForm(
               key: ValueKey(_formData['posicion_geografica']),
               fields: PosicionGeografica.formFields,
-              initialData: Map<String, dynamic>.from(_formData['posicion_geografica']),
+              initialData: Map<String, dynamic>.from(_formData['posicion_geografica']?? {}),
               controllers: {
                 'latitud': _latitudController,
                 'longitud': _longitudController,
@@ -390,7 +392,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         isCollapsible: true,
         content: DynamicForm(
           fields: Carga.formFields,
-          initialData: Map<String, dynamic>.from(_formData['carga']),
+          initialData: Map<String, dynamic>.from(_formData['carga']?? {}),
           onSave: (data) => setState(() => _formData['carga']!.addAll(data)),
         ),
       ),
@@ -402,7 +404,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         isCollapsible: false,
         content: DynamicForm(
           fields: Inventario.formFields,
-          initialData: {'observaciones': _formData['observaciones']},
+          initialData: {'observaciones': _formData['observaciones']?? {}},
           onSave: (data) => setState(() => _formData['observaciones'] = data['observaciones'] ?? ''),
         ),
       ),
@@ -668,8 +670,8 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
         // Send to backend
         final url = esEdicion
             ? Uri.parse
-          //("http://192.168.0.105:8082/api/inventario/${widget.inventario!.id}")
-            //: Uri.parse('https://192.168.0.105:8082/api/inventario/add');
+          //("http://192.168.1.14:8082/api/inventario/${widget.inventario!.id}")
+            //: Uri.parse('https://:8082/api/inventario/add');
         ('https://api.bridgecare.com.co/inventario/${widget.inventario!.id}')
             : Uri.parse('https://api.bridgecare.com.co/inventario/add');
 
@@ -696,16 +698,16 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           final responseData = jsonDecode(response.body);
-          int? puenteId;
-          int? usuarioId;
 
-          if (responseData is Map) {
-            puenteId = responseData['puente']?['id'];
-            usuarioId = responseData['usuario']?['id'];
+          int puenteId;
+          if (responseData is Map && responseData['puente']?['id'] != null) {
+            puenteId = responseData['puente']['id'];
           } else if (responseData is int) {
             puenteId = responseData;
+          } else {
+            debugPrint("❌ No se pudo extraer el puenteId");
+            return;
           }
-
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(esEdicion
@@ -713,19 +715,14 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
                   : 'Inventario creado'),
             ),
           );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => InspectionFormScreen(puenteId: puenteId, usuarioId: widget.usuarioId,),
+            ),
+          );
 
-          if (puenteId != null) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => InspectionFormScreen(puenteId: puenteId!),
-              ),
-            );
-          }
-
-          debugPrint("✅ Inventario procesado con puenteId: $puenteId y usuarioId: $usuarioId");
-        } else {
-          debugPrint("❌ Error al guardar inventario: ${response.statusCode}");
+          debugPrint("✅ Inventario procesado con puenteId: $puenteId y usuarioId: ${widget.usuarioId}");
         }
 
         debugPrint(

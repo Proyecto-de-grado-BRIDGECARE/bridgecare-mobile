@@ -2,6 +2,7 @@ import 'package:bridgecare/features/bridge_management/inspection/presentation/pa
 import 'package:flutter/material.dart';
 import 'package:bridgecare/features/search_bridge/services/bridge_service.dart';
 import 'package:bridgecare/features/bridge_management/models/puente.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BridgeListScreen extends StatefulWidget {
   const BridgeListScreen({super.key});
@@ -297,17 +298,27 @@ class _BridgeListState extends State<BridgeListScreen> {
                                       Align(
                                         alignment: Alignment.centerRight,
                                         child: ElevatedButton.icon(
-                                          onPressed: () {
+                                          onPressed: () async {
+                                            final prefs = await SharedPreferences.getInstance();
+                                            final usuarioId = prefs.getInt('usuario_id');
+
+                                            if (usuarioId == null) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(content: Text("Error: usuario no identificado")),
+                                              );
+                                              return;
+                                            }
+
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) =>
-                                                    InspectionFormScreen(
-                                                  puenteId: puente.id!,
+                                                builder: (context) => InspectionFormScreen(
+                                                  puenteId: puente.id!, usuarioId: usuarioId,
                                                 ),
                                               ),
                                             );
                                           },
+
                                           icon: const Icon(Icons.add,
                                               size: 20,
                                               color: Color(0xff281537)),

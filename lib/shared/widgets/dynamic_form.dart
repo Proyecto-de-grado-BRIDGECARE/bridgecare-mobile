@@ -223,13 +223,27 @@ class DynamicFormState extends State<DynamicForm>
       case 'date':
         if (_formData[fieldName] != null &&
             _controllers[fieldName]!.text.isEmpty) {
-          _controllers[fieldName]!.text = (_formData[fieldName] as DateTime)
-              .toIso8601String()
-              .split('T')[0];
+          final value = _formData[fieldName];
+          if (value is DateTime) {
+            _controllers[fieldName]!.text = value.toIso8601String().split('T')[0];
+          } else if (value is String) {
+            final parsed = DateTime.tryParse(value);
+            if (parsed != null) {
+              _formData[fieldName] = parsed; // Corrige el tipo en runtime
+              _controllers[fieldName]!.text = parsed.toIso8601String().split('T')[0];
+            }
+          }
         } else if (initialValue != null &&
             _controllers[fieldName]!.text.isEmpty) {
-          _controllers[fieldName]!.text =
-              (initialValue as DateTime).toIso8601String().split('T')[0];
+          if (initialValue is DateTime) {
+            _controllers[fieldName]!.text = initialValue.toIso8601String().split('T')[0];
+          } else if (initialValue is String) {
+            final parsedDate = DateTime.tryParse(initialValue);
+            if (parsedDate != null) {
+              _controllers[fieldName]!.text = parsedDate.toIso8601String().split('T')[0];
+              _formData[fieldName] = parsedDate;
+            }
+          }
         }
         field = TextFormField(
           controller: _controllers[fieldName],

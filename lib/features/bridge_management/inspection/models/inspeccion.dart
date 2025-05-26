@@ -4,7 +4,7 @@ class Inspeccion {
   final int temperatura;
   final String administrador;
   final int anioProximaInspeccion;
-  final String observacionesGenerales;
+  final String? observacionesGenerales;
   final DateTime fecha;
 
 
@@ -14,7 +14,7 @@ class Inspeccion {
     required this.temperatura,
     required this.administrador,
     required this.anioProximaInspeccion,
-    required this.observacionesGenerales,
+    this.observacionesGenerales,
     required this.fecha,
   });
 
@@ -38,9 +38,14 @@ class Inspeccion {
       'anioProximaInspeccion': anioProximaInspeccion,
       'observacionesGenerales': observacionesGenerales,
       'fecha': fecha.toIso8601String(),
-      'puenteId': puenteId,
-      'usuarioId': usuarioId,
+      'puente': {
+        'id': puenteId,
+      },
+      'usuario': {
+        'id': usuarioId,
+      },
     };
   }
+
 
 }
