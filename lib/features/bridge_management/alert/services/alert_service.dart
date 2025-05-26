@@ -34,11 +34,18 @@ class AlertService {
 
     if (response.statusCode == 200) {
       final List<dynamic> body = json.decode(utf8.decode(response.bodyBytes));
-      return body.map((json) => Alerta.fromJson(json)).toList();
+      final alertas = body.map((json) => Alerta.fromJson(json)).toList();
+
+      if (alertas.isEmpty) {
+        debugPrint('ℹ️ Este puente no tiene alertas registradas.');
+      }
+      return alertas;
     } else {
-      debugPrint('❌ Error al obtener alertas: ${response.statusCode}');
-      debugPrint('❌ Body: ${utf8.decode(response.bodyBytes)}');
-      throw Exception('Error al cargar alertas por puente');
-    }
+        final mensajeError = 'No fue posible cargar las alertas de este puente. Intenta más tarde.';
+        debugPrint('$mensajeError - Código: ${response.statusCode}');
+        throw Exception(mensajeError);
   }
+
+
+}
 }
