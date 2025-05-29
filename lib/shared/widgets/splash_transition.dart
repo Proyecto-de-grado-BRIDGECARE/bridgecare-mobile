@@ -58,7 +58,6 @@ class SplashToLoginTransitionState extends State<SplashToLoginTransition> {
             );
           } else {
             debugPrint('⚠️ Error: no se pudo obtener el usuario');
-            // Podrías redirigir al login en este caso
           }
         } else {
           setState(() {
