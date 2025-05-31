@@ -253,7 +253,10 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                         child: const Text('Ver alertas'),
                       ),
                       TextButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          Navigator.pop(context);  // Cierra el diálogo
+                          Navigator.pushNamed(context, '/home');  // Navega a home
+                        },
                         child: const Text('Cerrar'),
                       ),
                     ],
