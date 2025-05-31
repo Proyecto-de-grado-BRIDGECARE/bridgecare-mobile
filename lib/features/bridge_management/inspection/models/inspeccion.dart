@@ -7,7 +7,6 @@ class Inspeccion {
   final String? observacionesGenerales;
   final DateTime fecha;
 
-
   Inspeccion({
     this.id,
     required this.tiempo,
@@ -46,6 +45,4 @@ class Inspeccion {
       },
     };
   }
-
-
 }

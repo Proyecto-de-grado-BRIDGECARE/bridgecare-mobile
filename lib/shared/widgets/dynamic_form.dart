@@ -1,5 +1,5 @@
+import 'dart:io';
 import 'dart:typed_data';
-import 'package:bridgecare/shared/services/image_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -27,7 +27,6 @@ class DynamicFormState extends State<DynamicForm>
     with AutomaticKeepAliveClientMixin {
   final Map<String, dynamic> _formData = {};
   final Map<String, TextEditingController> _controllers = {};
-  final ImageHandler _imageHandler = ImageHandler();
 
   @override
   bool get wantKeepAlive => true;
@@ -68,7 +67,7 @@ class DynamicFormState extends State<DynamicForm>
   void dispose() {
     _controllers.forEach((key, controller) {
       if (widget.controllers == null || widget.controllers![key] == null) {
-        controller.dispose(); // ✅ solo si el controlador es interno
+        controller.dispose();
       }
     });
     super.dispose();
@@ -144,21 +143,20 @@ class DynamicFormState extends State<DynamicForm>
           onSaved: (value) => _formData[fieldName] = value,
         );
         break;
-
       case 'textarea':
         final isReadOnly = fieldInfo['readOnly'] == true;
         field = TextFormField(
           controller: _controllers[fieldName],
-          decoration: _getInputDecoration(fieldInfo['label'], readOnly: isReadOnly),
+          decoration:
+              _getInputDecoration(fieldInfo['label'], readOnly: isReadOnly),
           readOnly: isReadOnly,
           enabled: !isReadOnly,
-          maxLines: 5, // <-- Hace que sea un textarea visible
+          maxLines: 5,
           minLines: 3,
           keyboardType: TextInputType.multiline,
           onSaved: (value) => _formData[fieldName] = value,
         );
         break;
-
       case 'number':
         field = TextFormField(
           controller: _controllers[fieldName],
@@ -179,7 +177,6 @@ class DynamicFormState extends State<DynamicForm>
             _formData[fieldName]?.toString() ?? initialValue?.toString();
         final dropdownValue =
             options.contains(currentValue) ? currentValue : null;
-
         field = DropdownButtonFormField<String>(
           value: dropdownValue,
           decoration: _getInputDecoration(fieldInfo['label']),
@@ -225,22 +222,26 @@ class DynamicFormState extends State<DynamicForm>
             _controllers[fieldName]!.text.isEmpty) {
           final value = _formData[fieldName];
           if (value is DateTime) {
-            _controllers[fieldName]!.text = value.toIso8601String().split('T')[0];
+            _controllers[fieldName]!.text =
+                value.toIso8601String().split('T')[0];
           } else if (value is String) {
             final parsed = DateTime.tryParse(value);
             if (parsed != null) {
-              _formData[fieldName] = parsed; // Corrige el tipo en runtime
-              _controllers[fieldName]!.text = parsed.toIso8601String().split('T')[0];
+              _formData[fieldName] = parsed;
+              _controllers[fieldName]!.text =
+                  parsed.toIso8601String().split('T')[0];
             }
           }
         } else if (initialValue != null &&
             _controllers[fieldName]!.text.isEmpty) {
           if (initialValue is DateTime) {
-            _controllers[fieldName]!.text = initialValue.toIso8601String().split('T')[0];
+            _controllers[fieldName]!.text =
+                initialValue.toIso8601String().split('T')[0];
           } else if (initialValue is String) {
             final parsedDate = DateTime.tryParse(initialValue);
             if (parsedDate != null) {
-              _controllers[fieldName]!.text = parsedDate.toIso8601String().split('T')[0];
+              _controllers[fieldName]!.text =
+                  parsedDate.toIso8601String().split('T')[0];
               _formData[fieldName] = parsedDate;
             }
           }
@@ -271,102 +272,64 @@ class DynamicFormState extends State<DynamicForm>
           onSaved: (value) => _formData[fieldName] = _formData[fieldName],
         );
         break;
-
       case 'image':
-        _formData[fieldName] ??= initialValue ?? <XFile>[];
-        final maxImages = fieldInfo['maxImages'] as int? ?? 5;
-        final List<XFile> images = _formData[fieldName] as List<XFile>;
-
+        List<XFile> selectedImages = _formData[fieldName] is List<XFile>
+            ? _formData[fieldName] as List<XFile>
+            : [];
         field = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(fieldInfo['label'],
-                style: TextStyle(color: Colors.blueGrey[700])),
+            Text(
+              fieldInfo['label'] as String,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8.0),
             Wrap(
               spacing: 8.0,
               runSpacing: 8.0,
-              children: images.map((image) {
-                return Stack(
-                  children: [
-                    FutureBuilder<Uint8List>(
-                      future: image.readAsBytes(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => Dialog(
-                                  backgroundColor: Colors.transparent,
-                                  child: GestureDetector(
-                                    onTap: () => Navigator.pop(context),
-                                    child: Image.memory(
-                                      snapshot.data!,
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Image.memory(
-                              snapshot.data!,
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        }
-                        return Container(
+              children: [
+                ...selectedImages.map((image) => Stack(
+                      children: [
+                        Image.file(
+                          File(image.path),
                           width: 100,
                           height: 100,
-                          color: Colors.grey[300],
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                      },
-                    ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: IconButton(
-                        icon: Icon(Icons.remove_circle, color: Colors.red),
-                        onPressed: () {
-                          setState(() {
-                            images.remove(image);
-                            widget.onSave(_formData);
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                );
-              }).toList(),
+                          fit: BoxFit.cover,
+                        ),
+                        Positioned(
+                          right: 0,
+                          child: IconButton(
+                            icon: const Icon(Icons.remove_circle,
+                                color: Colors.red),
+                            onPressed: () {
+                              setState(() {
+                                selectedImages.remove(image);
+                                _formData[fieldName] = selectedImages;
+                                widget.onSave(_formData);
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    )),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    final picker = ImagePicker();
+                    final XFile? image = await picker.pickImage(
+                        source: ImageSource.camera); // Or ImageSource.gallery
+                    if (image != null) {
+                      setState(() {
+                        selectedImages.add(image);
+                        _formData[fieldName] = selectedImages;
+                        widget.onSave(_formData);
+                      });
+                    }
+                  },
+                  icon: const Icon(Icons.add_a_photo),
+                  label: const Text('Add Image'),
+                ),
+              ],
             ),
-            if (images.length < maxImages)
-              ElevatedButton.icon(
-                onPressed: () async {
-                  final imageData = await _imageHandler.captureAndUploadImage(
-                    widget.extraData?['inspeccionUuid'] ?? '',
-                    widget.extraData?['componenteUuid'] ?? '',
-                    widget.extraData?['puenteId'] ?? '',
-                  );
-                  if (imageData != null) {
-                    setState(() {
-                      images.add(XFile(imageData.localPath));
-                      widget.onSave(_formData);
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Imagen añadida y en cola')),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Error al capturar imagen')),
-                    );
-                  }
-                },
-                icon: Icon(Icons.add_a_photo),
-                label: Text('Tomar Foto (${images.length}/$maxImages)'),
-              ),
           ],
         );
         break;

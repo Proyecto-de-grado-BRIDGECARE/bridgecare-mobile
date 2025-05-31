@@ -58,10 +58,6 @@ class Componente {
       ],
     },
     'danio': {'type': 'text', 'label': 'Daño'},
-    'imagen': {
-      'type': 'image',
-      'label': 'Imágenes (0-5)',
-      'maxImages': 5,
-    },
+    'imagenUrls': {'type': 'image', 'label': 'Imágenes'},
   };
 }

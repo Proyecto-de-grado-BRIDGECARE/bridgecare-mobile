@@ -1,26 +1,25 @@
 import 'dart:convert';
+import 'package:bridgecare/features/bridge_management/alert/presentation/pages/alert_page.dart';
 import 'package:bridgecare/features/bridge_management/inspection/models/componente.dart';
 import 'package:bridgecare/features/bridge_management/inspection/models/inspeccion.dart';
 import 'package:bridgecare/features/bridge_management/inspection/models/reparacion.dart';
+import 'package:bridgecare/shared/help_loader.dart';
 import 'package:bridgecare/shared/widgets/dynamic_form.dart';
-import 'package:bridgecare/features/bridge_management/models/puente.dart';
 import 'package:bridgecare/shared/widgets/form_template.dart';
+import 'package:bridgecare/shared/widgets/help_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../../shared/help_loader.dart';
-import '../../../../../shared/widgets/help_icon_button.dart';
-import '../../../alert/presentation/pages/alert_page.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:http_parser/http_parser.dart' as parser;
 
 class InspectionFormScreen extends StatefulWidget {
   final int puenteId;
 
-  const InspectionFormScreen(
-      { required this.puenteId, super.key});
+  const InspectionFormScreen({required this.puenteId, super.key});
 
   @override
   InspectionFormScreenState createState() => InspectionFormScreenState();
@@ -36,14 +35,15 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
   };
   List<Map<String, String>> componentList = [];
   int? usuarioId;
-  late Future<void> _initFuture;
+  late Future<void> initFuture;
 
   @override
   void initState() {
     super.initState();
     helpSectionsFuture = loadHelpSections();
-    _initFuture = _initialize();
+    initFuture = _initialize();
   }
+
   Future<void> _initialize() async {
     await _loadComponents();
     await _loadUserIdFromToken();
@@ -51,18 +51,18 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
 
   Future<void> _loadComponents() async {
     final String response =
-    await rootBundle.loadString('assets/data/inspection_components.json');
+        await rootBundle.loadString('assets/data/inspection_components.json');
     final List<dynamic> data = jsonDecode(response);
     setState(() {
       componentList =
           data.map((item) => Map<String, String>.from(item)).toList();
-      // Initialize _formData with component keys after loading
       for (var component in componentList) {
         _formData[component['key']!] = {};
         _formData['reparaciones_${component['key']}'] = {};
       }
     });
   }
+
   Future<void> _loadUserIdFromToken() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt('usuario_id');
@@ -71,7 +71,7 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
         usuarioId = userId;
       });
     } else {
-      debugPrint("❌ No se encontró usuario_id en SharedPreferences");
+      debugPrint("No se encontró usuario_id en SharedPreferences");
     }
   }
 
@@ -87,60 +87,53 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
 
       try {
         if (_formData['inspeccion']!['fecha'] != null) {
+          DateTime fecha;
+          if (_formData['inspeccion']!['fecha'] is String) {
+            fecha = DateTime.parse(_formData['inspeccion']!['fecha'] as String);
+          } else if (_formData['inspeccion']!['fecha'] is DateTime) {
+            fecha = _formData['inspeccion']!['fecha'] as DateTime;
+          } else {
+            throw Exception('Invalid fecha format');
+          }
           _formData['inspeccion']!['fecha'] =
-          (_formData['inspeccion']!['fecha'] as DateTime)
-              .toIso8601String()
-              .split('T')[0];
+              fecha.toIso8601String().split('T')[0];
         }
 
-        // Construir componentes con imágenes subidas
-        final componentes = await Future.wait(componentList.map((component) async {
+        // Construir componentes con imágenes
+        final componentes =
+            await Future.wait(componentList.map((component) async {
           final componentKey = component['key']!;
           final comp = Map<String, dynamic>.from(_formData[componentKey] ?? {});
           final reparacion = _formData['reparaciones_$componentKey'] ?? {};
-
-          // Subida de imágenes
-          List<String> uploadedUrls = [];
-          if (comp['imagenUrls'] != null && (comp['imagenUrls'] as List).isNotEmpty) {
-            final List<XFile> images = comp['imagenUrls'] as List<XFile>;
-            for (var image in images) {
-              var request = http.MultipartRequest(
-                'POST',
-                Uri.parse('http://192.168.20.24:8083/api/imagenes/upload'), // Actualiza si tu endpoint es otro
-              );
-              request.files.add(await http.MultipartFile.fromPath('image', image.path));
-
-              final response = await request.send();
-              if (response.statusCode == 200) {
-                final responseData = await response.stream.bytesToString();
-                final url = jsonDecode(responseData)['url'] as String;
-                uploadedUrls.add(url);
-              } else {
-                throw Exception('Fallo al subir imagen: ${response.reasonPhrase}');
-              }
-            }
+          List<String> imagePaths = [];
+          if (comp['imagenUrls'] != null &&
+              (comp['imagenUrls'] as List).isNotEmpty) {
+            imagePaths =
+                (comp['imagenUrls'] as List<XFile>).map((x) => x.path).toList();
           }
 
           return {
             'nomb': component['title']!.replaceAll('/', ' ').toUpperCase(),
-            'calificacion': _parseDropdownValue(comp['calificacion']?.toString()),
+            'calificacion':
+                _parseDropdownValue(comp['calificacion']?.toString()),
             'mantenimiento': comp['mantenimiento'] ?? '',
             'inspEesp': comp['inspEesp'] ?? '',
-            'numeroFfotos': int.tryParse(comp['numeroFfotos']?.toString() ?? '0'),
+            'numeroFfotos':
+                int.tryParse(comp['numeroFfotos']?.toString() ?? '0'),
             'tipoDanio': _parseDropdownValue(comp['tipoDanio']?.toString()),
             'danio': comp['danio'] ?? '',
-            'imagenUrls': uploadedUrls.isNotEmpty ? uploadedUrls : null,
+            'imagenUrls': imagePaths.isNotEmpty ? imagePaths : null,
             'reparacion': reparacion.isNotEmpty ? [reparacion] : []
           };
         }).toList());
 
-        if (usuarioId == null) {
+        if (usuarioId == null && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No se pudo obtener el usuario autenticado')),
+            const SnackBar(
+                content: Text('No se pudo obtener el usuario autenticado')),
           );
           return;
         }
-
 
         // Armar objeto inspección
         final inspeccion = {
@@ -153,85 +146,136 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
         final prefs = await SharedPreferences.getInstance();
         var token = prefs.getString('token');
         if (token == null || token.isEmpty) {
-          debugPrint('❌ Error: No token found in SharedPreferences');
-          return;
-        }
-        final decoded = JwtDecoder.decode(token);
-        debugPrint('🔍 Token decodificado: $decoded');
-        //if (token == null) {
-        //   debugPrint('Error: No token found in SharedPreferences');
-        // return;
-        // }
-        final userId = prefs.getInt('usuario_id');
-        if (userId != null) {
-          _formData['usuario']?['id'] = userId;
-        } else {
-          debugPrint("No se encontró usuario_id en SharedPreferences");
+          debugPrint('Error: No token found in SharedPreferences');
           return;
         }
 
-        print('Token: $token');
-        print('Request Body: ${jsonEncode(inspeccion)}');
+        // Check connectivity
+        var connectivityResult = await (Connectivity().checkConnectivity());
+        bool isConnected = connectivityResult != ConnectivityResult.none;
 
-        // Enviar inspección
-        final response = await http.post(
-          Uri.parse('https://api.bridgecare.com.co/inspeccion/add'),
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode(inspeccion),
-        );
+        List<String> allImagePaths = componentes
+            .where((c) => c['imagenUrls'] != null)
+            .expand((c) => c['imagenUrls'] as List<String>)
+            .toList();
 
-        print('Response Status: ${response.statusCode}');
-        print('Response Body: ${response.body}');
-
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Inspección enviada con éxito')),
-          );
-
-          final hayAlertas = await _tieneAlertas(widget.puenteId);
-          if (hayAlertas && mounted) {
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('¡Atención!'),
-                content: const Text(
-                    'Se han generado alertas para esta inspección. ¿Deseas revisarlas?'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              AlertScreen(puenteId: widget.puenteId),
-                        ),
-                      );
-                    },
-                    child: const Text('Ver alertas'),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cerrar'),
-                  ),
-                ],
-              ),
+        if (isConnected) {
+          final prefs = await SharedPreferences.getInstance();
+          var token = prefs.getString('token');
+          if (token == null || token.isEmpty) {
+            debugPrint('Error: No token found in SharedPreferences');
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('No se encontró el token de autenticación')),
             );
+            return;
           }
-        } else {
-          throw Exception('Error al enviar inspección: ${response.body}');
+
+          // Validate token
+          try {
+            bool isExpired = JwtDecoder.isExpired(token);
+            if (isExpired) {
+              debugPrint('Error: Token is expired');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text(
+                        'Sesión expirada. Por favor, inicia sesión de nuevo')),
+              );
+              // Optionally redirect to login screen
+              return;
+            }
+          } catch (e) {
+            debugPrint('Error decoding token: $e');
+          }
+
+          var request = http.MultipartRequest(
+            'POST',
+            Uri.parse('https://api.bridgecare.com.co/inspeccion/add'),
+          );
+          request.headers['Authorization'] = 'Bearer $token';
+          // Let http package set multipart/form-data with boundary automatically
+          // request.headers['Content-Type'] = 'multipart/form-data'; // Not needed
+          request.fields['inspeccion'] = jsonEncode(inspeccion);
+          // Set Content-Type for inspeccion part (optional, for clarity)
+          request.files.add(http.MultipartFile.fromString(
+            'inspeccion',
+            jsonEncode(inspeccion),
+            contentType: parser.MediaType('application', 'json'),
+          ));
+          for (var path in allImagePaths) {
+            request.files
+                .add(await http.MultipartFile.fromPath('images', path));
+          }
+
+          debugPrint('Request Headers: ${request.headers}');
+          debugPrint('Request Fields: ${request.fields}');
+          debugPrint(
+              'Request Files: ${request.files.map((f) => f.filename).toList()}');
+
+          try {
+            final response = await request.send();
+            final responseBody = await response.stream.bytesToString();
+            debugPrint('Response Status: ${response.statusCode}');
+            debugPrint('Response Body: $responseBody');
+
+            if (response.statusCode == 200 || response.statusCode == 201) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Inspección enviada con éxito')),
+                );
+              }
+              final hayAlertas = await _tieneAlertas(widget.puenteId);
+              if (hayAlertas && mounted) {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('¡Atención!'),
+                    content: const Text(
+                        'Se han generado alertas para esta inspección. ¿Deseas revisarlas?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  AlertScreen(puenteId: widget.puenteId),
+                            ),
+                          );
+                        },
+                        child: const Text('Ver alertas'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cerrar'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            } else {
+              throw Exception(
+                  'Error al enviar inspección: ${response.statusCode} - $responseBody');
+            }
+          } catch (e) {
+            debugPrint('Request failed: $e');
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Error al enviar inspección: $e')),
+              );
+            }
+          }
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e')),
+          );
+        }
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -253,7 +297,8 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
           onSave: _saveForm,
           sections: [
             FormSection(
-              titleWidget: const Text('Información Básica', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              titleWidget: const Text('Información Básica',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               isCollapsible: true,
               content: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,7 +318,7 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                 titleWidget: DefaultSectionTitle(
                   text: component['title']!,
                   trailing: HelpIconButton(
-                    helpKey: componentKey, // Usa el mismo key de la sección para buscar ayuda contextual
+                    helpKey: componentKey,
                     helpSections: helpSections,
                   ),
                 ),
@@ -299,16 +344,17 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
                     DynamicForm(
                       fields: Reparacion.formFields,
                       initialData: _formData['reparaciones_$componentKey'],
-                      onSave: (data) =>
-                          setState(() => _formData['reparaciones_$componentKey']!.addAll(data)),
+                      onSave: (data) => setState(() =>
+                          _formData['reparaciones_$componentKey']!
+                              .addAll(data)),
                     ),
                   ],
                 ),
               );
-
             }),
             FormSection(
-              titleWidget: const Text('Observaciones Generales', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              titleWidget: const Text('Observaciones Generales',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               isCollapsible: false,
               content: DynamicForm(
                 fields: const {
@@ -323,7 +369,7 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
               ),
             ),
             FormSection(
-              titleWidget: const SizedBox.shrink(), // sin título
+              titleWidget: const SizedBox.shrink(),
               isCollapsible: false,
               content: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 5.0),
@@ -360,12 +406,13 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
       },
     );
   }
+
   Future<bool> _tieneAlertas(int puenteId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       var token = prefs.getString('token');
       if (token == null || token.isEmpty) {
-        debugPrint('❌ Error: No token found in SharedPreferences');
+        debugPrint('Error: No token found in SharedPreferences');
         return false;
       }
 
@@ -377,8 +424,8 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
         },
       );
 
-      debugPrint('🔍 Alerta response status: ${response.statusCode}');
-      debugPrint('🔍 Alerta response body: ${response.body}');
+      debugPrint('Alerta response status: ${response.statusCode}');
+      debugPrint('Alerta response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -387,17 +434,8 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
         return false;
       }
     } catch (e) {
-      debugPrint('❌ Error al verificar alertas: $e');
+      debugPrint('Error al verificar alertas: $e');
       return false;
     }
   }
-
-
-  Future<String> _getToken() async {
-    // Usa SharedPreferences u otro método según tu app
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('access_token') ?? '';
-  }
-
-
 }
