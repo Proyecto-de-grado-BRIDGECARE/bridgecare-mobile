@@ -452,7 +452,7 @@ class InventoryFormScreenState extends State<InventoryFormScreen> {
     debugPrint('📤 Token antes de PUT: $token');
 
     //Validar campos requeridos del formulario del puente
-    if (!_puenteFormKey.currentState!.validateForm()) {
+    if (_puenteFormKey.currentState == null || !_puenteFormKey.currentState!.validateForm()) {
       return; //No continuar si faltan campos requeridos
     }
 
