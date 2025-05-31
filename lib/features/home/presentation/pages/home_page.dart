@@ -17,7 +17,8 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
-class _HomePageState extends State<HomePage>{
+
+class _HomePageState extends State<HomePage> {
   String? expandedTile;
   @override
   Widget build(BuildContext context) {
@@ -50,7 +51,8 @@ class _HomePageState extends State<HomePage>{
                     return Center(
                       child: Text(
                         'Tipo de usuario no reconocido: ${widget.tipoUsuario}',
-                        style: const TextStyle(color: Colors.white, fontSize: 18),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     );
                   }
@@ -66,23 +68,27 @@ class _HomePageState extends State<HomePage>{
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ManualPdfViewerPage(tipoUsuario: widget.tipoUsuario),
+                      builder: (_) =>
+                          ManualPdfViewerPage(tipoUsuario: widget.tipoUsuario),
                     ),
                   ),
                   child: Text(
                     'Manual',
-                    style: TextStyle(fontSize: 17, color: Colors.white, decoration: TextDecoration.underline),
+                    style: TextStyle(
+                        fontSize: 17,
+                        color: Colors.white,
+                        decoration: TextDecoration.underline),
                   ),
                 ),
               ],
             ),
-
             const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
+
   Widget _buildHeader(BuildContext context) {
     return Stack(
       alignment: Alignment.center,
@@ -102,14 +108,16 @@ class _HomePageState extends State<HomePage>{
           top: 20,
           right: 5,
           child: PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
+            icon:
+                const Icon(Icons.more_vert, color: Color(0xff01579a), size: 50),
             onSelected: (value) {
               if (value == 'logout') {
                 Navigator.pushReplacementNamed(context, '/login');
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 'logout', child: Text('Cerrar sesión')),
+              const PopupMenuItem(
+                  value: 'logout', child: Text('Cerrar sesión')),
             ],
           ),
         ),
@@ -120,6 +128,7 @@ class _HomePageState extends State<HomePage>{
       ],
     );
   }
+
   Widget _buildStudentOptions(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -191,19 +200,21 @@ class _HomePageState extends State<HomePage>{
         child: Center(
           child: Text(
             text,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+            style: const TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
           ),
         ),
       ),
     );
   }
+
   //estilos del home de admin
   Widget _buildExpandableTile(
-      BuildContext context, {
-        required String title,
-        required String keyValue,
-        required Map<String, String> options,
-      }) {
+    BuildContext context, {
+    required String title,
+    required String keyValue,
+    required Map<String, String> options,
+  }) {
     final entries = options.entries.toList();
     final isExpanded = expandedTile == keyValue;
 
@@ -218,7 +229,7 @@ class _HomePageState extends State<HomePage>{
         child: Theme(
           data: Theme.of(context).copyWith(
             dividerColor: Colors.transparent,
-            splashColor: Colors.white.withOpacity(0.1),
+            splashColor: Colors.white.withValues(alpha: 0.1),
             highlightColor: Colors.transparent,
           ),
           child: ExpansionTile(
@@ -226,7 +237,8 @@ class _HomePageState extends State<HomePage>{
             initiallyExpanded: isExpanded,
             iconColor: Colors.black,
             collapsedIconColor: Colors.black,
-            tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            tilePadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             childrenPadding: const EdgeInsets.symmetric(horizontal: 16),
             title: Text(
               title,
@@ -248,14 +260,15 @@ class _HomePageState extends State<HomePage>{
                   title: Text(
                     entry.key,
                     style: const TextStyle(
-                      fontSize: 18, // ⬅️ Ajusta este valor según lo que necesites
+                      fontSize:
+                          18, // ⬅️ Ajusta este valor según lo que necesites
                       fontWeight: FontWeight.w500,
                       color: Colors.black,
                     ),
                   ),
-
                   onTap: () => Navigator.pushNamed(context, entry.value),
-                  visualDensity: const VisualDensity(horizontal: 0, vertical: -2),
+                  visualDensity:
+                      const VisualDensity(horizontal: 0, vertical: -2),
                   contentPadding: EdgeInsets.zero,
                   dense: true,
                 );
@@ -272,5 +285,4 @@ class _HomePageState extends State<HomePage>{
       ),
     );
   }
-
 }

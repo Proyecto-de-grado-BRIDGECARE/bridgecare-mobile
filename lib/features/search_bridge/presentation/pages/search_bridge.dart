@@ -199,7 +199,7 @@ class _BridgeListState extends State<BridgeListScreen> {
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   shape: BoxShape.circle,
                                 ),
                                 padding: EdgeInsets.all(6),
@@ -246,7 +246,7 @@ class _BridgeListState extends State<BridgeListScreen> {
                             },
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 shape: BoxShape.circle,
                               ),
                               padding: EdgeInsets.all(6),
@@ -288,10 +288,12 @@ class _BridgeListState extends State<BridgeListScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(12),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: Text(
@@ -307,43 +309,54 @@ class _BridgeListState extends State<BridgeListScreen> {
                                           PopupMenuButton<String>(
                                             onSelected: (value) async {
                                               if (value == 'inspeccion') {
-                                                final prefs = await SharedPreferences.getInstance();
-                                                final usuarioId = prefs.getInt('usuario_id');
+                                                final prefs =
+                                                    await SharedPreferences
+                                                        .getInstance();
+                                                final usuarioId =
+                                                    prefs.getInt('usuario_id');
 
-                                                if (usuarioId == null) {
-                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                if (usuarioId == null &&
+                                                    context.mounted) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
                                                     const SnackBar(
-                                                        content:
-                                                        Text("Error: usuario no identificado")),
+                                                        content: Text(
+                                                            "Error: usuario no identificado")),
                                                   );
                                                   return;
                                                 }
-
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => InspectionFormScreen(
-                                                      puenteId: puente.id!,
+                                                if (context.mounted) {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          InspectionFormScreen(
+                                                        puenteId: puente.id!,
+                                                      ),
                                                     ),
-                                                  ),
-                                                );
+                                                  );
+                                                }
                                               } else if (value == 'alertas') {
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (context) =>
-                                                        AlertScreen(puenteId: puente.id!),
+                                                        AlertScreen(
+                                                            puenteId:
+                                                                puente.id!),
                                                   ),
                                                 );
                                               }
                                             },
-                                            icon: const Icon(Icons.more_vert, color: Color(0xff01579a)),
+                                            icon: const Icon(Icons.more_vert,
+                                                color: Color(0xff01579a)),
                                             itemBuilder: (context) => [
                                               const PopupMenuItem(
                                                 value: 'inspeccion',
                                                 child: Row(
                                                   children: [
-                                                    Icon(Icons.add, color: Colors.blue),
+                                                    Icon(Icons.add,
+                                                        color: Colors.blue),
                                                     SizedBox(width: 8),
                                                     Text("Nueva inspección"),
                                                   ],
@@ -353,7 +366,9 @@ class _BridgeListState extends State<BridgeListScreen> {
                                                 value: 'alertas',
                                                 child: Row(
                                                   children: [
-                                                    Icon(Icons.warning_amber_rounded,
+                                                    Icon(
+                                                        Icons
+                                                            .warning_amber_rounded,
                                                         color: Colors.orange),
                                                     SizedBox(width: 8),
                                                     Text("Ver alertas"),
@@ -370,7 +385,6 @@ class _BridgeListState extends State<BridgeListScreen> {
                                   ),
                                 ),
                               );
-
                             },
                           ),
                         ),

@@ -107,7 +107,7 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                         overflow:
-                        TextOverflow.ellipsis, // Previene overflow visual
+                            TextOverflow.ellipsis, // Previene overflow visual
                       ),
                     ),
                   ],
@@ -183,7 +183,7 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                   fillColor: Color(0xccffffff),
                                   hintText: 'Escribe el nombre del puente',
                                   contentPadding:
-                                  EdgeInsets.symmetric(horizontal: 16),
+                                      EdgeInsets.symmetric(horizontal: 16),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
                                     borderSide: BorderSide(
@@ -208,7 +208,7 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   shape: BoxShape.circle,
                                 ),
                                 padding: EdgeInsets.all(6),
@@ -230,16 +230,16 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                 fillColor: Color(0xccffffff),
                                 hintText: 'Escribe el nombre del municipio',
                                 contentPadding:
-                                EdgeInsets.symmetric(horizontal: 16),
+                                    EdgeInsets.symmetric(horizontal: 16),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                   borderSide:
-                                  BorderSide(color: Colors.white, width: 2),
+                                      BorderSide(color: Colors.white, width: 2),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15),
                                   borderSide:
-                                  BorderSide(color: Colors.white, width: 2),
+                                      BorderSide(color: Colors.white, width: 2),
                                 ),
                               ),
                               onChanged: (value) {
@@ -255,7 +255,7 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                             },
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 shape: BoxShape.circle,
                               ),
                               padding: EdgeInsets.all(6),
@@ -298,16 +298,16 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                   padding: const EdgeInsets.all(12),
                                   child: Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Expanded(
                                             child: Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   "Nombre: ${puente.nombre}",
@@ -323,84 +323,136 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                             ),
                                           ),
                                           PopupMenuButton<String>(
-                                            icon: const Icon(Icons.more_horiz, color: Colors.blueAccent, size: 40),
+                                            icon: const Icon(Icons.more_horiz,
+                                                color: Colors.blueAccent,
+                                                size: 40),
                                             onSelected: (value) async {
                                               switch (value) {
                                                 case 'alertas':
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => AlertScreen(puenteId: puente.id!,),
+                                                      builder: (context) =>
+                                                          AlertScreen(
+                                                        puenteId: puente.id!,
+                                                      ),
                                                     ),
                                                   );
                                                   break;
                                                 case 'editar':
                                                   try {
                                                     final inventario =
-                                                    await InventarioService().getInventarioDTOporPuente(puente.id!);
-                                                    if (inventario != null) {
+                                                        await InventarioService()
+                                                            .getInventarioDTOporPuente(
+                                                                puente.id!);
+                                                    if (inventario != null &&
+                                                        context.mounted) {
                                                       Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
-                                                          builder: (context) => InventoryFormScreen(
-                                                            usuarioId: widget.usuarioId,
-                                                            inventario: inventario,
+                                                          builder: (context) =>
+                                                              InventoryFormScreen(
+                                                            usuarioId: widget
+                                                                .usuarioId,
+                                                            inventario:
+                                                                inventario,
                                                           ),
                                                         ),
                                                       );
                                                     } else {
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        const SnackBar(
-                                                            content: Text('Este puente no tiene inventario.')),
-                                                      );
+                                                      if (context.mounted) {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          const SnackBar(
+                                                              content: Text(
+                                                                  'Este puente no tiene inventario.')),
+                                                        );
+                                                      }
                                                     }
                                                   } catch (e) {
-                                                    debugPrint("❌ Error al obtener inventario: $e");
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      const SnackBar(content: Text('Error al cargar el inventario')),
-                                                    );
+                                                    debugPrint(
+                                                        "Error al obtener inventario: $e");
+                                                    if (context.mounted) {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                            content: Text(
+                                                                'Error al cargar el inventario')),
+                                                      );
+                                                    }
                                                   }
                                                   break;
 
                                                 case 'eliminar':
-                                                  final confirm = await showDialog<bool>(
+                                                  final confirm =
+                                                      await showDialog<bool>(
                                                     context: context,
-                                                    builder: (context) => AlertDialog(
-                                                      title: const Text('Confirmar eliminación'),
-                                                      content: Text('¿Eliminar el puente "${puente.nombre}"?'),
+                                                    builder: (context) =>
+                                                        AlertDialog(
+                                                      title: const Text(
+                                                          'Confirmar eliminación'),
+                                                      content: Text(
+                                                          '¿Eliminar el puente "${puente.nombre}"?'),
                                                       actions: [
                                                         TextButton(
-                                                          onPressed: () => Navigator.of(context).pop(false),
-                                                          child: const Text('Cancelar'),
+                                                          onPressed: () =>
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop(false),
+                                                          child: const Text(
+                                                              'Cancelar'),
                                                         ),
                                                         TextButton(
-                                                          onPressed: () => Navigator.of(context).pop(true),
-                                                          child: const Text('Eliminar',
-                                                              style: TextStyle(color: Colors.red)),
+                                                          onPressed: () =>
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop(true),
+                                                          child: const Text(
+                                                              'Eliminar',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red)),
                                                         ),
                                                       ],
                                                     ),
                                                   );
                                                   if (confirm == true) {
                                                     try {
-                                                      await _puenteService.deletePuente(puente.id!);
+                                                      await _puenteService
+                                                          .deletePuente(
+                                                              puente.id!);
                                                       _cargarPuentes();
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        const SnackBar(content: Text('Puente eliminado exitosamente')),
-                                                      );
+                                                      if (context.mounted) {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          const SnackBar(
+                                                              content: Text(
+                                                                  'Puente eliminado exitosamente')),
+                                                        );
+                                                      }
                                                     } catch (e) {
-                                                      print('❌ Error al eliminar puente: $e');
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(
-                                                          content: Text(
-                                                            e.toString().contains('403')
-                                                                ? 'No tienes permiso para eliminar este puente.'
-                                                                : 'Ocurrió un error al eliminar el puente.',
+                                                      debugPrint(
+                                                          'Error al eliminar puente: $e');
+                                                      if (context.mounted) {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          SnackBar(
+                                                            content: Text(
+                                                              e
+                                                                      .toString()
+                                                                      .contains(
+                                                                          '403')
+                                                                  ? 'No tienes permiso para eliminar este puente.'
+                                                                  : 'Ocurrió un error al eliminar el puente.',
+                                                            ),
                                                           ),
-                                                        ),
-                                                      );
+                                                        );
+                                                      }
                                                     }
-
                                                   }
                                                   break;
                                               }
@@ -410,7 +462,10 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                                 value: 'alertas',
                                                 child: Row(
                                                   children: const [
-                                                    Icon(Icons.warning_amber_rounded, color: Colors.orange),
+                                                    Icon(
+                                                        Icons
+                                                            .warning_amber_rounded,
+                                                        color: Colors.orange),
                                                     SizedBox(width: 8),
                                                     Text("Ver alertas"),
                                                   ],
@@ -420,7 +475,9 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                                 value: 'eliminar',
                                                 child: Row(
                                                   children: const [
-                                                    Icon(Icons.close, color: Colors.redAccent),
+                                                    Icon(Icons.close,
+                                                        color:
+                                                            Colors.redAccent),
                                                     SizedBox(width: 8),
                                                     Text("Eliminar"),
                                                   ],
@@ -430,7 +487,9 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                                 value: 'editar',
                                                 child: Row(
                                                   children: const [
-                                                    Icon(Icons.edit, color: Colors.blueAccent),
+                                                    Icon(Icons.edit,
+                                                        color:
+                                                            Colors.blueAccent),
                                                     SizedBox(width: 8),
                                                     Text("Editar"),
                                                   ],
@@ -442,7 +501,7 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                       ),
                                       const SizedBox(
                                           height:
-                                          8), // más controlado y elegante
+                                              8), // más controlado y elegante
                                       Align(
                                         alignment: Alignment
                                             .centerLeft, // puedes cambiar a center si prefieres
@@ -453,8 +512,8 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     InspectionFormScreen(
-                                                      puenteId: puente.id!,
-                                                    ),
+                                                  puenteId: puente.id!,
+                                                ),
                                               ),
                                             );
                                           },
@@ -464,16 +523,16 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
                                           label: const Text("Inspección"),
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor:
-                                            const Color(0xff01579a),
+                                                const Color(0xff01579a),
                                             foregroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                              BorderRadius.circular(70),
+                                                  BorderRadius.circular(70),
                                             ),
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 16, vertical: 8),
                                             textStyle:
-                                            const TextStyle(fontSize: 14),
+                                                const TextStyle(fontSize: 14),
                                           ),
                                         ),
                                       ),
@@ -496,5 +555,3 @@ class _PuentesListAdminState extends State<PuentesListAdminScreen> {
     );
   }
 }
-
-

@@ -154,7 +154,7 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   shape: BoxShape.circle,
                                 ),
                                 padding: EdgeInsets.all(6),
@@ -293,23 +293,27 @@ class _UsuariosListAdminState extends State<UsuariosListAdminScreen> {
                                                                 u.id ==
                                                                 usuario.id);
                                                       });
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                        const SnackBar(
-                                                            content: Text(
-                                                                "Usuario eliminado")),
-                                                      );
+                                                      if (context.mounted) {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          const SnackBar(
+                                                              content: Text(
+                                                                  "Usuario eliminado")),
+                                                        );
+                                                      }
                                                     } catch (e) {
                                                       debugPrint(
                                                           "Error al eliminar: $e");
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                        SnackBar(
-                                                            content: Text(
-                                                                "Error: $e")),
-                                                      );
+                                                      if (context.mounted) {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          SnackBar(
+                                                              content: Text(
+                                                                  "Error: $e")),
+                                                        );
+                                                      }
                                                     }
                                                   }
                                                 },

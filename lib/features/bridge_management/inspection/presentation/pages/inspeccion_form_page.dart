@@ -151,8 +151,10 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
         }
 
         // Check connectivity
-        var connectivityResult = await (Connectivity().checkConnectivity());
-        bool isConnected = connectivityResult != ConnectivityResult.none;
+        List<ConnectivityResult> connectivityResults =
+            await Connectivity().checkConnectivity();
+        bool isConnected =
+            !connectivityResults.contains(ConnectivityResult.none);
 
         List<String> allImagePaths = componentes
             .where((c) => c['imagenUrls'] != null)
@@ -164,10 +166,12 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
           var token = prefs.getString('token');
           if (token == null || token.isEmpty) {
             debugPrint('Error: No token found in SharedPreferences');
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('No se encontró el token de autenticación')),
-            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('No se encontró el token de autenticación')),
+              );
+            }
             return;
           }
 
@@ -176,11 +180,13 @@ class InspectionFormScreenState extends State<InspectionFormScreen> {
             bool isExpired = JwtDecoder.isExpired(token);
             if (isExpired) {
               debugPrint('Error: Token is expired');
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text(
-                        'Sesión expirada. Por favor, inicia sesión de nuevo')),
-              );
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text(
+                          'Sesión expirada. Por favor, inicia sesión de nuevo')),
+                );
+              }
               // Optionally redirect to login screen
               return;
             }

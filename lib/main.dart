@@ -114,8 +114,9 @@ void callbackDispatcher() {
         notificationDetails,
       );
 
-      var connectivityResult = await (Connectivity().checkConnectivity());
-      bool isConnected = connectivityResult != ConnectivityResult.none;
+      List<ConnectivityResult> connectivityResults =
+          await Connectivity().checkConnectivity();
+      bool isConnected = !connectivityResults.contains(ConnectivityResult.none);
 
       if (!isConnected) {
         return false;

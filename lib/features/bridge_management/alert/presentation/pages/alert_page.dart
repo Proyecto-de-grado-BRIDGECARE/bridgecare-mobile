@@ -8,7 +8,6 @@ import '../../../../home/presentation/pages/home_page.dart';
 class AlertScreen extends StatefulWidget {
   final int puenteId;
 
-
   const AlertScreen({super.key, required this.puenteId});
 
   @override
@@ -24,6 +23,7 @@ class _AlertScreenState extends State<AlertScreen> {
     super.initState();
     _alertas = _alertService.getAlertasPorPuente(widget.puenteId);
   }
+
   Color getAlertColor(String tipo) {
     switch (tipo.toUpperCase()) {
       case 'CRITICA':
@@ -36,7 +36,6 @@ class _AlertScreenState extends State<AlertScreen> {
         return Colors.blueGrey;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -71,9 +70,11 @@ class _AlertScreenState extends State<AlertScreen> {
                         final prefs = await SharedPreferences.getInstance();
                         final usuarioId = prefs.getInt('usuario_id');
                         final tipoUsuario = prefs.getInt('tipo_usuario');
-                        print('🧪 usuario_id en prefs: $usuarioId');
-                        print('🧪 tipo_usuario en prefs: $tipoUsuario');
-                        if (usuarioId != null && tipoUsuario != null) {
+                        debugPrint('🧪 usuario_id en prefs: $usuarioId');
+                        debugPrint('🧪 tipo_usuario en prefs: $tipoUsuario');
+                        if (usuarioId != null &&
+                            tipoUsuario != null &&
+                            context.mounted) {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -85,14 +86,16 @@ class _AlertScreenState extends State<AlertScreen> {
                           );
                         } else {
                           // Manejo de error si no se encuentran los datos
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('No se pudo obtener la información del usuario')),
-                          );
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text(
+                                      'No se pudo obtener la información del usuario')),
+                            );
+                          }
                         }
                       },
                     ),
-
-
                     const SizedBox(width: 8),
                     const Expanded(
                       child: Text(
@@ -122,14 +125,18 @@ class _AlertScreenState extends State<AlertScreen> {
                     child: FutureBuilder<List<Alerta>>(
                       future: _alertas,
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
                         if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
                         }
                         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return const Center(child: Text('No hay alertas disponibles.'));
+                          return const Center(
+                              child: Text('No hay alertas disponibles.'));
                         }
 
                         return ListView.builder(
@@ -152,7 +159,8 @@ class _AlertScreenState extends State<AlertScreen> {
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18,
-                                        color: getAlertColor(alerta.tipo), // ← aquí se aplica el color dinámico
+                                        color: getAlertColor(alerta
+                                            .tipo), // ← aquí se aplica el color dinámico
                                       ),
                                     ),
                                     const SizedBox(height: 4),
